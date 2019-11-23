@@ -73,6 +73,11 @@ impl Board {
     fn _ready(&self, _owner: godot::Node) {
         godot_print!("{:#?} tile size, {:?} map", self.tile_size, self.tiles);
     }
+
+    #[export]
+    fn test_func(&self, _owner: godot::Node) {
+        godot_print!("test_func");
+    }
 }
 
 /// The Tiles of the game's Board.
