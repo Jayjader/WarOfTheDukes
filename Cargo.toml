@@ -1,5 +1,5 @@
 [package]
-name = "game"
+name = "war_of_the_dukes"
 version = "0.1.0"
 edition = "2018"
 
@@ -7,4 +7,5 @@ edition = "2018"
 crate-type = ["cdylib"]
 
 [dependencies]
-gdnative = { git = "https://github.com/GodotNativeTools/godot-rust" }
+gdnative = { git = "https://github.com/GodotNativeTools/godot-rust"}
+hex2d = "0.2"
