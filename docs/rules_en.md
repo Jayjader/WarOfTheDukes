@@ -1,5 +1,4 @@
-## Game Rules
-
+# War of the Dukes
 ### Story
 
 For the past three hundred years, the Dukes of Orfburg and Wulfenburg have been engaged
@@ -14,7 +13,7 @@ Dukes" that you will reenact. This initiation game, kept voluntarily simple, is
 designed to familiarise beginners with the basic principles of war games, as
 well as give a decently realistic example of the "Napoleon" theme.
 
-# War of the Dukes
+## Game Rules
 
 ### The game
 
@@ -49,7 +48,9 @@ situations are not symmetrical: they do not exactly share the same winning condi
 
 #### Setting up the Pawns
 
-Each player places one of their units on each city or fortress tile they own. Next, they take turns placing their remaining units on tiles they possess until all have been placed.  
+Each player places one of their units on each city or fortress tile they own.
+Next, they take turns placing their remaining units on tiles they possess until
+all have been placed.  
 The player owning Orfburg always plays first.
 
 #### Game Length
@@ -130,3 +131,56 @@ following properties:
  - a unit may enter an enemy Zone of Control for no additional movement cost,
    but may not move within in; the unit must thus end its movement upon
    entering the Zone,
+ - a unit may also thus only enter a new ZoC after exiting any ZoC it might currently be in,
+ - ZoC do not extend over rivers, but they do cross bridges,
+ - units are forbidden from retreating into an enemy ZoC.
+
+Example:
+
+![](./example_0.png)
+
+Unit C, being in unit A's Zone of Control, may not cross through the tile
+labelled `X1` to reach the one labelled `X2`. Instead, it must first exit and
+then go around `X1` to finally enter `X2`. It thus spends a total of 4 movement
+points to get to `X2` (and not 2!).
+
+
+#### Combat
+
+To do battle, the attacking unit must be in range of the defending unit:
+adjacent tiles for infantry and cavalry, 1 tile further for artillery. Multiple
+friendly units can attack the same enemy target, as long as they are each
+individually in range.  
+Once combat has been declared, sum up the attackers' offensive power, as well
+as the defenders' defensive power (which is doubled in cities and tripled in
+fortresses). The attacking player rolls a die, and applies any eventual
+modifier due to the terrain. This result is compared to the ratio of the
+attacker's power vs the defender's power, which can go from 1/5 (or "1 to 5")
+to 6/1 (or "6 to 1"), on the combat result table.  
+These results are noted as a pair of letters, whose meaning is the following:
+
+AE (Attacker Eliminated): the attacking units are removed from play
+AR (Attacker Retreats): the attacking units must move back 1 tile
+DE (Defender Eliminated): the defending units are removed from play
+DR (Defender Retreats): the defending units must move back 1 tile
+EX (EXchange): the defending units are removed from play, as well as attacking
+units with a total strength at least equal to the defenders'.
+
+A unit that can not retreat (because a river, lake, or ZoC is behind it) is
+removed from play, unless it is surrounded by friendly units: in this case it
+pushes one of these out of the way and takes its place.  
+Additionally, these 3 rules are to be taken into account during combat:
+
+ - a given unit may not be attacked more than once (1 time) during a single phase,
+ - a given unit (or group of units) may only attack a single enemy unit during the same phase,
+ - multiple allied units may band together to attack an adversary unit, but
+   this action only counts as a single combat, with a sole die role.
+
+Combat results take effect immediately, before the next phase begins.
+
+##### Special case: Artillery
+
+An artillery unit may do battle either from a distance of 2 tiles (a
+bombardment) or from an adjacent tile (close combat). During a bombardment, it
+is not affected by the retreat or exchange results. During close combat,
+however, it behaves like any other unit.
