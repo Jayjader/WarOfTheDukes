@@ -8,9 +8,20 @@
 
 config_version=4
 
-_global_script_classes=[  ]
+_global_script_classes=[ {
+"base": "Node2D",
+"class": "Forest",
+"language": "GDScript",
+"path": "res://tiles/forest.gd"
+}, {
+"base": "Node2D",
+"class": "Plains",
+"language": "GDScript",
+"path": "res://tiles/plains.gd"
+} ]
 _global_script_class_icons={
-
+"Forest": "res://tiles/forest.png",
+"Plains": "res://tiles/plains.png"
 }
 
 [application]

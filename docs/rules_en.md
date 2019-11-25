@@ -98,23 +98,19 @@ eliminates the enemy Duke.
 
 During their active phase, each player may move as many units as they desire
 to, within the limits of each unit's movement points. Here is the number of
-points needed to move one tile, depending on the nature of the terrain:
+points needed to move one tile, depending on the nature of the terrain on the
+border that tile shares with a unit's current tile:
 
-terrain        | movement points per tile
----------------|-------------------------
-roads          | 0.5
-cities         | 0.5
-normal         | 1
-bridges        | 1 (0.5 if a road crosses the bridge)
-woods          | 2
-cliffs (brown) | 2
-rivers         | Impassable other than via bridges
-lakes          | Impassable
-
-
-Note: if a unit wishing to traverse a road during their movement is not already
-on that road, it must first spend the necessary movement points to reach the
-road by crossing the terrain that separates it from the road.
+terrain on border | movement points to cross into
+------------------|-------------------------------
+roads             | 0.5
+cities            | 0.5
+normal            | 1
+bridges           | 1 (0.5 if a road crosses the bridge)
+woods             | 2
+cliffs (brown)    | 2
+rivers            | Impassable other than via bridges
+lakes             | Impassable
 
 #### Movement Restrictions
 
