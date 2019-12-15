@@ -1,53 +1,18 @@
 #[macro_use]
 extern crate gdnative as godot;
-use hex2d::{Coordinate, Spacing};
+extern crate serde;
+#[macro_use]
+extern crate serde_scan;
+
 use std::collections::HashMap;
+use std::convert::TryFrom;
+use std::fs;
 
-/// The "Unit" enum. Represents the 4 unit types of the game:
-///  Infantry, Cavalry, Artillery, Duke
-pub enum Unit {
-    Duke,
-    Infantry,
-    Cavalry,
-    Artillery,
-}
+use hex2d::{Coordinate, Direction, Spacing};
+use serde::Deserialize;
+use serde_scan::from_str;
 
-/// The "Strength" trait. Represents the capability to participate offensively in combat.
-pub trait Strength {
-    fn attack(&self) -> u32;
-}
-
-impl Strength for Unit {
-    fn attack(&self) -> u32 {
-        use Unit::*;
-        match self {
-            Duke => 0,
-            Infantry => 5,
-            Cavalry => 2,
-            Artillery => 3,
-        }
-    }
-}
-
-/// The "Defense" trait. Represents the capability to participate defensively in combat.
-pub trait Defense {
-    fn defend(&self) -> u32;
-}
-
-impl Defense for Unit {
-    fn defend(&self) -> u32 {
-        match self {
-            Unit::Duke => 1,
-            _ => self.attack(),
-        }
-    }
-}
-
-//impl godot::ToVariant for hex2d::Coordinate {
-//    fn to_variant(&self) -> godot::Variant {
-//        godot::Vector2::new(self.x as f32, self.y as f32)
-//    }
-//}
+mod unit;
 
 /// The Game Board. Is a 2D grid of hexagonal Tiles.
 #[derive(NativeClass)]
@@ -59,28 +24,6 @@ struct Board {
 
 const TILE_SIZE: f32 = 60 as f32;
 
-const BOARD_TILES: &[(Coordinate, TileType)] = &[
-    (Coordinate { x: 0, y: 0 }, TileType::City),
-    (Coordinate { x: 0, y: 1 }, TileType::City),
-    (Coordinate { x: 0, y: 2 }, TileType::City),
-    (Coordinate { x: 0, y: 3 }, TileType::City),
-    (Coordinate { x: 0, y: 4 }, TileType::Cliff),
-    (Coordinate { x: 0, y: 5 }, TileType::Plains),
-    (Coordinate { x: 0, y: 6 }, TileType::Forest),
-    (Coordinate { x: 0, y: 7 }, TileType::Forest),
-    (Coordinate { x: 0, y: 8 }, TileType::Forest),
-    (Coordinate { x: 0, y: 9 }, TileType::Forest),
-    (Coordinate { x: 0, y: 10 }, TileType::Forest),
-    (Coordinate { x: 0, y: 11 }, TileType::Forest),
-    (Coordinate { x: 0, y: 12 }, TileType::Forest),
-    (Coordinate { x: 0, y: 13 }, TileType::Plains),
-    (Coordinate { x: 0, y: 14 }, TileType::Plains),
-    (Coordinate { x: 0, y: 15 }, TileType::Plains),
-    (Coordinate { x: 0, y: 16 }, TileType::Forest),
-    (Coordinate { x: 0, y: 17 }, TileType::Forest),
-    (Coordinate { x: 0, y: 18 }, TileType::Forest),
-];
-
 #[methods]
 impl Board {
     fn new(tile_size: hex2d::Spacing) -> Board {
@@ -91,16 +34,14 @@ impl Board {
     }
     // Godot's init hook
     fn _init(_owner: godot::Node) -> Self {
-        use TileType::*;
         let mut board = Board::new(hex2d::Spacing::FlatTop(TILE_SIZE));
-        for (coord, tile) in BOARD_TILES.iter() {
-            board.tiles.insert(*coord, *tile);
-        }
         board
     }
     // Godot's ready hook
     #[export]
-    fn _ready(&self, _owner: godot::Node) {}
+    fn _ready(&self, _owner: godot::Node) {
+        let contents = fs::read_to_string("board.config").expect("file read error :(");
+    }
 
     #[export]
     fn test_func(&self, _owner: godot::Node) {
@@ -119,38 +60,29 @@ impl Board {
 
 /// The type of terrain making up the center of a tile. This can impact a unit's offensive or
 /// defensive power during combat.
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Deserialize)]
 enum TileType {
     Plains,
-    Road,
     City,
     Forest,
     Cliff,
     Lake,
 }
 
-/// The type of terrain making up the border between 2 tiles. As well as the different types of
-/// tile, there are a few extra special cases, such as bridges and rivers. This can impact a unit's
-/// ability to move through the border in question, reflected by the cost in movement points to do
-/// so.
-#[derive(Debug, Copy, Clone)]
-enum BorderType {
-    Some(TileType),
-    River,
-    Bridge,
-    BridgeWithRoad,
-}
+impl TryFrom<&str> for TileType {
+    type Error = &'static str;
 
-/// A tile on the game board
-#[derive(Debug, Copy, Clone)]
-struct Tile {
-    center: TileType,
-    yz: BorderType,
-    xz: BorderType,
-    xy: BorderType,
-    zy: BorderType,
-    zx: BorderType,
-    yx: BorderType,
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        use TileType::*;
+        match value {
+            "Plains" => Ok(Plains),
+            "City" => Ok(City),
+            "Forest" => Ok(Forest),
+            "Cliff" => Ok(Cliff),
+            "Lake" => Ok(Lake),
+            _ => Err("Unknown TileType"),
+        }
+    }
 }
 
 impl ToString for TileType {
@@ -158,24 +90,10 @@ impl ToString for TileType {
         use TileType::*;
         match &self {
             Plains => "Plains".to_string(),
-            Road => "Road".to_string(),
             City => "City".to_string(),
             Forest => "Forest".to_string(),
             Cliff => "Cliff".to_string(),
             Lake => "Lake".to_string(),
-        }
-    }
-}
-
-impl ToString for BorderType {
-    fn to_string(&self) -> String {
-        use BorderType::*;
-        use TileType::*;
-        match &self {
-            Some(tile_type) => tile_type.to_string(),
-            River => "River".to_string(),
-            Bridge => "Bridge".to_string(),
-            BridgeWithRoad => "BridgeWithRoad".to_string(),
         }
     }
 }
@@ -187,10 +105,195 @@ impl godot::ToVariant for TileType {
     }
 }
 
+/// The type of terrain making up the border between 2 tiles. As well as the different types of
+/// tile, there are a few extra special cases, such as bridges and rivers. This can impact a unit's
+/// ability to move through the border in question, reflected by the cost in movement points to do
+/// so.
+#[derive(Debug, Copy, Clone, Deserialize)]
+enum BorderType {
+    River,
+    Road,
+    Bridge,
+    BridgeWithRoad,
+}
+
+impl TryFrom<&str> for BorderType {
+    type Error = &'static str;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        use BorderType::*;
+        match value {
+            "river" => Ok(River),
+            "road" => Ok(Road),
+            "bridge" => Ok(Bridge),
+            "bridge_with_road" => Ok(BridgeWithRoad),
+            _ => Err("Unknown BorderType"),
+        }
+    }
+}
+
+impl ToString for BorderType {
+    fn to_string(&self) -> String {
+        use BorderType::*;
+        match self {
+            River => "River".to_string(),
+            Road => "Road".to_string(),
+            Bridge => "Bridge".to_string(),
+            BridgeWithRoad => "BridgeWithRoad".to_string(),
+        }
+    }
+}
+
 impl godot::ToVariant for BorderType {
     fn to_variant(&self) -> godot::Variant {
         use godot::{GodotString, Variant};
         Variant::from_godot_string(&GodotString::from_str(self.to_string()))
+    }
+}
+
+/// A tile on the game board
+#[derive(Debug, Copy, Clone, Deserialize)]
+struct Tile {
+    center: TileType,
+    yz: Option<BorderType>,
+    xz: Option<BorderType>,
+    xy: Option<BorderType>,
+    zy: Option<BorderType>,
+    zx: Option<BorderType>,
+    yx: Option<BorderType>,
+}
+
+impl Tile {
+    fn new(center: TileType) -> Tile {
+        Tile {
+            center,
+            yz: None,
+            xz: None,
+            xy: None,
+            zy: None,
+            zx: None,
+            yx: None,
+        }
+    }
+    fn bridge(self, d: hex2d::Direction) -> Tile {
+        use hex2d::Direction::*;
+        use BorderType::Bridge;
+        match d {
+            YZ => Tile {
+                yz: Some(Bridge),
+                ..self
+            },
+            XZ => Tile {
+                xz: Some(Bridge),
+                ..self
+            },
+            XY => Tile {
+                xy: Some(Bridge),
+                ..self
+            },
+            ZY => Tile {
+                zy: Some(Bridge),
+                ..self
+            },
+            ZX => Tile {
+                zx: Some(Bridge),
+                ..self
+            },
+            YX => Tile {
+                yx: Some(Bridge),
+                ..self
+            },
+        }
+    }
+    fn road(self, d: hex2d::Direction) -> Tile {
+        use hex2d::Direction::*;
+        use BorderType::Road;
+        match d {
+            YZ => Tile {
+                yz: Some(Road),
+                ..self
+            },
+            XZ => Tile {
+                xz: Some(Road),
+                ..self
+            },
+            XY => Tile {
+                xy: Some(Road),
+                ..self
+            },
+            ZY => Tile {
+                zy: Some(Road),
+                ..self
+            },
+            ZX => Tile {
+                zx: Some(Road),
+                ..self
+            },
+            YX => Tile {
+                yx: Some(Road),
+                ..self
+            },
+        }
+    }
+    fn river(self, d: hex2d::Direction) -> Tile {
+        use hex2d::Direction::*;
+        use BorderType::River;
+        match d {
+            YZ => Tile {
+                yz: Some(River),
+                ..self
+            },
+            XZ => Tile {
+                xz: Some(River),
+                ..self
+            },
+            XY => Tile {
+                xy: Some(River),
+                ..self
+            },
+            ZY => Tile {
+                zy: Some(River),
+                ..self
+            },
+            ZX => Tile {
+                zx: Some(River),
+                ..self
+            },
+            YX => Tile {
+                yx: Some(River),
+                ..self
+            },
+        }
+    }
+    fn bridge_with_road(self, d: hex2d::Direction) -> Tile {
+        use hex2d::Direction::*;
+        use BorderType::BridgeWithRoad;
+        match d {
+            YZ => Tile {
+                yz: Some(BridgeWithRoad),
+                ..self
+            },
+            XZ => Tile {
+                xz: Some(BridgeWithRoad),
+                ..self
+            },
+            XY => Tile {
+                xy: Some(BridgeWithRoad),
+                ..self
+            },
+            ZY => Tile {
+                zy: Some(BridgeWithRoad),
+                ..self
+            },
+            ZX => Tile {
+                zx: Some(BridgeWithRoad),
+                ..self
+            },
+            YX => Tile {
+                yx: Some(BridgeWithRoad),
+                ..self
+            },
+        }
     }
 }
 
@@ -205,63 +308,7 @@ impl godot::ToVariant for Tile {
 }
 
 #[cfg(test)]
-mod test {
-    use crate::{Defense, Strength, Unit};
-
-    #[test]
-    fn test_duke_attack_should_be_0() {
-        assert_eq!(Unit::Duke.attack(), 0);
-    }
-
-    #[test]
-    fn test_duke_defense_should_be_1() {
-        assert_eq!(Unit::Duke.defend(), 1);
-    }
-
-    #[test]
-    fn test_infantry_strength_should_be_5() {
-        assert_eq!(Unit::Infantry.attack(), 5);
-        assert_eq!(Unit::Infantry.defend(), 5);
-    }
-
-    #[test]
-    fn test_cavalry_strength_should_be_2() {
-        assert_eq!(Unit::Cavalry.attack(), 2);
-        assert_eq!(Unit::Cavalry.defend(), 2);
-    }
-
-    #[test]
-    fn test_artillery_strength_should_be_3() {
-        assert_eq!(Unit::Artillery.attack(), 3);
-        assert_eq!(Unit::Artillery.defend(), 3);
-    }
-}
-
-/// The HelloWorld "class"
-///#[derive(NativeClass)]
-///#[inherit(godot::Node)]
-///pub struct HelloWorld;
-///
-/// __One__ `impl` block can have the `#[methods]` attribute, which will generate
-/// code to automatically bind any exported methods to Godot.
-///#[methods]
-///impl HelloWorld {
-///    /// The "constructor" of the class.
-///    fn _init(_owner: godot::Node) -> Self {
-///        HelloWorld
-///    }
-///
-///    // In order to make a method known to Godot, the #[export] attribute has to be used.
-///    // In Godot script-classes do not actually inherit the parent class.
-///    // Instead they are"attached" to the parent object, called the "owner".
-///    // The owner is passed to every single exposed method.
-///    #[export]
-///    fn _ready(&self, _owner: godot::Node) {
-///        // The `godot_print!` macro works like `println!` but prints to the Godot-editor
-///        // output tab as well.
-///        godot_print!("hello, world...");
-///    }
-///}
+mod test {}
 
 /// Function that registers all exposed classes to Godot
 fn init(handle: godot::init::InitHandle) {
