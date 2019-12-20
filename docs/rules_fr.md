@@ -104,7 +104,7 @@ par la nature du terrain qui la sépare de la route.)
 
 // page 2
 
-**limitations des mouvements** : une unité ne peut en aucun cas se placer sur un
+**limitations des mouvements** : une unité ne peut en aucun cas se placer sur une
 case occupée par une autre unité, amie ou ennemie. Seule exception : le duc,
 qui, sur les cases de villes ou de forteresses, peut se placer sur une autre
 unité amie. Mais au cours d'un déplacement, une unité peut traverser une case
@@ -170,7 +170,7 @@ On tiendra également compte des trois règles suivantes :
    phase ;
  - une unité donnée (ou un groupe d'unités) ne peut attaquer qu'une seule unité
    ennemie durant la même phase ;
- - plusieurs unités amies peuvent s'allier pour attaquer  une unité adverse,
+ - plusieurs unités amies peuvent s'allier pour attaquer une unité adverse,
    mais cette action ne constitue qu'un seul combat, comportant un seul jet de
    dés.  
 
