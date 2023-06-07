@@ -1,426 +1,426 @@
 {
   "board": {
-    "tiles": [
-      {
-        "x": 0,
-        "y": 0,
-        "center": "City",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 1,
-        "center": "City",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 2,
-        "center": "City",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 3,
-        "center": "City",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 4,
-        "center": "Cliff",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 5,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 6,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 7,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 8,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 9,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 10,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 11,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 12,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 13,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 14,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 15,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 16,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 17,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 18,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 19,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 20,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 21,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 22,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 0,
-        "y": 23,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 0,
-        "center": "City",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 1,
-        "center": "City",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 2,
-        "center": "City",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 3,
-        "center": "Cliff",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 4,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 5,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 6,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 7,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 8,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 9,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 10,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 11,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 12,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 13,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 14,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 15,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 16,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 17,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 18,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 19,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 20,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 21,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 1,
-        "y": 22,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": -1,
-        "center": "City",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": 0,
-        "center": "City",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": 1,
-        "center": "City",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": 2,
-        "center": "Cliff",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": 3,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": 4,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": 5,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": 6,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": 7,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": 8,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": 9,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": 10,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": 11,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": 12,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": 13,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": 14,
-        "center": "City",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": 15,
-        "center": "City",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": 16,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": 17,
-        "center": "Forest",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": 18,
-        "center": "Plains",
-        "borders": {"yz": "river","xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  "river"}
-      },
-      {
-        "x": 2,
-        "y": 19,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": 20,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      },
-      {
-        "x": 2,
-        "y": 21,
-        "center": "Plains",
-        "borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
-      }
-    ]
+	"tiles": [
+	  {
+		"x": 0,
+		"y": 0,
+		"center": "City",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 1,
+		"center": "City",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 2,
+		"center": "City",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 3,
+		"center": "City",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 4,
+		"center": "Cliff",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 5,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 6,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 7,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 8,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 9,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 10,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 11,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 12,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 13,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 14,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 15,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 16,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 17,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 18,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 19,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 20,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 21,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 22,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 0,
+		"y": 23,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 0,
+		"center": "City",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 1,
+		"center": "City",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 2,
+		"center": "City",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 3,
+		"center": "Cliff",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 4,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 5,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 6,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 7,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 8,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 9,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 10,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 11,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 12,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 13,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 14,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 15,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 16,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 17,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 18,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 19,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 20,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 21,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 1,
+		"y": 22,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": -1,
+		"center": "City",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": 0,
+		"center": "City",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": 1,
+		"center": "City",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": 2,
+		"center": "Cliff",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": 3,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": 4,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": 5,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": 6,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": 7,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": 8,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": 9,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": 10,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": 11,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": 12,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": 13,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": 14,
+		"center": "City",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": 15,
+		"center": "City",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": 16,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": 17,
+		"center": "Forest",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": 18,
+		"center": "Plains",
+		"borders": {"yz": "river","xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  "river"}
+	  },
+	  {
+		"x": 2,
+		"y": 19,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": 20,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  },
+	  {
+		"x": 2,
+		"y": 21,
+		"center": "Plains",
+		"borders": {"yz": null,"xz": null, "xy": null, "zy":  null, "zx":  null, "yx":  null}
+	  }
+	]
   }
 }

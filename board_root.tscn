@@ -1,0 +1,80 @@
+[gd_scene load_steps=5 format=3 uid="uid://bwst2xk4wn3l6"]
+
+[ext_resource type="Script" path="res://BoardRoot.gd" id="1_r6u8w"]
+[ext_resource type="Texture2D" uid="uid://dgr4iw8ue00sq" path="res://docs/La guerre des ducs - Encart.jpg" id="2_w7llp"]
+[ext_resource type="Script" path="res://TileOverlay.gd" id="3_hyvcy"]
+[ext_resource type="Script" path="res://UIRoot.gd" id="4_j6bwx"]
+
+[node name="BoardRoot" type="Node2D"]
+script = ExtResource("1_r6u8w")
+
+[node name="Background" type="Sprite2D" parent="."]
+texture = ExtResource("2_w7llp")
+centered = false
+
+[node name="TileOverlay" type="Control" parent="Background"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_hyvcy")
+
+[node name="UIRoot" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1150.0
+offset_bottom = 645.0
+script = ExtResource("4_j6bwx")
+
+[node name="EditControls" type="VBoxContainer" parent="UIRoot"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -42.0
+offset_right = 42.0
+offset_bottom = 66.0
+grow_horizontal = 2
+
+[node name="ToggleEditing" type="Button" parent="UIRoot/EditControls"]
+layout_mode = 2
+toggle_mode = true
+text = "Editing"
+
+[node name="OriginControls" type="HBoxContainer" parent="UIRoot/EditControls"]
+layout_mode = 2
+
+[node name="SetOrigin" type="Button" parent="UIRoot/EditControls/OriginControls"]
+layout_mode = 2
+text = "Set Origin"
+
+[node name="Label" type="Label" parent="UIRoot/EditControls/OriginControls"]
+layout_mode = 2
+
+[node name="TileWidthControls" type="HBoxContainer" parent="UIRoot/EditControls"]
+layout_mode = 2
+
+[node name="Prefix" type="Label" parent="UIRoot/EditControls/TileWidthControls"]
+layout_mode = 2
+text = "Tile Width:"
+
+[node name="SetTileWidth" type="HSlider" parent="UIRoot/EditControls/TileWidthControls"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+
+[node name="Label" type="Label" parent="UIRoot/EditControls/TileWidthControls"]
+layout_mode = 2
+
+[node name="SaveMapData" type="Button" parent="UIRoot/EditControls"]
+layout_mode = 2
+text = "Save Map Data"
+
+[connection signal="origin_set" from="UIRoot" to="." method="set_origin"]
+[connection signal="origin_set" from="UIRoot" to="Background/TileOverlay" method="new_origin"]
+[connection signal="toggled" from="UIRoot/EditControls/ToggleEditing" to="." method="toggle_editing"]
+[connection signal="pressed" from="UIRoot/EditControls/OriginControls/SetOrigin" to="UIRoot" method="start_origin_set"]
+[connection signal="value_changed" from="UIRoot/EditControls/TileWidthControls/SetTileWidth" to="." method="set_tile_width"]
+[connection signal="pressed" from="UIRoot/EditControls/SaveMapData" to="Background/TileOverlay" method="save_data"]

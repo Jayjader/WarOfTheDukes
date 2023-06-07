@@ -6,30 +6,15 @@
 ;   [section] ; section goes between []
 ;   param=value ; assign values to parameters
 
-config_version=4
-
-_global_script_classes=[ {
-"base": "Node2D",
-"class": "Forest",
-"language": "GDScript",
-"path": "res://tiles/forest.gd"
-}, {
-"base": "Node2D",
-"class": "Plains",
-"language": "GDScript",
-"path": "res://tiles/plains.gd"
-} ]
-_global_script_class_icons={
-"Forest": "res://tiles/forest.png",
-"Plains": "res://tiles/plains.png"
-}
+config_version=5
 
 [application]
 
 config/name="War of the Dukes"
-run/main_scene="res://Main.tscn"
+run/main_scene="res://board_root.tscn"
+config/features=PackedStringArray("4.0")
 config/icon="res://icon.png"
 
 [rendering]
 
-environment/default_environment="res://default_env.tres"
+environment/defaults/default_environment="res://default_env.tres"

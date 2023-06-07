@@ -10,11 +10,11 @@ func _ready():
 		var new_tile
 		match x[1]:
 			"Plains": 
-		 		new_tile = Plains.instance()
+				new_tile = Plains.instantiate()
 			"Forest":
-				new_tile = Forest.instance()
+				new_tile = Forest.instantiate()
 			_:
-				new_tile = Plains.instance()
+				new_tile = Plains.instantiate()
 		
 		new_tile.position = Vector2(x[0][0], -x[0][1])
 		add_child(new_tile, true)
