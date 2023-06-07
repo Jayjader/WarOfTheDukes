@@ -49,39 +49,75 @@ grow_horizontal = 2
 [node name="OriginControls" type="VBoxContainer" parent="UIRoot/Panel/EditControls"]
 layout_mode = 2
 
+[node name="CalibrationMode" type="Label" parent="UIRoot/Panel/EditControls/OriginControls"]
+layout_mode = 2
+horizontal_alignment = 1
+
 [node name="Direct" type="HBoxContainer" parent="UIRoot/Panel/EditControls/OriginControls"]
 layout_mode = 2
 script = ExtResource("4_q436x")
 
-[node name="SetFirst" type="Button" parent="UIRoot/Panel/EditControls/OriginControls/Direct"]
+[node name="RestartCalibration" type="Button" parent="UIRoot/Panel/EditControls/OriginControls/Direct"]
 layout_mode = 2
 text = "Start Calibration"
 
-[node name="FirstLabel" type="Label" parent="UIRoot/Panel/EditControls/OriginControls/Direct"]
-layout_mode = 2
-text = "First: null"
-
-[node name="SecondLabel" type="Label" parent="UIRoot/Panel/EditControls/OriginControls/Direct"]
-layout_mode = 2
-text = "Second: null"
-
-[node name="HexCountControls" type="HBoxContainer" parent="UIRoot/Panel/EditControls"]
+[node name="Labels" type="HBoxContainer" parent="UIRoot/Panel/EditControls/OriginControls/Direct"]
 layout_mode = 2
 
-[node name="Prefix" type="Label" parent="UIRoot/Panel/EditControls/HexCountControls"]
+[node name="Left" type="VBoxContainer" parent="UIRoot/Panel/EditControls/OriginControls/Direct/Labels"]
 layout_mode = 2
-text = "Number of hexs between calibration points:"
+
+[node name="TopLeftLabel" type="Label" parent="UIRoot/Panel/EditControls/OriginControls/Direct/Labels/Left"]
+layout_mode = 2
+text = "T-L: null"
+
+[node name="BottomLeftLabel" type="Label" parent="UIRoot/Panel/EditControls/OriginControls/Direct/Labels/Left"]
+layout_mode = 2
+text = "B-L: null"
+
+[node name="Right" type="VBoxContainer" parent="UIRoot/Panel/EditControls/OriginControls/Direct/Labels"]
+layout_mode = 2
+
+[node name="TopRightLabel" type="Label" parent="UIRoot/Panel/EditControls/OriginControls/Direct/Labels/Right"]
+layout_mode = 2
+text = "T-R: null"
+
+[node name="BottomRightLabel" type="Label" parent="UIRoot/Panel/EditControls/OriginControls/Direct/Labels/Right"]
+layout_mode = 2
+text = "B-R: null"
+
+[node name="TilesWideControls" type="HBoxContainer" parent="UIRoot/Panel/EditControls"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UIRoot/Panel/EditControls/TilesWideControls"]
+layout_mode = 2
+text = "Tiles Wide:"
 horizontal_alignment = 2
 
-[node name="HexCount" type="LineEdit" parent="UIRoot/Panel/EditControls/HexCountControls"]
+[node name="TilesWide" type="LineEdit" parent="UIRoot/Panel/EditControls/TilesWideControls"]
+layout_mode = 2
+
+[node name="TilesHeighControls" type="HBoxContainer" parent="UIRoot/Panel/EditControls"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UIRoot/Panel/EditControls/TilesHeighControls"]
+layout_mode = 2
+text = "Tiles Heigh:"
+horizontal_alignment = 2
+
+[node name="TilesHeigh" type="LineEdit" parent="UIRoot/Panel/EditControls/TilesHeighControls"]
 layout_mode = 2
 
 [node name="SaveMapData" type="Button" parent="UIRoot/Panel/EditControls"]
 layout_mode = 2
 text = "Save Map Data"
 
-[connection signal="first_set" from="Background/TileOverlay" to="UIRoot/Panel/EditControls/OriginControls/Direct" method="on_first_set"]
-[connection signal="second_set" from="Background/TileOverlay" to="UIRoot/Panel/EditControls/OriginControls/Direct" method="on_second_set"]
-[connection signal="pressed" from="UIRoot/Panel/EditControls/OriginControls/Direct/SetFirst" to="Background/TileOverlay" method="start_calibrate_first"]
-[connection signal="text_changed" from="UIRoot/Panel/EditControls/HexCountControls/HexCount" to="Background/TileOverlay" method="set_hex_count"]
+[connection signal="bl_set" from="Background/TileOverlay" to="UIRoot/Panel/EditControls/OriginControls/Direct" method="on_bl_set"]
+[connection signal="br_set" from="Background/TileOverlay" to="UIRoot/Panel/EditControls/OriginControls/Direct" method="on_br_set"]
+[connection signal="calibration_mode_entered" from="Background/TileOverlay" to="UIRoot/Panel/EditControls/OriginControls/CalibrationMode" method="set_text"]
+[connection signal="tl_set" from="Background/TileOverlay" to="UIRoot/Panel/EditControls/OriginControls/Direct" method="on_tl_set"]
+[connection signal="tr_set" from="Background/TileOverlay" to="UIRoot/Panel/EditControls/OriginControls/Direct" method="on_tr_set"]
+[connection signal="pressed" from="UIRoot/Panel/EditControls/OriginControls/Direct/RestartCalibration" to="Background/TileOverlay" method="start_calibrate_first"]
+[connection signal="text_changed" from="UIRoot/Panel/EditControls/TilesWideControls/TilesWide" to="Background/TileOverlay" method="set_tiles_wide"]
+[connection signal="text_changed" from="UIRoot/Panel/EditControls/TilesHeighControls/TilesHeigh" to="Background/TileOverlay" method="set_tiles_heigh"]
 [connection signal="pressed" from="UIRoot/Panel/EditControls/SaveMapData" to="Background/TileOverlay" method="save_data"]
