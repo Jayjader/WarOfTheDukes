@@ -4,14 +4,6 @@ extends Node2D
 	set(value):
 		print_debug("toggling editing to %s" % value)
 		editing = value
-@export var tile_origin: Vector2i:
-	set(value):
-		print_debug("setting origin to %s" %value)
-		tile_origin = value
-@export var tile_width: int = 20:
-	set(value):
-		tile_width = value
-		$UIRoot/EditControls/TileWidthControls/Label.text = "%s" % value
 
 var tiles: Dictionary = {}
 
@@ -36,12 +28,5 @@ func _input(_event):
 		$Background.position.y -= 25
 		
 		
-func toggle_editing(new_value:bool):
+func toggle_editing(new_value: bool):
 	editing = new_value
-
-func set_origin(new_origin:Vector2i):
-	tile_origin = new_origin
-
-
-func set_tile_width(new_width: float):
-	tile_width = int(new_width)
