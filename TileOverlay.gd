@@ -43,6 +43,8 @@ var state = {
 			emit_signal("tl_set", value.get("top_left"))
 		if value.mode != state.mode:
 			emit_signal("calibration_mode_entered", "%s" % value.mode)
+		if value.get("hover") != state.get("hover"):
+			state.hover = nearest_hex_in_world(value.hover, state.origin_in_world_coordinates, state.hex_size)
 		state = value
 		queue_redraw()
 
@@ -79,14 +81,6 @@ func complete_size_calibration():
 	var hex_size = ((2 * hex_width / 3) + (hex_height / sqrt(3))) / 2
 	print_debug("calibrated: width %s, height %s, size %s" % [hex_width, hex_height, hex_size])
 	state = {mode=UIMode.CHOOSING_ORIGIN, origin_in_world_coordinates=null, hex_size=hex_size, hover=null}
-#@export var mode: UIMode = UIMode.NORMAL:
-#	set(value):
-#		print_debug("uimode set to %s" % value)
-#		emit_signal("calibration_mode_entered", "%s" % UIMode.find_key(value))
-#		if mode == UIMode.CALIBRATING_SIZE and value == UIMode.NORMAL:
-#			new_origin(calibration.bottom_left)
-#		mode = value
-#		queue_redraw()
 
 func previous_calibration_step():
 	if state.mode < UIMode.NORMAL and state.mode > UIMode.UNCALIBRATED:
@@ -100,7 +94,7 @@ func next_calibration_step():
 		complete_size_calibration()
 	elif state.mode == UIMode.CHOOSING_ORIGIN and state.get("origin_in_world_coordinates") != null:
 		state.mode = UIMode.NORMAL
-		state.erase("hover")
+		state.hover = null
 		state = state
 
 func save_data(data=tiles):
@@ -163,9 +157,19 @@ func _ready():
 		tiles = data
 
 
-func draw_grid(top_left: Vector2, bottom_right: Vector2):
-	pass
+func draw_grid(top_left: Vector2, bottom_right: Vector2, origin: Vector2, hex_size: float):
+	var size_vec = bottom_right - top_left
+	var grid_width_hex_count = size_vec.x / Util.horizontal_distance(hex_size)
+	var grid_height_hex_count = size_vec.y / Util.vertical_distance(hex_size)
+	for q in range(grid_width_hex_count):
+		for r in range(-q/2, -q/2 + grid_height_hex_count):
+			draw_hex(origin + Util.hex_coords_to_pixel(Vector2i(q, r), hex_size), hex_size)
 
+func nearest_hex_in_world(hovered, origin, hex_size):
+	var axial = Util.pixel_coords_to_hex(hovered - origin, hex_size)
+	var cube = Vector3(axial.x, axial.y, -axial.x-axial.y)
+	var nearest = Util.round_to_nearest_hex(cube, hex_size)
+	return Util.hex_coords_to_pixel(Vector2i(nearest.x, nearest.y), hex_size) + Vector2(origin)
 
 func _draw():
 	var temp_size = 25
@@ -180,16 +184,22 @@ func _draw():
 		if origin != null:
 			draw_hex(origin, state.hex_size)
 			# 5x2 square:
-			var grid_w = self.size.x / Util.horizontal_distance(state.hex_size)
-			var grid_h = self.size.y / Util.vertical_distance(state.hex_size)
-			for q in range(grid_w):
-				for r in range(-q/2, -q/2+grid_h, 1):
-					draw_hex(Util.hex_coords_to_pixel(Vector2i(q, r), state.hex_size) + Vector2(origin), state.hex_size)
+			draw_grid(self.position, self.size, origin, state.hex_size)
+			#var grid_w = self.size.x / Util.horizontal_distance(state.hex_size)
+			#var grid_h = self.size.y / Util.vertical_distance(state.hex_size)
+			#for q in range(grid_w):
+			#	for r in range(-q/2, -q/2+grid_h, 1):
+			#		draw_hex(Util.hex_coords_to_pixel(Vector2i(q, r), state.hex_size) + Vector2(origin), state.hex_size)
 		return
+	if state.mode == UIMode.NORMAL:
+		var hovered = state.get("hover")
+		var origin = state.get("origin_in_world_coordinates")
+		var hex_size = state.get("hex_size")
+		if hovered != null and origin != null and hex_size != null:
+			draw_hex(nearest_hex_in_world(hovered, origin, hex_size), state.hex_size)
 
 func _gui_input(event):
-	if state.mode != UIMode.NORMAL:
-		if event is InputEventMouseButton:
+	if state.mode != UIMode.NORMAL and event is InputEventMouseButton:
 			if event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
 				accept_event()
 				var integer_position = Vector2i(event.position)
@@ -208,8 +218,6 @@ func _gui_input(event):
 					return
 
 				queue_redraw()
-		if state.mode > UIMode.UNCALIBRATED and (
-			state.mode < UIMode.CALIBRATING_SIZE or state.mode == UIMode.CHOOSING_ORIGIN
-		) and event is InputEventMouseMotion:
-			state.hover = Vector2i(self.position + event.position)
-			queue_redraw()
+	if state.mode > UIMode.UNCALIBRATED and state.mode != UIMode.CALIBRATING_SIZE and event is InputEventMouseMotion:
+		state.hover = Vector2i(event.position)
+		queue_redraw()
