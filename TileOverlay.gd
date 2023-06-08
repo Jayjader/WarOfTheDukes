@@ -4,12 +4,12 @@ extends Control
 
 signal origin_set(position: Vector2i)
 
-signal calibration_mode_entered(new_mode: UIMode)
+signal calibration_mode_entered(new_mode: String)
 
-signal bl_set(position: Vector2i)
-signal br_set(position: Vector2i)
-signal tr_set(position: Vector2i)
-signal tl_set(position: Vector2i)
+signal bl_set(position)
+signal br_set(position)
+signal tr_set(position)
+signal tl_set(position)
 
 var Util = preload("res://util.gd")
 
@@ -38,7 +38,7 @@ var calibration = {
 	set(value):
 		print_debug("uimode set to %s" % value)
 		mode = value
-		emit_signal("calibration_mode_entered", mode)
+		emit_signal("calibration_mode_entered", "%s" % mode)
 
 func start_calibrate_first():
 	calibration =  {
@@ -50,6 +50,9 @@ func start_calibrate_first():
 		tiles_heigh = null,
 	}
 	emit_signal("bl_set", null)
+	emit_signal("br_set", null)
+	emit_signal("tr_set", null)
+	emit_signal("tl_set", null)
 	self.rotation = 0
 	mode = UIMode.CALIBRATING_BL
 
