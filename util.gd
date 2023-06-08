@@ -41,7 +41,7 @@ static func pixel_coords_to_hex(pixel: Vector2, hex_size: float):
 		sqrt(3) * pixel.y - pixel.x
 	) / (3 * hex_size)
 
-static func round_to_nearest_hex(cube: Vector3, hex_size: float):
+static func round_to_nearest_hex(cube: Vector3):
 	var rounded = round(cube)
 	var q_diff = abs(rounded.x - cube.x)
 	var r_diff = abs(rounded.y - cube.y)

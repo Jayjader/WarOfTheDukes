@@ -43,8 +43,8 @@ var state = {
 			emit_signal("tl_set", value.get("top_left"))
 		if value.mode != state.mode:
 			emit_signal("calibration_mode_entered", "%s" % UIMode.find_key(value.mode))
-		if value.get("hover") != state.get("hover"):
-			state.hover = nearest_hex_in_world(value.hover, state.origin_in_world_coordinates, state.hex_size)
+		#if value.get("hover") != state.get("hover"):
+		#	state.hover = nearest_hex_in_world(value.hover, state.origin_in_world_coordinates, state.hex_size)[0]
 		state = value
 		queue_redraw()
 
@@ -81,6 +81,13 @@ func complete_size_calibration():
 	var hex_size = ((2 * hex_width / 3) + (hex_height / sqrt(3))) / 2
 	print_debug("calibrated: width %s, height %s, size %s" % [hex_width, hex_height, hex_size])
 	state = {mode=UIMode.CHOOSING_ORIGIN, origin_in_world_coordinates=null, hex_size=hex_size, hover=null}
+func choose_origin(new_origin: Vector2):
+	state = {
+		mode = UIMode.CHOOSING_ORIGIN,
+		origin_in_world_coordinates = new_origin,
+		hex_size = state.hex_size,
+		hover = null
+	}
 
 func previous_calibration_step():
 	if state.mode < UIMode.NORMAL and state.mode > UIMode.UNCALIBRATED:
@@ -128,10 +135,7 @@ func new_origin(origin: Vector2i):
 		% Util.pixel_coords_to_hex(tiles_origin, state.hex_size)
 	)
 
-func draw_hex(center: Vector2i, hex_size: float, angle_offset:float=0):
-	var color = Color.RED
-	if center == tiles_origin:
-		color = Color.REBECCA_PURPLE
+func draw_hex(center: Vector2i, hex_size: float, color:Color=Color.RED, angle_offset:float=0):
 	for i in range(6):
 		draw_line(
 			Util.hex_corner_trig(center, hex_size, i, angle_offset),
@@ -180,11 +184,16 @@ func draw_grid(top_left: Vector2, bottom_right: Vector2, origin: Vector2, hex_si
 		for r in range(-q/2, -q/2 + grid_height_hex_count):
 			draw_hex(origin + Util.hex_coords_to_pixel(Vector2i(q, r), hex_size), hex_size)
 
-func nearest_hex_in_world(hovered, origin, hex_size):
+func nearest_hex_to_pix(hovered: Vector2, origin: Vector2, hex_size: float):
 	var axial = Util.pixel_coords_to_hex(hovered - origin, hex_size)
 	var cube = Vector3(axial.x, axial.y, -axial.x-axial.y)
-	var nearest = Util.round_to_nearest_hex(cube, hex_size)
-	return Util.hex_coords_to_pixel(Vector2i(nearest.x, nearest.y), hex_size) + Vector2(origin)
+	var nearest_cube = Util.round_to_nearest_hex(cube)
+	return Vector2i(nearest_cube.x, nearest_cube.y)
+	
+func nearest_hex_in_world(hovered, origin, hex_size):
+	var nearest_axial = nearest_hex_to_pix(hovered, origin, hex_size)
+	var is_origin = nearest_axial == Vector2i(0, 0)
+	return [Util.hex_coords_to_pixel(nearest_axial, hex_size) + Vector2(origin), is_origin]
 
 func _draw():
 	var temp_size = 25
@@ -197,21 +206,20 @@ func _draw():
 			draw_hex(hovered, state.hex_size)
 		var origin = state.get("origin_in_world_coordinates")
 		if origin != null:
-			draw_hex(origin, state.hex_size)
-			# 5x2 square:
 			draw_grid(self.position, self.size, origin, state.hex_size)
-			#var grid_w = self.size.x / Util.horizontal_distance(state.hex_size)
-			#var grid_h = self.size.y / Util.vertical_distance(state.hex_size)
-			#for q in range(grid_w):
-			#	for r in range(-q/2, -q/2+grid_h, 1):
-			#		draw_hex(Util.hex_coords_to_pixel(Vector2i(q, r), state.hex_size) + Vector2(origin), state.hex_size)
-		return
+			draw_hex(origin, state.hex_size, Color.REBECCA_PURPLE)
+			return
 	if state.mode == UIMode.NORMAL:
 		var hovered = state.get("hover")
 		var origin = state.get("origin_in_world_coordinates")
 		var hex_size = state.get("hex_size")
 		if (hovered != null) and (origin != null) and (hex_size != null):
-			draw_hex(nearest_hex_in_world(hovered, origin, hex_size), state.hex_size)
+			var retVal = nearest_hex_in_world(hovered, origin, hex_size)
+			var nearest = retVal[0]
+			var is_origin = retVal[1]
+			draw_hex(nearest, state.hex_size, Color.REBECCA_PURPLE if is_origin else Color.LIGHT_SALMON)
+			draw_string_outline(get_theme_default_font(), nearest, "%s"%nearest_hex_to_pix(hovered, origin, hex_size), HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK)
+			draw_string(get_theme_default_font(), nearest, "%s"%nearest_hex_to_pix(hovered, origin, hex_size), HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE)
 
 func _gui_input(event):
 	if state.mode != UIMode.NORMAL and event is InputEventMouseButton:
@@ -227,8 +235,7 @@ func _gui_input(event):
 				elif state.mode == UIMode.CALIBRATING_TL:
 					choose_tl(integer_position)
 				elif state.mode == UIMode.CHOOSING_ORIGIN:
-					state.origin_in_world_coordinates = integer_position
-					state = state
+					choose_origin(integer_position)
 				else:
 					return
 
