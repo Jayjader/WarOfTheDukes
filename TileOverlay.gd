@@ -56,6 +56,11 @@ func start_calibrate_first():
 	self.rotation = 0
 	mode = UIMode.CALIBRATING_BL
 
+func previous_calibration_point():
+	mode = mode - 1 as UIMode
+func next_calibration_point():
+	mode = mode + 1 as UIMode
+
 func save_data(data=tiles):
 	var file = FileAccess.open("./map.data", FileAccess.WRITE)
 	file.store_var(data)
@@ -83,6 +88,30 @@ func draw_hex(center: Vector2i, hex_size: float):
 			Util.hex_corner_trig(center, hex_size, i+1),
 			color, 4)
 
+func draw_calibration(c, mode: UIMode, hex_size: float):
+	if c.bottom_left != null:
+		draw_hex(c.bottom_left, hex_size)
+	if c.bottom_right != null:
+		draw_hex(c.bottom_right, hex_size)
+	if c.top_right != null:
+		draw_hex(c.top_right, hex_size)
+	if c.top_left != null:
+		draw_hex(c.top_left, hex_size)
+
+	var last_chosen = null
+	if mode == UIMode.CALIBRATING_BR:
+		last_chosen = c.bottom_left
+	if mode == UIMode.CALIBRATING_TR:
+		last_chosen = c.bottom_right
+	if mode == UIMode.CALIBRATING_TL:
+		last_chosen = c.top_right
+	if mode == UIMode.CALIBRATING_SIZE:
+		last_chosen = c.top_left
+	if last_chosen != null:
+		var line_length = 400
+		for direction in [Vector2i.UP, Vector2i.LEFT, Vector2i.DOWN, Vector2i.RIGHT]:
+			draw_line(last_chosen, last_chosen + direction * line_length, Color.GREEN)
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	var data = load_data()
@@ -92,35 +121,9 @@ func _ready():
 
 func _draw():
 	var temp_size = 25
-	if mode == UIMode.CALIBRATING_BL:
-		return
-	if mode == UIMode.CALIBRATING_BR:
-		draw_hex(calibration.bottom_left, temp_size)
-		draw_line(calibration.bottom_left, calibration.bottom_left + Vector2i.UP * 200, Color.GREEN)
-		draw_line(calibration.bottom_left, calibration.bottom_left + Vector2i.RIGHT * 200, Color.GREEN)
-		return
-	if mode == UIMode.CALIBRATING_TR:
-		draw_hex(calibration.bottom_left, temp_size)
-		draw_hex(calibration.bottom_right, temp_size)
-		draw_line(calibration.bottom_right, calibration.bottom_right + Vector2i.UP * 200, Color.GREEN)
-		draw_line(calibration.bottom_right, calibration.bottom_right + Vector2i.RIGHT * 200, Color.GREEN)
-		return
-	if mode == UIMode.CALIBRATING_TL:
-		draw_hex(calibration.bottom_left, temp_size)
-		draw_hex(calibration.bottom_right, temp_size)
-		draw_hex(calibration.top_right, temp_size)
-		draw_line(calibration.top_right, calibration.top_right + Vector2i.UP * 200, Color.GREEN)
-		draw_line(calibration.top_right, calibration.top_right + Vector2i.RIGHT * 200, Color.GREEN)
-		return
-	if mode == UIMode.CALIBRATING_SIZE:
-		draw_hex(calibration.bottom_left, temp_size)
-		draw_hex(calibration.bottom_right, temp_size)
-		draw_hex(calibration.top_right, temp_size)
-		draw_hex(calibration.top_left, temp_size)
-		draw_line(calibration.top_left, calibration.top_left + Vector2i.UP * 200, Color.GREEN)
-		draw_line(calibration.top_left, calibration.top_left + Vector2i.RIGHT * 200, Color.GREEN)
-		return
-	
+	if mode != UIMode.NORMAL:
+		draw_calibration(calibration, mode, temp_size)
+
 	if calibration.bottom_left == null or \
 		calibration.bottom_right == null or \
 		calibration.top_right == null or \

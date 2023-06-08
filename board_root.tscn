@@ -86,6 +86,17 @@ text = "T-R: null"
 layout_mode = 2
 text = "B-R: null"
 
+[node name="PrevNextPoint" type="VBoxContainer" parent="UIRoot/Panel/EditControls/OriginControls/Direct"]
+layout_mode = 2
+
+[node name="Previous" type="Button" parent="UIRoot/Panel/EditControls/OriginControls/Direct/PrevNextPoint"]
+layout_mode = 2
+text = "Previous Point"
+
+[node name="Next" type="Button" parent="UIRoot/Panel/EditControls/OriginControls/Direct/PrevNextPoint"]
+layout_mode = 2
+text = "Next Point"
+
 [node name="TilesWideControls" type="HBoxContainer" parent="UIRoot/Panel/EditControls"]
 layout_mode = 2
 
@@ -118,6 +129,8 @@ text = "Save Map Data"
 [connection signal="tl_set" from="Background/TileOverlay" to="UIRoot/Panel/EditControls/OriginControls/Direct" method="on_tl_set"]
 [connection signal="tr_set" from="Background/TileOverlay" to="UIRoot/Panel/EditControls/OriginControls/Direct" method="on_tr_set"]
 [connection signal="pressed" from="UIRoot/Panel/EditControls/OriginControls/Direct/RestartCalibration" to="Background/TileOverlay" method="start_calibrate_first"]
+[connection signal="pressed" from="UIRoot/Panel/EditControls/OriginControls/Direct/PrevNextPoint/Previous" to="Background/TileOverlay" method="previous_calibration_point"]
+[connection signal="pressed" from="UIRoot/Panel/EditControls/OriginControls/Direct/PrevNextPoint/Next" to="Background/TileOverlay" method="next_calibration_point"]
 [connection signal="text_changed" from="UIRoot/Panel/EditControls/TilesWideControls/TilesWide" to="Background/TileOverlay" method="set_tiles_wide"]
 [connection signal="text_changed" from="UIRoot/Panel/EditControls/TilesHeighControls/TilesHeigh" to="Background/TileOverlay" method="set_tiles_heigh"]
 [connection signal="pressed" from="UIRoot/Panel/EditControls/SaveMapData" to="Background/TileOverlay" method="save_data"]
