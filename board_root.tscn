@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://bwst2xk4wn3l6"]
+[gd_scene load_steps=6 format=3 uid="uid://bwst2xk4wn3l6"]
 
 [ext_resource type="Script" path="res://BoardRoot.gd" id="1_r6u8w"]
 [ext_resource type="Texture2D" uid="uid://dgr4iw8ue00sq" path="res://docs/La guerre des ducs - Encart.jpg" id="2_w7llp"]
 [ext_resource type="Script" path="res://TileOverlay.gd" id="3_hyvcy"]
 [ext_resource type="Script" path="res://Direct.gd" id="4_q436x"]
+[ext_resource type="Script" path="res://Palette.gd" id="5_qxi0c"]
 
 [node name="BoardRoot" type="Node2D"]
 script = ExtResource("1_r6u8w")
@@ -28,7 +29,7 @@ offset_right = 1150.0
 offset_bottom = 645.0
 mouse_filter = 2
 
-[node name="Panel" type="Panel" parent="UIRoot"]
+[node name="Calibration" type="Panel" parent="UIRoot"]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.3
@@ -36,7 +37,7 @@ anchor_right = 0.7
 offset_bottom = 130.0
 grow_horizontal = 2
 
-[node name="EditControls" type="VBoxContainer" parent="UIRoot/Panel"]
+[node name="EditControls" type="VBoxContainer" parent="UIRoot/Calibration"]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -46,96 +47,140 @@ offset_right = 205.5
 offset_bottom = 101.0
 grow_horizontal = 2
 
-[node name="OriginControls" type="VBoxContainer" parent="UIRoot/Panel/EditControls"]
+[node name="OriginControls" type="VBoxContainer" parent="UIRoot/Calibration/EditControls"]
 layout_mode = 2
 
-[node name="CalibrationMode" type="Label" parent="UIRoot/Panel/EditControls/OriginControls"]
+[node name="CalibrationMode" type="Label" parent="UIRoot/Calibration/EditControls/OriginControls"]
 layout_mode = 2
 horizontal_alignment = 1
 
-[node name="Direct" type="HBoxContainer" parent="UIRoot/Panel/EditControls/OriginControls"]
+[node name="Direct" type="HBoxContainer" parent="UIRoot/Calibration/EditControls/OriginControls"]
 layout_mode = 2
 script = ExtResource("4_q436x")
 
-[node name="RestartCalibration" type="Button" parent="UIRoot/Panel/EditControls/OriginControls/Direct"]
+[node name="RestartCalibration" type="Button" parent="UIRoot/Calibration/EditControls/OriginControls/Direct"]
 layout_mode = 2
 text = "Restart Calibration"
 
-[node name="Labels" type="HBoxContainer" parent="UIRoot/Panel/EditControls/OriginControls/Direct"]
+[node name="Labels" type="HBoxContainer" parent="UIRoot/Calibration/EditControls/OriginControls/Direct"]
 layout_mode = 2
 
-[node name="Left" type="VBoxContainer" parent="UIRoot/Panel/EditControls/OriginControls/Direct/Labels"]
+[node name="Left" type="VBoxContainer" parent="UIRoot/Calibration/EditControls/OriginControls/Direct/Labels"]
 layout_mode = 2
 
-[node name="TopLeftLabel" type="Label" parent="UIRoot/Panel/EditControls/OriginControls/Direct/Labels/Left"]
+[node name="TopLeftLabel" type="Label" parent="UIRoot/Calibration/EditControls/OriginControls/Direct/Labels/Left"]
 layout_mode = 2
 text = "T-L: null"
 
-[node name="BottomLeftLabel" type="Label" parent="UIRoot/Panel/EditControls/OriginControls/Direct/Labels/Left"]
+[node name="BottomLeftLabel" type="Label" parent="UIRoot/Calibration/EditControls/OriginControls/Direct/Labels/Left"]
 layout_mode = 2
 text = "B-L: null"
 
-[node name="Right" type="VBoxContainer" parent="UIRoot/Panel/EditControls/OriginControls/Direct/Labels"]
+[node name="Right" type="VBoxContainer" parent="UIRoot/Calibration/EditControls/OriginControls/Direct/Labels"]
 layout_mode = 2
 
-[node name="TopRightLabel" type="Label" parent="UIRoot/Panel/EditControls/OriginControls/Direct/Labels/Right"]
+[node name="TopRightLabel" type="Label" parent="UIRoot/Calibration/EditControls/OriginControls/Direct/Labels/Right"]
 layout_mode = 2
 text = "T-R: null"
 
-[node name="BottomRightLabel" type="Label" parent="UIRoot/Panel/EditControls/OriginControls/Direct/Labels/Right"]
+[node name="BottomRightLabel" type="Label" parent="UIRoot/Calibration/EditControls/OriginControls/Direct/Labels/Right"]
 layout_mode = 2
 text = "B-R: null"
 
-[node name="PrevNextPoint" type="VBoxContainer" parent="UIRoot/Panel/EditControls/OriginControls/Direct"]
+[node name="PrevNextPoint" type="VBoxContainer" parent="UIRoot/Calibration/EditControls/OriginControls/Direct"]
 layout_mode = 2
 
-[node name="Previous" type="Button" parent="UIRoot/Panel/EditControls/OriginControls/Direct/PrevNextPoint"]
+[node name="Previous" type="Button" parent="UIRoot/Calibration/EditControls/OriginControls/Direct/PrevNextPoint"]
 layout_mode = 2
 text = "Previous Point"
 
-[node name="Next" type="Button" parent="UIRoot/Panel/EditControls/OriginControls/Direct/PrevNextPoint"]
+[node name="Next" type="Button" parent="UIRoot/Calibration/EditControls/OriginControls/Direct/PrevNextPoint"]
 layout_mode = 2
 text = "Next Point"
 
-[node name="TilesWideControls" type="HBoxContainer" parent="UIRoot/Panel/EditControls"]
+[node name="TilesWideControls" type="HBoxContainer" parent="UIRoot/Calibration/EditControls"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UIRoot/Panel/EditControls/TilesWideControls"]
+[node name="Label" type="Label" parent="UIRoot/Calibration/EditControls/TilesWideControls"]
 layout_mode = 2
 text = "Tiles Wide:"
 horizontal_alignment = 2
 
-[node name="TilesWide" type="LineEdit" parent="UIRoot/Panel/EditControls/TilesWideControls"]
+[node name="TilesWide" type="LineEdit" parent="UIRoot/Calibration/EditControls/TilesWideControls"]
 layout_mode = 2
 
-[node name="TilesHeighControls" type="HBoxContainer" parent="UIRoot/Panel/EditControls"]
+[node name="TilesHeighControls" type="HBoxContainer" parent="UIRoot/Calibration/EditControls"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UIRoot/Panel/EditControls/TilesHeighControls"]
+[node name="Label" type="Label" parent="UIRoot/Calibration/EditControls/TilesHeighControls"]
 layout_mode = 2
 text = "Tiles Heigh:"
 horizontal_alignment = 2
 
-[node name="TilesHeigh" type="LineEdit" parent="UIRoot/Panel/EditControls/TilesHeighControls"]
+[node name="TilesHeigh" type="LineEdit" parent="UIRoot/Calibration/EditControls/TilesHeighControls"]
 layout_mode = 2
 
-[node name="SaveMapData" type="Button" parent="UIRoot/Panel/EditControls"]
+[node name="SaveMapData" type="Button" parent="UIRoot/Calibration/EditControls"]
 layout_mode = 2
 text = "Save Map Data"
 
-[node name="SaveCalibrationData" type="Button" parent="UIRoot/Panel/EditControls"]
+[node name="SaveCalibrationData" type="Button" parent="UIRoot/Calibration/EditControls"]
 layout_mode = 2
 text = "Save Calibration Data"
 
-[connection signal="bl_set" from="Background/TileOverlay" to="UIRoot/Panel/EditControls/OriginControls/Direct" method="on_bl_set"]
-[connection signal="br_set" from="Background/TileOverlay" to="UIRoot/Panel/EditControls/OriginControls/Direct" method="on_br_set"]
-[connection signal="calibration_mode_entered" from="Background/TileOverlay" to="UIRoot/Panel/EditControls/OriginControls/CalibrationMode" method="set_text"]
-[connection signal="tl_set" from="Background/TileOverlay" to="UIRoot/Panel/EditControls/OriginControls/Direct" method="on_tl_set"]
-[connection signal="tr_set" from="Background/TileOverlay" to="UIRoot/Panel/EditControls/OriginControls/Direct" method="on_tr_set"]
-[connection signal="pressed" from="UIRoot/Panel/EditControls/OriginControls/Direct/RestartCalibration" to="Background/TileOverlay" method="start_calibration"]
-[connection signal="pressed" from="UIRoot/Panel/EditControls/OriginControls/Direct/PrevNextPoint/Previous" to="Background/TileOverlay" method="previous_calibration_step"]
-[connection signal="pressed" from="UIRoot/Panel/EditControls/OriginControls/Direct/PrevNextPoint/Next" to="Background/TileOverlay" method="next_calibration_step"]
-[connection signal="text_changed" from="UIRoot/Panel/EditControls/TilesWideControls/TilesWide" to="Background/TileOverlay" method="choose_tiles_wide"]
-[connection signal="text_changed" from="UIRoot/Panel/EditControls/TilesHeighControls/TilesHeigh" to="Background/TileOverlay" method="choose_tiles_heigh"]
-[connection signal="pressed" from="UIRoot/Panel/EditControls/SaveMapData" to="Background/TileOverlay" method="save_data"]
-[connection signal="pressed" from="UIRoot/Panel/EditControls/SaveCalibrationData" to="Background/TileOverlay" method="save_calibration_data"]
+[node name="Palette" type="Panel" parent="UIRoot"]
+layout_mode = 0
+offset_left = 861.0
+offset_top = 13.0
+offset_right = 1122.0
+offset_bottom = 251.0
+script = ExtResource("5_qxi0c")
+items = Array[String](["Plains", "City", "Forest", "Cliff", "Lake", "Fortress"])
+
+[node name="Items" type="VBoxContainer" parent="UIRoot/Palette"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -101.0
+offset_top = -103.0
+offset_right = 101.0
+offset_bottom = 103.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="HBoxContainer" parent="UIRoot/Palette/Items"]
+layout_mode = 2
+
+[node name="Static" type="Label" parent="UIRoot/Palette/Items/Title"]
+layout_mode = 2
+text = "Selected:"
+
+[node name="Selected" type="Label" parent="UIRoot/Palette/Items/Title"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="UIRoot/Palette/Items/Title"]
+layout_mode = 2
+text = "Clear Selection"
+
+[node name="Erase" type="Button" parent="UIRoot/Palette/Items"]
+layout_mode = 2
+text = "Erase Tile"
+
+[connection signal="bl_set" from="Background/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_bl_set"]
+[connection signal="br_set" from="Background/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_br_set"]
+[connection signal="calibration_mode_entered" from="Background/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/CalibrationMode" method="set_text"]
+[connection signal="tl_set" from="Background/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_tl_set"]
+[connection signal="tr_set" from="Background/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_tr_set"]
+[connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/RestartCalibration" to="Background/TileOverlay" method="start_calibration"]
+[connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/PrevNextPoint/Previous" to="Background/TileOverlay" method="previous_calibration_step"]
+[connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/PrevNextPoint/Next" to="Background/TileOverlay" method="next_calibration_step"]
+[connection signal="text_changed" from="UIRoot/Calibration/EditControls/TilesWideControls/TilesWide" to="Background/TileOverlay" method="choose_tiles_wide"]
+[connection signal="text_changed" from="UIRoot/Calibration/EditControls/TilesHeighControls/TilesHeigh" to="Background/TileOverlay" method="choose_tiles_heigh"]
+[connection signal="pressed" from="UIRoot/Calibration/EditControls/SaveMapData" to="Background/TileOverlay" method="save_data"]
+[connection signal="pressed" from="UIRoot/Calibration/EditControls/SaveCalibrationData" to="Background/TileOverlay" method="save_calibration_data"]
+[connection signal="palette_selection_changed" from="UIRoot/Palette" to="Background/TileOverlay" method="change_paint_selection"]
+[connection signal="pressed" from="UIRoot/Palette/Items/Title/Button" to="UIRoot/Palette" method="clear_selection"]
+[connection signal="pressed" from="UIRoot/Palette/Items/Erase" to="UIRoot/Palette" method="change_selection" binds= ["erase"]]

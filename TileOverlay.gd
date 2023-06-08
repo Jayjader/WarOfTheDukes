@@ -11,9 +11,10 @@ signal br_set(position)
 signal tr_set(position)
 signal tl_set(position)
 
+
 var Util = preload("res://util.gd")
 
-var tiles = {Vector2i(0,0): "blank"}
+var tiles = {}
 var tiles_origin = Vector2i(0,0)
 
 enum UIMode {
@@ -25,6 +26,7 @@ enum UIMode {
 	CALIBRATING_SIZE,
 	CHOOSING_ORIGIN,
 	NORMAL,
+	PAINTING_TILES,
 }
 var MODES = len(UIMode.keys())
 
@@ -46,6 +48,16 @@ var state = {
 		state = value
 		queue_redraw()
 
+func change_paint_selection(selection):
+	if selection == "":
+		var new_state = {mode=UIMode.NORMAL}
+		new_state.merge(state)
+		new_state.erase("selection")
+		state = new_state
+	else:
+		var new_state = {mode=UIMode.PAINTING_TILES, selection=selection}
+		new_state.merge(state)
+		state = new_state
 func start_calibration():
 	state = {mode=UIMode.CALIBRATING_BL, bottom_left=null, hover=null}
 func choose_bl(new_bl: Vector2):
@@ -85,10 +97,10 @@ func complete_size_calibration():
 	var hex_size = ((2 * hex_width / 3) + (hex_height / sqrt(3))) / 2
 	print_debug("calibrated: width %s, height %s, size %s" % [hex_width, hex_height, hex_size])
 	state = {mode=UIMode.CHOOSING_ORIGIN, origin_in_world_coordinates=null, hex_size=hex_size, hover=null}
-func choose_origin(new_origin: Vector2):
+func choose_origin(new_origin_position: Vector2):
 	state = {
 		mode = UIMode.CHOOSING_ORIGIN,
-		origin_in_world_coordinates = new_origin,
+		origin_in_world_coordinates = new_origin_position,
 		hex_size = state.hex_size,
 		hover = null
 	}
@@ -123,6 +135,14 @@ func load_calibration_data():
 	var data = file.get_var()
 	return {mode=UIMode.NORMAL, hex_size=data.hex_size, origin_in_world_coordinates=data.origin}
 
+
+func paint_tile(position: Vector2i, kind: String):
+	if kind == "erase":
+		tiles.erase(position)
+	else:
+		tiles[position] = kind
+	queue_redraw()
+
 func save_data(data=tiles):
 	var file = FileAccess.open("./map.data", FileAccess.WRITE)
 	file.store_var(data)
@@ -136,7 +156,6 @@ func load_data():
 func new_origin(origin: Vector2i):
 	tiles.clear()
 	tiles_origin = Vector2i(origin)
-	tiles[tiles_origin] = "blank"
 	emit_signal("origin_set", origin)
 	print_debug(
 		"hex coords according to origin=bottom_left: %s"
@@ -203,6 +222,20 @@ func nearest_hex_in_world(hovered, origin, hex_size):
 	var is_origin = nearest_axial == Vector2i(0, 0)
 	return [Util.hex_coords_to_pixel(nearest_axial, hex_size) + Vector2(origin), is_origin]
 
+const colors = {
+	Plains=Color.BEIGE,
+	City=Color.SLATE_GRAY,
+	Forest=Color.DARK_GREEN,
+	Cliff=Color.SADDLE_BROWN,
+	Lake=Color.BLUE,
+	Fortress=Color.BLACK,
+}
+func fill_hex(center: Vector2i, hex_size: float, kind: String, angle_offset:float=0):
+	var points = PackedVector2Array()
+	for i in range(6):
+		points.append(Util.hex_corner_trig(center, hex_size, i, angle_offset))
+	draw_colored_polygon(points, Color(colors[kind], 0.8))
+
 func _draw():
 	var temp_size = 25
 	if state.mode <= UIMode.CALIBRATING_SIZE:
@@ -217,7 +250,7 @@ func _draw():
 			draw_grid(self.position, self.size, origin, state.hex_size)
 			draw_hex(origin, state.hex_size, Color.REBECCA_PURPLE)
 			return
-	if state.mode == UIMode.NORMAL:
+	if state.mode >= UIMode.NORMAL:
 		var hovered = state.get("hover")
 		var origin = state.get("origin_in_world_coordinates")
 		var hex_size = state.get("hex_size")
@@ -228,6 +261,9 @@ func _draw():
 			draw_hex(nearest, state.hex_size, Color.REBECCA_PURPLE if is_origin else Color.LIGHT_SALMON)
 			draw_string_outline(get_theme_default_font(), nearest, "%s"%nearest_hex_to_pix(hovered, origin, hex_size), HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK)
 			draw_string(get_theme_default_font(), nearest, "%s"%nearest_hex_to_pix(hovered, origin, hex_size), HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE)
+		for tile in tiles:
+			fill_hex(Util.hex_coords_to_pixel(tile, hex_size) + origin, hex_size, tiles[tile])
+
 
 func _gui_input(event):
 	if state.mode != UIMode.NORMAL and event is InputEventMouseButton:
@@ -244,6 +280,10 @@ func _gui_input(event):
 					choose_tl(integer_position)
 				elif state.mode == UIMode.CHOOSING_ORIGIN:
 					choose_origin(integer_position)
+				elif state.mode == UIMode.PAINTING_TILES:
+					paint_tile(
+						nearest_hex_to_pix(state.hover, state.origin_in_world_coordinates, state.hex_size),
+						state.selection)
 				else:
 					return
 
