@@ -267,25 +267,25 @@ func _draw():
 
 func _gui_input(event):
 	if state.mode != UIMode.NORMAL and event is InputEventMouseButton:
-			if event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
-				accept_event()
-				var integer_position = Vector2i(event.position)
-				if state.mode == UIMode.CALIBRATING_BL:
-					choose_bl(integer_position)
-				elif state.mode == UIMode.CALIBRATING_BR:
-					choose_br(integer_position)
-				elif state.mode == UIMode.CALIBRATING_TR:
-					choose_tr(integer_position)
-				elif state.mode == UIMode.CALIBRATING_TL:
-					choose_tl(integer_position)
-				elif state.mode == UIMode.CHOOSING_ORIGIN:
-					choose_origin(integer_position)
-				elif state.mode == UIMode.PAINTING_TILES:
-					paint_tile(
-						nearest_hex_to_pix(state.hover, state.origin_in_world_coordinates, state.hex_size),
-						state.selection)
-				else:
-					return
+		if event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
+			accept_event()
+			var integer_position = Vector2i(event.position)
+			if state.mode == UIMode.CALIBRATING_BL:
+				choose_bl(integer_position)
+			elif state.mode == UIMode.CALIBRATING_BR:
+				choose_br(integer_position)
+			elif state.mode == UIMode.CALIBRATING_TR:
+				choose_tr(integer_position)
+			elif state.mode == UIMode.CALIBRATING_TL:
+				choose_tl(integer_position)
+			elif state.mode == UIMode.CHOOSING_ORIGIN:
+				choose_origin(integer_position)
+			elif state.mode == UIMode.PAINTING_TILES:
+				paint_tile(
+					nearest_hex_to_pix(state.hover, state.origin_in_world_coordinates, state.hex_size),
+					state.selection)
+			else:
+				return
 
 				queue_redraw()
 	if state.mode > UIMode.UNCALIBRATED and state.mode != UIMode.CALIBRATING_SIZE and event is InputEventMouseMotion:
