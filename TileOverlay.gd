@@ -17,53 +17,91 @@ var tiles = {Vector2i(0,0): "blank"}
 var tiles_origin = Vector2i(0,0)
 
 enum UIMode {
-	NORMAL,
+	UNCALIBRATED,
 	CALIBRATING_BL,
 	CALIBRATING_BR,
 	CALIBRATING_TR,
 	CALIBRATING_TL,
 	CALIBRATING_SIZE,
+	CHOOSING_ORIGIN,
+	NORMAL,
 }
 var MODES = len(UIMode.keys())
 
-var calibration = {
-	bottom_left = null,
-	bottom_right = null,
-	top_right = null,
-	top_left = null,
-	tiles_wide = null,
-	tiles_heigh = null,
-}
-
-@export var mode: UIMode = UIMode.NORMAL:
+var state = {
+	mode = UIMode.UNCALIBRATED,
+}:
 	set(value):
-		print_debug("uimode set to %s" % value)
-		emit_signal("calibration_mode_entered", "%s" % UIMode.find_key(value))
-		if mode == UIMode.CALIBRATING_SIZE and value == UIMode.NORMAL:
-			new_origin(calibration.bottom_left)
-		mode = value
+		print_debug("overlay state: %s" % value)
+		if value.get("bottom_left") != state.get("bottom_left"):
+			emit_signal("bl_set", value.get("bottom_left"))
+		if value.get("bottom_right") != state.get("bottom_right"):
+			emit_signal("br_set", value.get("bottom_right"))
+		if value.get("top_right") != state.get("top_right"):
+			emit_signal("tr_set", value.get("top_right"))
+		if value.get("top_left") != state.get("top_left"):
+			emit_signal("tl_set", value.get("top_left"))
+		if value.mode != state.mode:
+			emit_signal("calibration_mode_entered", "%s" % value.mode)
+		state = value
 		queue_redraw()
 
-func start_calibrate_first():
-	calibration =  {
-		bottom_left = null,
-		bottom_right = null,
-		top_right = null,
-		top_left = null,
-		tiles_wide = null,
-		tiles_heigh = null,
-	}
-	emit_signal("bl_set", null)
-	emit_signal("br_set", null)
-	emit_signal("tr_set", null)
-	emit_signal("tl_set", null)
-	self.rotation = 0
-	mode = UIMode.CALIBRATING_BL
+func start_calibration():
+	state = {mode=UIMode.CALIBRATING_BL, bottom_left=null, hover=null}
+func choose_bl(new_bl: Vector2):
+	state.merge({mode=UIMode.CALIBRATING_BR, bottom_left=new_bl, bottom_right=null, hover=null}, true)
+	state = state
+func choose_br(new_br: Vector2):
+	state.merge({mode=UIMode.CALIBRATING_TR, bottom_right=new_br, top_right=null, hover=null}, true)
+	state = state
+func choose_tr(new_tr: Vector2):
+	state.merge({mode=UIMode.CALIBRATING_TL, top_right=new_tr, top_left=null, hover=null}, true)
+	state = state
+func choose_tl(new_tl: Vector2):
+	state.merge({mode=UIMode.CALIBRATING_SIZE, top_left=new_tl, tiles_wide=null, tiles_heigh=null, hover=null}, true)
+	state = state
+func choose_tiles_wide(tiles_wide: String):
+	state.tiles_wide = float(tiles_wide)
+	state = state
+func choose_tiles_heigh(tiles_heigh: String):
+	state.tiles_heigh = float(tiles_heigh)
+	state = state
+func complete_size_calibration():
+	var hex_width = (Vector2(
+			state.bottom_right - state.bottom_left
+			+ state.top_right - state.top_left
+		) / 2).length() / (state.tiles_wide + 1)
+	var hex_height = (Vector2(
+			state.bottom_left - state.top_left
+			+ state.bottom_right - state.top_right
+		) / 2).length() / (state.tiles_heigh + 1)
+	# derive hex size from average of size derived from measured width and of size derived from measured height
+	var hex_size = ((2 * hex_width / 3) + (hex_height / sqrt(3))) / 2
+	print_debug("calibrated: width %s, height %s, size %s" % [hex_width, hex_height, hex_size])
+	state = {mode=UIMode.CHOOSING_ORIGIN, origin_in_world_coordinates=null, hex_size=hex_size, hover=null}
+#@export var mode: UIMode = UIMode.NORMAL:
+#	set(value):
+#		print_debug("uimode set to %s" % value)
+#		emit_signal("calibration_mode_entered", "%s" % UIMode.find_key(value))
+#		if mode == UIMode.CALIBRATING_SIZE and value == UIMode.NORMAL:
+#			new_origin(calibration.bottom_left)
+#		mode = value
+#		queue_redraw()
 
-func previous_calibration_point():
-	mode = ((mode + MODES - 1) % MODES) as UIMode
-func next_calibration_point():
-	mode = ((mode + 1) % MODES) as UIMode
+func previous_calibration_step():
+	if state.mode < UIMode.NORMAL and state.mode > UIMode.UNCALIBRATED:
+		state.mode = ((state.mode + MODES - 1) % MODES) as UIMode
+	state = state
+func next_calibration_step():
+	if state.mode < UIMode.CALIBRATING_SIZE:
+		state.mode = (state.mode + 1) as UIMode
+		state = state
+	elif state.mode == UIMode.CALIBRATING_SIZE and state.get("tiles_wide") != null and state.get("tiles_heigh") != null:
+		complete_size_calibration()
+	elif state.mode == UIMode.CHOOSING_ORIGIN and state.get("origin_in_world_coordinates") != null:
+		state.mode = UIMode.NORMAL
+		state.erase("hover")
+		state = state
 
 func save_data(data=tiles):
 	var file = FileAccess.open("./map.data", FileAccess.WRITE)
@@ -80,40 +118,42 @@ func new_origin(origin: Vector2i):
 	tiles_origin = Vector2i(origin)
 	tiles[tiles_origin] = "blank"
 	emit_signal("origin_set", origin)
+	print_debug(
+		"hex coords according to origin=bottom_left: %s"
+		% Util.pixel_coords_to_hex(tiles_origin, state.hex_size)
+	)
 
-func draw_hex(center: Vector2i, hex_size: float):
+func draw_hex(center: Vector2i, hex_size: float, angle_offset:float=0):
 	var color = Color.RED
 	if center == tiles_origin:
 		color = Color.REBECCA_PURPLE
 	for i in range(6):
 		draw_line(
-			Util.hex_corner_trig(center, hex_size, i),
-			Util.hex_corner_trig(center, hex_size, i+1),
+			Util.hex_corner_trig(center, hex_size, i, angle_offset),
+			Util.hex_corner_trig(center, hex_size, i+1, angle_offset),
 			color, 4)
 
-func draw_calibration(c, c_mode: UIMode, hex_size: float):
-	if c.bottom_left != null:
+func draw_calibration(c: Dictionary, hex_size: float):
+	if c.get("bottom_left") != null:
 		draw_hex(c.bottom_left, hex_size)
-	if c.bottom_right != null:
+	if c.get("bottom_right") != null:
 		draw_hex(c.bottom_right, hex_size)
-	if c.top_right != null:
+	if c.get("top_right") != null:
 		draw_hex(c.top_right, hex_size)
-	if c.top_left != null:
+	if c.get("top_left") != null:
 		draw_hex(c.top_left, hex_size)
 
-	var last_chosen = null
-	if c_mode == UIMode.CALIBRATING_BR:
-		last_chosen = c.bottom_left
-	if c_mode == UIMode.CALIBRATING_TR:
-		last_chosen = c.bottom_right
-	if c_mode == UIMode.CALIBRATING_TL:
-		last_chosen = c.top_right
-	if c_mode == UIMode.CALIBRATING_SIZE:
-		last_chosen = c.top_left
-	if last_chosen != null:
+	if state.get("hover") != null:
 		var line_length = 400
-		for direction in [Vector2i.UP, Vector2i.LEFT, Vector2i.DOWN, Vector2i.RIGHT]:
-			draw_line(last_chosen, last_chosen + direction * line_length, Color.GREEN)
+		for direction in [
+			Vector2.LEFT,
+			(sqrt(3) * Vector2.UP + Vector2.LEFT) / 2,
+			(sqrt(3) * Vector2.DOWN + Vector2.LEFT) / 2,
+			Vector2.RIGHT,
+			(sqrt(3) * Vector2.DOWN + Vector2.RIGHT) / 2,
+			(sqrt(3) * Vector2.UP + Vector2.RIGHT) / 2,
+			]:
+			draw_line(state.hover, Vector2(state.hover) + direction * line_length, Color.GREEN)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -122,84 +162,54 @@ func _ready():
 	if data != null:
 		tiles = data
 
+
+func draw_grid(top_left: Vector2, bottom_right: Vector2):
+	pass
+
+
 func _draw():
 	var temp_size = 25
-	if mode != UIMode.NORMAL:
-		draw_calibration(calibration, mode, temp_size)
-
-	if calibration.bottom_left == null or \
-		calibration.bottom_right == null or \
-		calibration.top_right == null or \
-		calibration.top_left == null or \
-		calibration.tiles_wide == null or\
-		calibration.tiles_heigh == null:
+	if state.mode <= UIMode.CALIBRATING_SIZE:
+		draw_calibration(state, temp_size)
 		return
-	
-	var hex_width = (Vector2(
-			calibration.bottom_right - calibration.bottom_left
-			+ calibration.top_right - calibration.top_left
-		) / 2).length() / (calibration.tiles_wide + 1)
-	var hex_height = (Vector2(
-		calibration.bottom_left - calibration.top_left
-		+ calibration.bottom_right - calibration.top_right
-		) / 2).length() / (calibration.tiles_heigh + 1)
-	# derive hex size from average of size derived from measured width and of size derived from measured height
-	var hex_size = ((2 * hex_width / 3) + (hex_height / sqrt(3))) / 2
-	print_debug("calibrated: width %s, height %s, size %s" % [hex_width, hex_height, hex_size])
-	for i in range(0, calibration.tiles_wide+2):
-		for j in range(0, calibration.tiles_heigh+2):
-			if i % 2 == 0:
-				draw_hex(
-					Vector2i(tiles_origin.x + i * Util.horizontal_distance(hex_size),
-							 tiles_origin.y - j * Util.vertical_distance(hex_size)
-					),
-					hex_size
-				)
-			else:
-				if j <= calibration.tiles_heigh:
-					draw_hex(
-						Vector2i(tiles_origin.x + i * Util.horizontal_distance(hex_size),
-								 tiles_origin.y - float(2*j+1)/2 * Util.vertical_distance(hex_size)
-						),
-						hex_size
-					)
-	for tile in tiles:
-		draw_hex(tile, hex_size)
+	if state.mode == UIMode.CHOOSING_ORIGIN:
+		var hovered = state.get("hover")
+		if hovered != null:
+			draw_hex(hovered, state.hex_size)
+		var origin = state.get("origin_in_world_coordinates")
+		if origin != null:
+			draw_hex(origin, state.hex_size)
+			# 5x2 square:
+			var grid_w = self.size.x / Util.horizontal_distance(state.hex_size)
+			var grid_h = self.size.y / Util.vertical_distance(state.hex_size)
+			for q in range(grid_w):
+				for r in range(-q/2, -q/2+grid_h, 1):
+					draw_hex(Util.hex_coords_to_pixel(Vector2i(q, r), state.hex_size) + Vector2(origin), state.hex_size)
+		return
 
 func _gui_input(event):
-	if mode != UIMode.NORMAL:
-		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
-			accept_event()
-			var integer_position = Vector2i(self.position + event.position)
-			if mode == UIMode.CALIBRATING_BL:
-				calibration.bottom_left = integer_position
-				emit_signal("bl_set", calibration.bottom_left)
-				queue_redraw()
-			elif mode == UIMode.CALIBRATING_BR:
-				calibration.bottom_right = integer_position
-				emit_signal("br_set", calibration.bottom_right)
-				#var old_pivot = self.pivot_offset
-				#self.pivot_offset = calibration[1]
-				#self.rotation = acos(
-				#	Vector2(calibration[1] - calibration[0])
-				#		.normalized()
-				#		.dot(Vector2.RIGHT)
-				#)
-				#self.pivot_offset = old_pivot
-				queue_redraw()
-			elif mode == UIMode.CALIBRATING_TR:
-				calibration.top_right = integer_position
-				emit_signal("tr_set", calibration.top_right)
-				queue_redraw()
-			elif mode == UIMode.CALIBRATING_TL:
-				calibration.top_left = integer_position
-				emit_signal("tl_set", calibration.top_left)
-				queue_redraw()
+	if state.mode != UIMode.NORMAL:
+		if event is InputEventMouseButton:
+			if event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
+				accept_event()
+				var integer_position = Vector2i(event.position)
+				if state.mode == UIMode.CALIBRATING_BL:
+					choose_bl(integer_position)
+				elif state.mode == UIMode.CALIBRATING_BR:
+					choose_br(integer_position)
+				elif state.mode == UIMode.CALIBRATING_TR:
+					choose_tr(integer_position)
+				elif state.mode == UIMode.CALIBRATING_TL:
+					choose_tl(integer_position)
+				elif state.mode == UIMode.CHOOSING_ORIGIN:
+					state.origin_in_world_coordinates = integer_position
+					state = state
+				else:
+					return
 
-func set_tiles_heigh(value: String):
-	calibration.tiles_heigh = float(value)
-	queue_redraw()
-	
-func set_tiles_wide(value: String):
-	calibration.tiles_wide = float(value)
-	queue_redraw()
+				queue_redraw()
+		if state.mode > UIMode.UNCALIBRATED and (
+			state.mode < UIMode.CALIBRATING_SIZE or state.mode == UIMode.CHOOSING_ORIGIN
+		) and event is InputEventMouseMotion:
+			state.hover = Vector2i(self.position + event.position)
+			queue_redraw()
