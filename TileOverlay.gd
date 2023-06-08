@@ -24,6 +24,7 @@ enum UIMode {
 	CALIBRATING_TL,
 	CALIBRATING_SIZE,
 }
+var MODES = len(UIMode.keys())
 
 var calibration = {
 	bottom_left = null,
@@ -37,8 +38,11 @@ var calibration = {
 @export var mode: UIMode = UIMode.NORMAL:
 	set(value):
 		print_debug("uimode set to %s" % value)
+		emit_signal("calibration_mode_entered", "%s" % UIMode.find_key(value))
+		if mode == UIMode.CALIBRATING_SIZE and value == UIMode.NORMAL:
+			new_origin(calibration.bottom_left)
 		mode = value
-		emit_signal("calibration_mode_entered", "%s" % mode)
+		queue_redraw()
 
 func start_calibrate_first():
 	calibration =  {
@@ -57,9 +61,9 @@ func start_calibrate_first():
 	mode = UIMode.CALIBRATING_BL
 
 func previous_calibration_point():
-	mode = mode - 1 as UIMode
+	mode = ((mode + MODES - 1) % MODES) as UIMode
 func next_calibration_point():
-	mode = mode + 1 as UIMode
+	mode = ((mode + 1) % MODES) as UIMode
 
 func save_data(data=tiles):
 	var file = FileAccess.open("./map.data", FileAccess.WRITE)
@@ -75,7 +79,6 @@ func new_origin(origin: Vector2i):
 	tiles.clear()
 	tiles_origin = Vector2i(origin)
 	tiles[tiles_origin] = "blank"
-	queue_redraw()
 	emit_signal("origin_set", origin)
 
 func draw_hex(center: Vector2i, hex_size: float):
@@ -88,7 +91,7 @@ func draw_hex(center: Vector2i, hex_size: float):
 			Util.hex_corner_trig(center, hex_size, i+1),
 			color, 4)
 
-func draw_calibration(c, mode: UIMode, hex_size: float):
+func draw_calibration(c, c_mode: UIMode, hex_size: float):
 	if c.bottom_left != null:
 		draw_hex(c.bottom_left, hex_size)
 	if c.bottom_right != null:
@@ -99,13 +102,13 @@ func draw_calibration(c, mode: UIMode, hex_size: float):
 		draw_hex(c.top_left, hex_size)
 
 	var last_chosen = null
-	if mode == UIMode.CALIBRATING_BR:
+	if c_mode == UIMode.CALIBRATING_BR:
 		last_chosen = c.bottom_left
-	if mode == UIMode.CALIBRATING_TR:
+	if c_mode == UIMode.CALIBRATING_TR:
 		last_chosen = c.bottom_right
-	if mode == UIMode.CALIBRATING_TL:
+	if c_mode == UIMode.CALIBRATING_TL:
 		last_chosen = c.top_right
-	if mode == UIMode.CALIBRATING_SIZE:
+	if c_mode == UIMode.CALIBRATING_SIZE:
 		last_chosen = c.top_left
 	if last_chosen != null:
 		var line_length = 400
@@ -140,9 +143,9 @@ func _draw():
 		calibration.bottom_left - calibration.top_left
 		+ calibration.bottom_right - calibration.top_right
 		) / 2).length() / (calibration.tiles_heigh + 1)
+	# derive hex size from average of size derived from measured width and of size derived from measured height
 	var hex_size = ((2 * hex_width / 3) + (hex_height / sqrt(3))) / 2
 	print_debug("calibrated: width %s, height %s, size %s" % [hex_width, hex_height, hex_size])
-	#var hex_size = (calibration[1] - calibration[0]).length() / (sqrt(3) * (calibration[2] + 1))
 	for i in range(0, calibration.tiles_wide+2):
 		for j in range(0, calibration.tiles_heigh+2):
 			if i % 2 == 0:
@@ -171,12 +174,10 @@ func _gui_input(event):
 			if mode == UIMode.CALIBRATING_BL:
 				calibration.bottom_left = integer_position
 				emit_signal("bl_set", calibration.bottom_left)
-				mode = UIMode.CALIBRATING_BR
 				queue_redraw()
 			elif mode == UIMode.CALIBRATING_BR:
 				calibration.bottom_right = integer_position
 				emit_signal("br_set", calibration.bottom_right)
-				mode = UIMode.CALIBRATING_TR
 				#var old_pivot = self.pivot_offset
 				#self.pivot_offset = calibration[1]
 				#self.rotation = acos(
@@ -189,23 +190,16 @@ func _gui_input(event):
 			elif mode == UIMode.CALIBRATING_TR:
 				calibration.top_right = integer_position
 				emit_signal("tr_set", calibration.top_right)
-				mode = UIMode.CALIBRATING_TL
 				queue_redraw()
 			elif mode == UIMode.CALIBRATING_TL:
 				calibration.top_left = integer_position
 				emit_signal("tl_set", calibration.top_left)
-				mode = UIMode.CALIBRATING_SIZE
 				queue_redraw()
 
 func set_tiles_heigh(value: String):
 	calibration.tiles_heigh = float(value)
+	queue_redraw()
 	
 func set_tiles_wide(value: String):
 	calibration.tiles_wide = float(value)
-
-func _process(_delta):
-	if mode == UIMode.CALIBRATING_SIZE and \
-		calibration.tiles_wide != null and \
-		calibration.tiles_heigh != null:
-			mode = UIMode.NORMAL
-			new_origin(calibration.bottom_left)
+	queue_redraw()
