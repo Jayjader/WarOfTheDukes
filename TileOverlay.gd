@@ -43,31 +43,35 @@ var state = {
 			emit_signal("tl_set", value.get("top_left"))
 		if value.mode != state.mode:
 			emit_signal("calibration_mode_entered", "%s" % UIMode.find_key(value.mode))
-		#if value.get("hover") != state.get("hover"):
-		#	state.hover = nearest_hex_in_world(value.hover, state.origin_in_world_coordinates, state.hex_size)[0]
 		state = value
 		queue_redraw()
 
 func start_calibration():
 	state = {mode=UIMode.CALIBRATING_BL, bottom_left=null, hover=null}
 func choose_bl(new_bl: Vector2):
-	state.merge({mode=UIMode.CALIBRATING_BR, bottom_left=new_bl, bottom_right=null, hover=null}, true)
-	state = state
+	var next_state = {mode=UIMode.CALIBRATING_BR, bottom_left=new_bl, bottom_right=null, hover=null}
+	next_state.merge(state, false)
+	state = next_state
 func choose_br(new_br: Vector2):
-	state.merge({mode=UIMode.CALIBRATING_TR, bottom_right=new_br, top_right=null, hover=null}, true)
-	state = state
+	var next_state = {mode=UIMode.CALIBRATING_TR, bottom_right=new_br, top_right=null, hover=null}
+	next_state.merge(state, false)
+	state = next_state
 func choose_tr(new_tr: Vector2):
-	state.merge({mode=UIMode.CALIBRATING_TL, top_right=new_tr, top_left=null, hover=null}, true)
-	state = state
+	var next_state = {mode=UIMode.CALIBRATING_TL, top_right=new_tr, top_left=null, hover=null}
+	next_state.merge(state, false)
+	state = next_state
 func choose_tl(new_tl: Vector2):
-	state.merge({mode=UIMode.CALIBRATING_SIZE, top_left=new_tl, tiles_wide=null, tiles_heigh=null, hover=null}, true)
-	state = state
+	var next_state = {mode=UIMode.CALIBRATING_SIZE, top_left=new_tl, tiles_wide=null, tiles_heigh=null, hover=null}
+	next_state.merge(state, false)
+	state = next_state
 func choose_tiles_wide(tiles_wide: String):
-	state.tiles_wide = float(tiles_wide)
-	state = state
+	var next_state = {tiles_wide = float(tiles_wide)}
+	next_state.merge(state, false)
+	state = next_state
 func choose_tiles_heigh(tiles_heigh: String):
-	state.tiles_heigh = float(tiles_heigh)
-	state = state
+	var next_state = {tiles_heigh = float(tiles_heigh)}
+	next_state.merge(state, false)
+	state = next_state
 func complete_size_calibration():
 	var hex_width = (Vector2(
 			state.bottom_right - state.bottom_left
@@ -90,19 +94,23 @@ func choose_origin(new_origin: Vector2):
 	}
 
 func previous_calibration_step():
+	var next_state = {}
+	next_state.merge(state)
 	if state.mode < UIMode.NORMAL and state.mode > UIMode.UNCALIBRATED:
-		state.mode = ((state.mode + MODES - 1) % MODES) as UIMode
-	state = state
+		next_state.mode = ((state.mode + MODES - 1) % MODES) as UIMode
+	state = next_state
 func next_calibration_step():
+	var next_state = {}
+	next_state.merge(state)
 	if state.mode < UIMode.CALIBRATING_SIZE:
-		state.mode = (state.mode + 1) as UIMode
-		state = state
+		next_state.mode = (state.mode + 1) as UIMode
+		state = next_state
 	elif state.mode == UIMode.CALIBRATING_SIZE and state.get("tiles_wide") != null and state.get("tiles_heigh") != null:
 		complete_size_calibration()
 	elif state.mode == UIMode.CHOOSING_ORIGIN and state.get("origin_in_world_coordinates") != null:
-		state.mode = UIMode.NORMAL
-		state.hover = null
-		state = state
+		next_state.mode = UIMode.NORMAL
+		next_state.hover = null
+		state = next_state
 
 func save_calibration_data(data=state):
 	var file = FileAccess.open("./calibration.data", FileAccess.WRITE)
