@@ -32,7 +32,7 @@ var state = {
 	mode = UIMode.UNCALIBRATED,
 }:
 	set(value):
-		print_debug("overlay state: %s" % value)
+		print_debug("overlay state: %s; old state: %s" % [value, state])
 		if value.get("bottom_left") != state.get("bottom_left"):
 			emit_signal("bl_set", value.get("bottom_left"))
 		if value.get("bottom_right") != state.get("bottom_right"):
@@ -42,7 +42,7 @@ var state = {
 		if value.get("top_left") != state.get("top_left"):
 			emit_signal("tl_set", value.get("top_left"))
 		if value.mode != state.mode:
-			emit_signal("calibration_mode_entered", "%s" % value.mode)
+			emit_signal("calibration_mode_entered", "%s" % UIMode.find_key(value.mode))
 		if value.get("hover") != state.get("hover"):
 			state.hover = nearest_hex_in_world(value.hover, state.origin_in_world_coordinates, state.hex_size)
 		state = value
@@ -96,6 +96,17 @@ func next_calibration_step():
 		state.mode = UIMode.NORMAL
 		state.hover = null
 		state = state
+
+func save_calibration_data(data=state):
+	var file = FileAccess.open("./calibration.data", FileAccess.WRITE)
+	file.store_var({origin=data.origin_in_world_coordinates, hex_size=data.hex_size})
+
+func load_calibration_data():
+	var file = FileAccess.open("./calibration.data", FileAccess.READ)
+	if file == null:
+		return null
+	var data = file.get_var()
+	return {mode=UIMode.NORMAL, hex_size=data.hex_size, origin_in_world_coordinates=data.origin}
 
 func save_data(data=tiles):
 	var file = FileAccess.open("./map.data", FileAccess.WRITE)
@@ -155,6 +166,10 @@ func _ready():
 	print_debug("loaded: %s"%data)
 	if data != null:
 		tiles = data
+	var calib_data = load_calibration_data()
+	print_debug("calibration: %s"%calib_data)
+	if calib_data != null:
+		state = calib_data
 
 
 func draw_grid(top_left: Vector2, bottom_right: Vector2, origin: Vector2, hex_size: float):
@@ -195,7 +210,7 @@ func _draw():
 		var hovered = state.get("hover")
 		var origin = state.get("origin_in_world_coordinates")
 		var hex_size = state.get("hex_size")
-		if hovered != null and origin != null and hex_size != null:
+		if (hovered != null) and (origin != null) and (hex_size != null):
 			draw_hex(nearest_hex_in_world(hovered, origin, hex_size), state.hex_size)
 
 func _gui_input(event):

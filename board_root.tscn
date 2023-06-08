@@ -123,6 +123,10 @@ layout_mode = 2
 layout_mode = 2
 text = "Save Map Data"
 
+[node name="SaveCalibrationData" type="Button" parent="UIRoot/Panel/EditControls"]
+layout_mode = 2
+text = "Save Calibration Data"
+
 [connection signal="bl_set" from="Background/TileOverlay" to="UIRoot/Panel/EditControls/OriginControls/Direct" method="on_bl_set"]
 [connection signal="br_set" from="Background/TileOverlay" to="UIRoot/Panel/EditControls/OriginControls/Direct" method="on_br_set"]
 [connection signal="calibration_mode_entered" from="Background/TileOverlay" to="UIRoot/Panel/EditControls/OriginControls/CalibrationMode" method="set_text"]
@@ -134,3 +138,4 @@ text = "Save Map Data"
 [connection signal="text_changed" from="UIRoot/Panel/EditControls/TilesWideControls/TilesWide" to="Background/TileOverlay" method="choose_tiles_wide"]
 [connection signal="text_changed" from="UIRoot/Panel/EditControls/TilesHeighControls/TilesHeigh" to="Background/TileOverlay" method="choose_tiles_heigh"]
 [connection signal="pressed" from="UIRoot/Panel/EditControls/SaveMapData" to="Background/TileOverlay" method="save_data"]
+[connection signal="pressed" from="UIRoot/Panel/EditControls/SaveCalibrationData" to="Background/TileOverlay" method="save_calibration_data"]
