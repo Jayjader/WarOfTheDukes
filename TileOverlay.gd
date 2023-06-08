@@ -286,8 +286,11 @@ func _gui_input(event):
 					state.selection)
 			else:
 				return
-
 				queue_redraw()
+		elif event.button_index == MOUSE_BUTTON_RIGHT and event.is_pressed() and state.mode == UIMode.PAINTING_TILES:
+			accept_event()
+			paint_tile(Vector2i(event.position), "erase")
+			queue_redraw()
 	if state.mode > UIMode.UNCALIBRATED and state.mode != UIMode.CALIBRATING_SIZE and event is InputEventMouseMotion:
 		state.hover = Vector2i(event.position)
 		queue_redraw()
