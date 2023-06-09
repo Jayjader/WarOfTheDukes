@@ -23,13 +23,13 @@ const cartesian_directions = [
 	  Vector2i(-1,0), Vector2i(-1,1), Vector2i(0,1) ]
 ]
 
-static func axial_to_cube(axial: Vector2i):
-	return Vector3i(axial.x, axial.y, -(axial.x+axial.y))
+static func axial_to_cube(axial: Vector2):
+	return Vector3(axial.x, axial.y, -(axial.x+axial.y))
 
-static func cube_to_axial(cube: Vector3i):
-	return Vector2i(cube.x, cube.y)
+static func cube_to_axial(cube: Vector3):
+	return Vector2(cube.x, cube.y)
 
-static func hex_coords_to_pixel(axial: Vector2i, hex_size: float):
+static func hex_coords_to_pixel(axial: Vector2, hex_size: float):
 	return hex_size * Vector2(
 		3 * axial.x,
 		sqrt(3) * axial.x + 2 * sqrt(3) * axial.y
@@ -54,3 +54,43 @@ static func round_to_nearest_hex(cube: Vector3):
 	else:
 		rounded.z = -rounded.x-rounded.y
 	return Vector3i(rounded)
+
+static func direction_to_center_in_cube(nearest_in_cube: Vector3):
+	var s_q = -nearest_in_cube.z+nearest_in_cube.x
+	var r_s = -nearest_in_cube.y+nearest_in_cube.z
+	var q_r = -nearest_in_cube.x+nearest_in_cube.y
+	var max_abs = max(abs(s_q), abs(r_s), abs(q_r))
+	var direction_in_cube
+	if max_abs == abs(s_q):
+		if s_q > 0: # top-left
+			direction_in_cube = 4
+		else: # bottom-right
+			direction_in_cube = 1
+	elif max_abs == abs(r_s):
+		if r_s > 0: # bottom
+			direction_in_cube = 2
+		else: # top
+			direction_in_cube = 5
+	else:
+		if q_r > 0: # top-right
+			direction_in_cube = 0
+		else: # bottom-left
+			direction_in_cube = 3
+	
+	if direction_in_cube != null:
+		return cube_directions[direction_in_cube]
+
+static func derive_border_normals_in_cube(border_position: Vector3):
+	var first
+	var second
+	if abs(border_position.x - round(border_position.x)) < 0.4:
+		first = 5
+		second = 2
+	elif abs(border_position.y - round(border_position.y)) < 0.4:
+		first = 1
+		second = 4
+	elif abs(border_position.z - round(border_position.z)) < 0.4:
+		first = 0
+		second = 3
+	return [cube_directions[first], cube_directions[second]]
+
