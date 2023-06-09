@@ -289,15 +289,12 @@ func _draw():
 				if kind.begins_with("Bridge"):
 					var bridge_width = hex_size / 6
 					
-					var first_rem
-					var second_rem
 					var basis_index = 0
 					while basis_index < 6 and Util.cube_directions[basis_index] != normals[0]:
 						basis_index += 1
-					first_rem = Util.cube_directions[(basis_index+6)%6]
-					second_rem = Util.cube_directions[(basis_index+7)%6]
+					var first_rem = Util.cube_directions[(basis_index+6)%6]
+					var second_rem = Util.cube_directions[(basis_index+7)%6]
 					
-					#print_debug("remaining basis vectors: %s, %s" % [first_rem, second_rem])
 					var bridge_offset_basis = Util.cube_to_axial(bridge_width * (first_rem - second_rem))
 					draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[0]) / 3, hex_size) + bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) + bridge_offset_basis, colors[kind], 10)
 					draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[0]) / 3, hex_size) - bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) - bridge_offset_basis, colors[kind], 10)
