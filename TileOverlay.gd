@@ -154,7 +154,7 @@ func paint_selected_border():
 	var hovered = state.hover
 	var origin = state.origin_in_world_coordinates
 	var hex_size = state.hex_size
-	var nearest_in_axial = nearest_hex_in_axial(hovered, origin, hex_size)
+	var nearest_in_axial = Util.nearest_hex_in_axial(hovered, origin, hex_size)
 	var relative_to_center_in_axial = Vector2(nearest_in_axial) - Util.pixel_coords_to_hex(Vector2(hovered) - origin, hex_size)
 	var in_cube = Util.axial_to_cube(relative_to_center_in_axial)
 	var direction_to_nearest_center = Util.direction_to_center_in_cube(in_cube)
@@ -181,12 +181,40 @@ func new_origin(origin: Vector2i):
 		% Util.pixel_coords_to_hex(tiles_origin, state.hex_size)
 	)
 
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	var data = load_data()
+	print_debug("loaded: %s"%data)
+	if data != null:
+		tiles = data.get("tiles")
+		borders = data.get("borders")
+		if borders == null:
+			borders = {}
+	var calib_data = load_calibration_data()
+	print_debug("calibration: %s"%calib_data)
+	if calib_data != null:
+		state = calib_data
+
+
 func draw_hex(center: Vector2i, hex_size: float, color:Color=Color.RED, angle_offset:float=0):
 	for i in range(6):
 		draw_line(
 			Util.hex_corner_trig(center, hex_size, i, angle_offset),
 			Util.hex_corner_trig(center, hex_size, i+1, angle_offset),
 			color, 4)
+
+const colors = {
+	Plains=Color.BEIGE,
+	City=Color.SLATE_GRAY,
+	Forest=Color.DARK_GREEN,
+	Cliff=Color.SADDLE_BROWN,
+	Lake=Color.BLUE,
+	Fortress=Color.BLACK,
+	Road=Color.BLACK,
+	River=Color.BLUE,
+	Bridge=Color.DIM_GRAY,
+	"Bridge (No Road)"=Color.SADDLE_BROWN,
+}
 
 func draw_calibration(c: Dictionary, hex_size: float):
 	if c.get("bottom_left") != null:
@@ -210,21 +238,6 @@ func draw_calibration(c: Dictionary, hex_size: float):
 			]:
 			draw_line(state.hover, Vector2(state.hover) + direction * line_length, Color.GREEN)
 
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	var data = load_data()
-	print_debug("loaded: %s"%data)
-	if data != null:
-		tiles = data.get("tiles")
-		borders = data.get("borders")
-		if borders == null:
-			borders = {}
-	var calib_data = load_calibration_data()
-	print_debug("calibration: %s"%calib_data)
-	if calib_data != null:
-		state = calib_data
-
-
 func draw_grid(top_left: Vector2, bottom_right: Vector2, origin: Vector2, hex_size: float):
 	var size_vec = bottom_right - top_left
 	var grid_width_hex_count = size_vec.x / Util.horizontal_distance(hex_size)
@@ -233,29 +246,6 @@ func draw_grid(top_left: Vector2, bottom_right: Vector2, origin: Vector2, hex_si
 		for r in range(-q/2, -q/2 + grid_height_hex_count):
 			draw_hex(origin + Util.hex_coords_to_pixel(Vector2i(q, r), hex_size), hex_size)
 
-func nearest_hex_in_axial(hovered: Vector2, origin: Vector2, hex_size: float):
-	var axial = Util.pixel_coords_to_hex(hovered - origin, hex_size)
-	var cube = Vector3(axial.x, axial.y, -axial.x-axial.y)
-	var nearest_cube = Util.round_to_nearest_hex(cube)
-	return Vector2i(nearest_cube.x, nearest_cube.y)
-	
-func nearest_hex_in_world(hovered, origin, hex_size):
-	var nearest_axial = nearest_hex_in_axial(hovered, origin, hex_size)
-	var is_origin = nearest_axial == Vector2i(0, 0)
-	return [Util.hex_coords_to_pixel(nearest_axial, hex_size) + Vector2(origin), is_origin]
-
-const colors = {
-	Plains=Color.BEIGE,
-	City=Color.SLATE_GRAY,
-	Forest=Color.DARK_GREEN,
-	Cliff=Color.SADDLE_BROWN,
-	Lake=Color.BLUE,
-	Fortress=Color.BLACK,
-	Road=Color.BLACK,
-	River=Color.BLUE,
-	Bridge=Color.DIM_GRAY,
-	"Bridge (No Road)"=Color.SADDLE_BROWN,
-}
 func fill_hex(center: Vector2i, hex_size: float, kind: String, angle_offset:float=0):
 	var points = PackedVector2Array()
 	for i in range(6):
@@ -292,7 +282,7 @@ func draw_border(kind, border_center, hex_size, origin):
 		draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[1]) / 3, hex_size) - bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) - bridge_offset_basis, colors[kind], 10)
 
 func draw_hover(mode, hovered, origin, hex_size):
-	var nearest_in_axial = nearest_hex_in_axial(hovered, origin, hex_size)
+	var nearest_in_axial = Util.nearest_hex_in_axial(hovered, origin, hex_size)
 	var nearest = Util.hex_coords_to_pixel(nearest_in_axial, hex_size) + origin
 	var is_origin = nearest_in_axial == Vector2i(0, 0)
 
@@ -314,7 +304,6 @@ func draw_hover(mode, hovered, origin, hex_size):
 		draw_hex(nearest, hex_size, Color.REBECCA_PURPLE if is_origin else Color.LIGHT_SALMON)
 		draw_string_outline(get_theme_default_font(), nearest, "%s"%nearest_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK)
 		draw_string(get_theme_default_font(), nearest, "%s"%nearest_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE)
-
 
 func _draw():
 	var temp_size = 25
@@ -347,25 +336,26 @@ func _draw():
 
 
 func _gui_input(event):
-	if state.mode != UIMode.NORMAL and event is InputEventMouseButton:
+	var current_mode = state.mode
+	if current_mode != UIMode.NORMAL and event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
 			accept_event()
 			var integer_position = Vector2i(event.position)
-			if state.mode == UIMode.CALIBRATING_BL:
+			if current_mode == UIMode.CALIBRATING_BL:
 				choose_bl(integer_position)
-			elif state.mode == UIMode.CALIBRATING_BR:
+			elif current_mode == UIMode.CALIBRATING_BR:
 				choose_br(integer_position)
-			elif state.mode == UIMode.CALIBRATING_TR:
+			elif current_mode == UIMode.CALIBRATING_TR:
 				choose_tr(integer_position)
-			elif state.mode == UIMode.CALIBRATING_TL:
+			elif current_mode == UIMode.CALIBRATING_TL:
 				choose_tl(integer_position)
-			elif state.mode == UIMode.CHOOSING_ORIGIN:
+			elif current_mode == UIMode.CHOOSING_ORIGIN:
 				choose_origin(integer_position)
-			elif state.mode == UIMode.PAINTING_TILES:
+			elif current_mode == UIMode.PAINTING_TILES:
 				paint_tile(
-					nearest_hex_in_axial(state.hover, state.origin_in_world_coordinates, state.hex_size),
+					Util.nearest_hex_in_axial(state.hover, state.origin_in_world_coordinates, state.hex_size),
 					state.selection)
-			elif state.mode == UIMode.PAINTING_BORDERS:
+			elif current_mode == UIMode.PAINTING_BORDERS:
 				paint_selected_border()
 			else:
 				return
@@ -374,6 +364,6 @@ func _gui_input(event):
 			accept_event()
 			paint_tile(Vector2i(event.position), "erase-tile")
 			queue_redraw()
-	if state.mode > UIMode.UNCALIBRATED and state.mode != UIMode.CALIBRATING_SIZE and event is InputEventMouseMotion:
+	if current_mode > UIMode.UNCALIBRATED and current_mode != UIMode.CALIBRATING_SIZE and event is InputEventMouseMotion:
 		state.hover = Vector2i(event.position)
 		queue_redraw()
