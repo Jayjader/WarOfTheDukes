@@ -163,6 +163,10 @@ grow_vertical = 2
 layout_mode = 2
 text = "Save Map Data"
 
+[node name="LoadMapData" type="Button" parent="UIRoot/Palette/Items"]
+layout_mode = 2
+text = "Load Map Data"
+
 [node name="HSeparator" type="HSeparator" parent="UIRoot/Palette/Items"]
 layout_mode = 2
 
@@ -226,6 +230,7 @@ text = "Erase Border"
 [connection signal="palette_selection_cleared" from="UIRoot/Palette" to="Background/TileOverlay" method="change_paint_selection" binds= [""]]
 [connection signal="palette_tile_selected" from="UIRoot/Palette" to="Background/TileOverlay" method="change_paint_selection"]
 [connection signal="pressed" from="UIRoot/Palette/Items/SaveMapData" to="." method="_on_map_data_save"]
+[connection signal="pressed" from="UIRoot/Palette/Items/LoadMapData" to="MapDataSaveLoad" method="load_data"]
 [connection signal="pressed" from="UIRoot/Palette/Items/Button" to="UIRoot/Palette" method="clear_selection"]
 [connection signal="pressed" from="UIRoot/Palette/Items/Tiles/Erase" to="UIRoot/Palette" method="change_selection" binds= ["erase-tile"]]
 [connection signal="pressed" from="UIRoot/Palette/Items/Borders/Erase" to="UIRoot/Palette" method="change_selection" binds= ["erase-border"]]
