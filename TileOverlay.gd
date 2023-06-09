@@ -275,19 +275,29 @@ func _draw():
 				var kind = borders[border_center]
 				var normals = Util.derive_border_normals_in_cube(Util.axial_to_cube(border_center))
 				var hex_above_border = Util.cube_to_axial(normals[0])
-				#var hex_below_border = Util.cube_to_axial(normals[1])
 				var a_hex_touching_border = border_center + Util.cube_to_axial(normals[0]) / 2
 				var hex_index = 0
 				while hex_index < 5 and Util.cube_directions[hex_index] != normals[0]:
 					hex_index += 1
-				#var above_index = Util.cube_directions.find(Vector3i(normals[0]))
-				#var below_index = Util.cube_directions.find(Vector3i(normals[1]))
 				var first_corner = origin + Util.hex_corner_trig(Util.hex_coords_to_pixel(a_hex_touching_border, hex_size), hex_size, (hex_index+2)%6)
 				var second_corner = origin + Util.hex_corner_trig(Util.hex_coords_to_pixel(a_hex_touching_border, hex_size), hex_size, (hex_index+3)%6)
-				draw_line(first_corner, second_corner, colors[kind], 10)
-				#var start_hex_corner = Util.hex_corner_trig()
-				#if kind == "bridge":
-				#	draw_line(Util.hex_coords_to_pixel(border, hex_size) + origin, hex_size, borders[border], 16)
+				if kind != "Road":
+					draw_line(first_corner, second_corner, colors[kind if not kind.begins_with("Bridge") else "River"], 10)
+				else:
+					draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[0]) / 3, hex_size), origin + Util.hex_coords_to_pixel(border_center, hex_size), colors[kind], 10)
+					draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[1]) / 3, hex_size), origin + Util.hex_coords_to_pixel(border_center, hex_size), colors[kind], 10)
+				if kind.begins_with("Bridge"):
+					var bridge_width = hex_size / 3
+					var remaining_basis_vectors = []
+					for vec in Util.cube_directions:
+						if normals[0] != vec and normals[1] != vec:
+							if not remaining_basis_vectors.has(-vec) and not remaining_basis_vectors.has(vec):
+								remaining_basis_vectors.append(vec)
+					var bridge_offset_basis = 2 * Util.cube_to_axial(remaining_basis_vectors[0] + remaining_basis_vectors[1])
+					draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[0]) / 3, hex_size) + bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) + bridge_offset_basis, colors[kind], 10)
+					draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[0]) / 3, hex_size) - bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) - bridge_offset_basis, colors[kind], 10)
+					draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[1]) / 3, hex_size) + bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) + bridge_offset_basis, colors[kind], 10)
+					draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[1]) / 3, hex_size) - bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) - bridge_offset_basis, colors[kind], 10)
 			if hovered != null:
 				var nearest_in_axial = nearest_hex_in_axial(hovered, origin, hex_size)
 				var nearest = Util.hex_coords_to_pixel(nearest_in_axial, hex_size) + origin
@@ -300,9 +310,9 @@ func _draw():
 					draw_circle(Util.hex_coords_to_pixel(border_center_in_axial, hex_size) + origin, 20, Color.DEEP_PINK)
 					var normals = Util.derive_border_normals_in_cube(Util.axial_to_cube(border_center_in_axial))
 					draw_line(
-						Util.hex_coords_to_pixel(border_center_in_axial + Util.cube_to_axial(Vector3(normals[0])), hex_size) + origin,
-						Util.hex_coords_to_pixel(border_center_in_axial + Util.cube_to_axial(Vector3(normals[1])), hex_size) + origin,
-						Color.GREEN, 20)
+						Util.hex_coords_to_pixel(border_center_in_axial + Util.cube_to_axial(Vector3(normals[0]))/2, hex_size) + origin,
+						Util.hex_coords_to_pixel(border_center_in_axial + Util.cube_to_axial(Vector3(normals[1]))/2, hex_size) + origin,
+						Color.GREEN, 10)
 					draw_string_outline(get_theme_default_font(), nearest, "%s"%border_center_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK)
 					draw_string(get_theme_default_font(), nearest, "%s"%border_center_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE)
 
