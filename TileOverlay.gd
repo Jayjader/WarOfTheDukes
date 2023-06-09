@@ -127,8 +127,9 @@ func next_calibration_step():
 		state = next_state
 
 func save_calibration_data(data=state):
-	var file = FileAccess.open("./calibration.data", FileAccess.WRITE)
-	file.store_var({origin=data.origin_in_world_coordinates, hex_size=data.hex_size})
+	if data.mode == UIMode.NORMAL:
+		var file = FileAccess.open("./calibration.data", FileAccess.WRITE)
+		file.store_var({origin=data.origin_in_world_coordinates, hex_size=data.hex_size})
 
 func load_calibration_data():
 	var file = FileAccess.open("./calibration.data", FileAccess.READ)
@@ -149,6 +150,17 @@ func paint_border(position: Vector2, kind: String):
 		borders.erase(position)
 	else:
 		borders[position] = kind
+func paint_selected_border():
+	var hovered = state.hover
+	var origin = state.origin_in_world_coordinates
+	var hex_size = state.hex_size
+	var nearest_in_axial = nearest_hex_in_axial(hovered, origin, hex_size)
+	var relative_to_center_in_axial = Vector2(nearest_in_axial) - Util.pixel_coords_to_hex(Vector2(hovered) - origin, hex_size)
+	var in_cube = Util.axial_to_cube(relative_to_center_in_axial)
+	var direction_to_nearest_center = Util.direction_to_center_in_cube(in_cube)
+	var border_center_in_axial = Vector2(nearest_in_axial) + Util.cube_to_axial(direction_to_nearest_center) / 2
+
+	paint_border(border_center_in_axial, state.selection)
 
 func save_data(data={tiles=tiles,borders=borders}):
 	var file = FileAccess.open("./map.data", FileAccess.WRITE)
@@ -250,12 +262,68 @@ func fill_hex(center: Vector2i, hex_size: float, kind: String, angle_offset:floa
 		points.append(Util.hex_corner_trig(center, hex_size, i, angle_offset))
 	draw_colored_polygon(points, Color(colors[kind], 0.8))
 
+func draw_border(kind, border_center, hex_size, origin):
+	var normals = Util.derive_border_normals_in_cube(Util.axial_to_cube(border_center))
+	var hex_above_border = Util.cube_to_axial(normals[0])
+	var a_hex_touching_border = border_center + Util.cube_to_axial(normals[0]) / 2
+	var hex_index = 0
+	while hex_index < 5 and Util.cube_directions[hex_index] != normals[0]:
+		hex_index += 1
+	var first_corner = origin + Util.hex_corner_trig(Util.hex_coords_to_pixel(a_hex_touching_border, hex_size), hex_size, (hex_index+2)%6)
+	var second_corner = origin + Util.hex_corner_trig(Util.hex_coords_to_pixel(a_hex_touching_border, hex_size), hex_size, (hex_index+3)%6)
+	if kind != "Road":
+		draw_line(first_corner, second_corner, colors[kind if not kind.begins_with("Bridge") else "River"], 10)
+	else:
+		draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[0]) / 3, hex_size), origin + Util.hex_coords_to_pixel(border_center, hex_size), colors[kind], 10)
+		draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[1]) / 3, hex_size), origin + Util.hex_coords_to_pixel(border_center, hex_size), colors[kind], 10)
+	if kind.begins_with("Bridge"):
+		var bridge_width = hex_size / 6
+
+		var basis_index = 0
+		while basis_index < 6 and Util.cube_directions[basis_index] != normals[0]:
+			basis_index += 1
+		var first_rem = Util.cube_directions[(basis_index+6)%6]
+		var second_rem = Util.cube_directions[(basis_index+7)%6]
+
+		var bridge_offset_basis = Util.cube_to_axial(bridge_width * (first_rem - second_rem))
+		draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[0]) / 3, hex_size) + bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) + bridge_offset_basis, colors[kind], 10)
+		draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[0]) / 3, hex_size) - bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) - bridge_offset_basis, colors[kind], 10)
+		draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[1]) / 3, hex_size) + bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) + bridge_offset_basis, colors[kind], 10)
+		draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[1]) / 3, hex_size) - bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) - bridge_offset_basis, colors[kind], 10)
+
+func draw_hover(mode, hovered, origin, hex_size):
+	var nearest_in_axial = nearest_hex_in_axial(hovered, origin, hex_size)
+	var nearest = Util.hex_coords_to_pixel(nearest_in_axial, hex_size) + origin
+	var is_origin = nearest_in_axial == Vector2i(0, 0)
+
+	if mode == UIMode.PAINTING_BORDERS:
+		var relative_to_center_in_axial = Vector2(nearest_in_axial) - Util.pixel_coords_to_hex(Vector2(hovered) - origin, hex_size)
+		var in_cube = Util.axial_to_cube(relative_to_center_in_axial)
+		var direction_to_nearest_center = Util.direction_to_center_in_cube(in_cube)
+		var border_center_in_axial = Vector2(nearest_in_axial) + Util.cube_to_axial(direction_to_nearest_center) / 2
+		draw_circle(Util.hex_coords_to_pixel(border_center_in_axial, hex_size) + origin, 20, Color.DEEP_PINK)
+		var normals = Util.derive_border_normals_in_cube(Util.axial_to_cube(border_center_in_axial))
+		draw_line(
+			Util.hex_coords_to_pixel(border_center_in_axial + Util.cube_to_axial(Vector3(normals[0]))/2, hex_size) + origin,
+			Util.hex_coords_to_pixel(border_center_in_axial + Util.cube_to_axial(Vector3(normals[1]))/2, hex_size) + origin,
+			Color.GREEN, 10)
+		draw_string_outline(get_theme_default_font(), nearest, "%s"%border_center_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK)
+		draw_string(get_theme_default_font(), nearest, "%s"%border_center_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE)
+
+	elif mode == UIMode.PAINTING_TILES or mode == UIMode.NORMAL:
+		draw_hex(nearest, hex_size, Color.REBECCA_PURPLE if is_origin else Color.LIGHT_SALMON)
+		draw_string_outline(get_theme_default_font(), nearest, "%s"%nearest_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK)
+		draw_string(get_theme_default_font(), nearest, "%s"%nearest_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE)
+
+
 func _draw():
 	var temp_size = 25
-	if state.mode <= UIMode.CALIBRATING_SIZE:
+	var current_mode = state.mode
+	if current_mode <= UIMode.CALIBRATING_SIZE:
 		draw_calibration(state, temp_size)
 		return
-	if state.mode == UIMode.CHOOSING_ORIGIN:
+
+	if current_mode == UIMode.CHOOSING_ORIGIN:
 		var hovered = state.get("hover")
 		if hovered != null:
 			draw_hex(hovered, state.hex_size)
@@ -263,8 +331,8 @@ func _draw():
 		if origin != null:
 			draw_grid(self.position, self.size, origin, state.hex_size)
 			draw_hex(origin, state.hex_size, Color.REBECCA_PURPLE)
-			return
-	if state.mode >= UIMode.NORMAL:
+
+	if current_mode >= UIMode.NORMAL:
 		var hovered = state.get("hover")
 		var origin = state.get("origin_in_world_coordinates")
 		var hex_size = state.get("hex_size")
@@ -273,56 +341,9 @@ func _draw():
 				fill_hex(Util.hex_coords_to_pixel(tile, hex_size) + origin, hex_size, tiles[tile])
 			for border_center in borders:
 				var kind = borders[border_center]
-				var normals = Util.derive_border_normals_in_cube(Util.axial_to_cube(border_center))
-				var hex_above_border = Util.cube_to_axial(normals[0])
-				var a_hex_touching_border = border_center + Util.cube_to_axial(normals[0]) / 2
-				var hex_index = 0
-				while hex_index < 5 and Util.cube_directions[hex_index] != normals[0]:
-					hex_index += 1
-				var first_corner = origin + Util.hex_corner_trig(Util.hex_coords_to_pixel(a_hex_touching_border, hex_size), hex_size, (hex_index+2)%6)
-				var second_corner = origin + Util.hex_corner_trig(Util.hex_coords_to_pixel(a_hex_touching_border, hex_size), hex_size, (hex_index+3)%6)
-				if kind != "Road":
-					draw_line(first_corner, second_corner, colors[kind if not kind.begins_with("Bridge") else "River"], 10)
-				else:
-					draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[0]) / 3, hex_size), origin + Util.hex_coords_to_pixel(border_center, hex_size), colors[kind], 10)
-					draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[1]) / 3, hex_size), origin + Util.hex_coords_to_pixel(border_center, hex_size), colors[kind], 10)
-				if kind.begins_with("Bridge"):
-					var bridge_width = hex_size / 6
-					
-					var basis_index = 0
-					while basis_index < 6 and Util.cube_directions[basis_index] != normals[0]:
-						basis_index += 1
-					var first_rem = Util.cube_directions[(basis_index+6)%6]
-					var second_rem = Util.cube_directions[(basis_index+7)%6]
-					
-					var bridge_offset_basis = Util.cube_to_axial(bridge_width * (first_rem - second_rem))
-					draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[0]) / 3, hex_size) + bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) + bridge_offset_basis, colors[kind], 10)
-					draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[0]) / 3, hex_size) - bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) - bridge_offset_basis, colors[kind], 10)
-					draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[1]) / 3, hex_size) + bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) + bridge_offset_basis, colors[kind], 10)
-					draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[1]) / 3, hex_size) - bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) - bridge_offset_basis, colors[kind], 10)
+				draw_border(kind, border_center, hex_size, origin)
 			if hovered != null:
-				var nearest_in_axial = nearest_hex_in_axial(hovered, origin, hex_size)
-				var nearest = Util.hex_coords_to_pixel(nearest_in_axial, hex_size) + origin
-				var is_origin = nearest_in_axial == Vector2i(0, 0)
-				if state.mode == UIMode.PAINTING_BORDERS:
-					var relative_to_center_in_axial = Vector2(nearest_in_axial) - Util.pixel_coords_to_hex(Vector2(hovered) - origin, hex_size)
-					var in_cube = Util.axial_to_cube(relative_to_center_in_axial)
-					var direction_to_nearest_center = Util.direction_to_center_in_cube(in_cube)
-					var border_center_in_axial = Vector2(nearest_in_axial) + Util.cube_to_axial(direction_to_nearest_center) / 2
-					draw_circle(Util.hex_coords_to_pixel(border_center_in_axial, hex_size) + origin, 20, Color.DEEP_PINK)
-					var normals = Util.derive_border_normals_in_cube(Util.axial_to_cube(border_center_in_axial))
-					draw_line(
-						Util.hex_coords_to_pixel(border_center_in_axial + Util.cube_to_axial(Vector3(normals[0]))/2, hex_size) + origin,
-						Util.hex_coords_to_pixel(border_center_in_axial + Util.cube_to_axial(Vector3(normals[1]))/2, hex_size) + origin,
-						Color.GREEN, 10)
-					draw_string_outline(get_theme_default_font(), nearest, "%s"%border_center_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK)
-					draw_string(get_theme_default_font(), nearest, "%s"%border_center_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE)
-
-					
-				elif state.mode == UIMode.PAINTING_TILES or state.mode == UIMode.NORMAL:
-					draw_hex(nearest, state.hex_size, Color.REBECCA_PURPLE if is_origin else Color.LIGHT_SALMON)
-					draw_string_outline(get_theme_default_font(), nearest, "%s"%nearest_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK)
-					draw_string(get_theme_default_font(), nearest, "%s"%nearest_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE)
+				draw_hover(current_mode, hovered, origin, hex_size)
 
 
 func _gui_input(event):
@@ -345,17 +366,7 @@ func _gui_input(event):
 					nearest_hex_in_axial(state.hover, state.origin_in_world_coordinates, state.hex_size),
 					state.selection)
 			elif state.mode == UIMode.PAINTING_BORDERS:
-				var hovered = state.get("hover")
-				var origin = state.get("origin_in_world_coordinates")
-				var hex_size = state.get("hex_size")
-
-				var nearest_in_axial = nearest_hex_in_axial(hovered, origin, hex_size)
-				var relative_to_center_in_axial = Vector2(nearest_in_axial) - Util.pixel_coords_to_hex(Vector2(hovered) - origin, hex_size)
-				var in_cube = Util.axial_to_cube(relative_to_center_in_axial)
-				var direction_to_nearest_center = Util.direction_to_center_in_cube(in_cube)
-				var border_center_in_axial = Vector2(nearest_in_axial) + Util.cube_to_axial(direction_to_nearest_center) / 2
-					
-				paint_border(border_center_in_axial, state.selection)
+				paint_selected_border()
 			else:
 				return
 			queue_redraw()
