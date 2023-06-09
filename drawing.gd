@@ -108,6 +108,6 @@ static func draw_hover(control: Control, mode, hovered, origin, hex_size):
 		control.draw_string(control.get_theme_default_font(), nearest, "%s"%border_center_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE)
 
 	elif mode == Enums.UIMode.PAINTING_TILES or mode == Enums.UIMode.NORMAL:
-		control.draw_hex(nearest, hex_size, Color.REBECCA_PURPLE if is_origin else Color.LIGHT_SALMON)
+		draw_hex(control, nearest, hex_size, Color.REBECCA_PURPLE if is_origin else Color.LIGHT_SALMON)
 		control.draw_string_outline(control.get_theme_default_font(), nearest, "%s"%nearest_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK)
 		control.draw_string(control.get_theme_default_font(), nearest, "%s"%nearest_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE)
