@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://c35tla0vwk800"]
+
+[ext_resource type="Script" path="res://GameSessionRoot.gd" id="1_5bdmu"]
+[ext_resource type="PackedScene" uid="uid://bwst2xk4wn3l6" path="res://board_root.tscn" id="2_e5lid"]
+
+[node name="GameSessionRoot" type="Node2D"]
+script = ExtResource("1_5bdmu")
+player_1 = 0
+
+[node name="BoardRoot" parent="." instance=ExtResource("2_e5lid")]
