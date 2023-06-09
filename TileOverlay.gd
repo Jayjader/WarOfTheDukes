@@ -3,8 +3,6 @@
 extends Control
 
 
-signal origin_set(position: Vector2i)
-
 signal calibration_mode_entered(new_mode: String)
 
 signal bl_set(position)
@@ -188,16 +186,6 @@ func paint_selected_border():
 
 	paint_border(border_center_in_axial, state.selection)
 
-
-
-func new_origin(origin: Vector2i):
-	map_data.tiles.clear()
-	tiles_origin = Vector2i(origin)
-	emit_signal("origin_set", origin)
-	print_debug(
-		"hex coords according to origin=bottom_left: %s"
-		% Util.pixel_coords_to_hex(tiles_origin, state.hex_size)
-	)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
