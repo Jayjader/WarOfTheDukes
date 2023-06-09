@@ -241,7 +241,8 @@ const colors = {
 	Fortress=Color.BLACK,
 	Road=Color.BLACK,
 	River=Color.BLUE,
-	Bridge=Color.BLACK,
+	Bridge=Color.DIM_GRAY,
+	"Bridge (No Road)"=Color.SADDLE_BROWN,
 }
 func fill_hex(center: Vector2i, hex_size: float, kind: String, angle_offset:float=0):
 	var points = PackedVector2Array()
@@ -270,20 +271,25 @@ func _draw():
 		if (origin != null) and (hex_size != null):
 			for tile in tiles:
 				fill_hex(Util.hex_coords_to_pixel(tile, hex_size) + origin, hex_size, tiles[tile])
-			for border in borders:
-				var kind = borders[border]
-				var normals = Util.derive_border_normals_in_cube(Util.axial_to_cube(border))
-				var hex_above_border = Util.cube_to_axial(normals[0]) / 2
-				var hex_below_border = Util.cube_to_axial(normals[1]) / 2
-				var first_corner = Util.hex_corner_trig(Util.hex_coords_to_pixel(Vector2(border) + hex_below_border, hex_size), hex_size, 4) + origin
-				var second_corner = Util.hex_corner_trig(Util.hex_coords_to_pixel(Vector2(border) + hex_below_border, hex_size), hex_size, 5) + origin
+			for border_center in borders:
+				var kind = borders[border_center]
+				var normals = Util.derive_border_normals_in_cube(Util.axial_to_cube(border_center))
+				var hex_above_border = Util.cube_to_axial(normals[0])
+				#var hex_below_border = Util.cube_to_axial(normals[1])
+				var a_hex_touching_border = border_center + Util.cube_to_axial(normals[0]) / 2
+				var hex_index = 0
+				while hex_index < 5 and Util.cube_directions[hex_index] != normals[0]:
+					hex_index += 1
+				#var above_index = Util.cube_directions.find(Vector3i(normals[0]))
+				#var below_index = Util.cube_directions.find(Vector3i(normals[1]))
+				var first_corner = origin + Util.hex_corner_trig(Util.hex_coords_to_pixel(a_hex_touching_border, hex_size), hex_size, (hex_index+2)%6)
+				var second_corner = origin + Util.hex_corner_trig(Util.hex_coords_to_pixel(a_hex_touching_border, hex_size), hex_size, (hex_index+3)%6)
 				draw_line(first_corner, second_corner, colors[kind], 10)
 				#var start_hex_corner = Util.hex_corner_trig()
 				#if kind == "bridge":
 				#	draw_line(Util.hex_coords_to_pixel(border, hex_size) + origin, hex_size, borders[border], 16)
 			if hovered != null:
 				var nearest_in_axial = nearest_hex_in_axial(hovered, origin, hex_size)
-				var nearest_in_cube = Util.axial_to_cube(nearest_in_axial)
 				var nearest = Util.hex_coords_to_pixel(nearest_in_axial, hex_size) + origin
 				var is_origin = nearest_in_axial == Vector2i(0, 0)
 				if state.mode == UIMode.PAINTING_BORDERS:

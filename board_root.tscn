@@ -136,7 +136,7 @@ offset_right = 1122.0
 offset_bottom = 490.0
 script = ExtResource("5_qxi0c")
 items = Array[String](["Plains", "City", "Forest", "Cliff", "Lake", "Fortress"])
-borders = Array[String](["Road", "River", "Bridge"])
+borders = Array[String](["Road", "River", "Bridge", "Bridge (No Road)"])
 
 [node name="Items" type="VBoxContainer" parent="UIRoot/Palette"]
 layout_mode = 1
