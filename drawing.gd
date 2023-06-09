@@ -25,13 +25,13 @@ const colors = {
 
 static func draw_calibration(control: Control, calibration: Dictionary, hex_size: float, hover):
 	if calibration.get("bottom_left") != null:
-		control.draw_hex(calibration.bottom_left, hex_size)
+		draw_hex(control, calibration.bottom_left, hex_size)
 	if calibration.get("bottom_right") != null:
-		control.draw_hex(calibration.bottom_right, hex_size)
+		draw_hex(control, calibration.bottom_right, hex_size)
 	if calibration.get("top_right") != null:
-		control.draw_hex(calibration.top_right, hex_size)
+		draw_hex(control, calibration.top_right, hex_size)
 	if calibration.get("top_left") != null:
-		control.draw_hex(calibration.top_left, hex_size)
+		draw_hex(control, calibration.top_left, hex_size)
 
 	if hover != null:
 		var line_length = 400
@@ -52,7 +52,7 @@ static func draw_grid(control: Control, top_left: Vector2, bottom_right: Vector2
 	for q in range(grid_width_hex_count):
 		@warning_ignore("integer_division")
 		for r in range(-q/2, -q/2 + grid_height_hex_count):
-			control.draw_hex(origin + Util.hex_coords_to_pixel(Vector2i(q, r), hex_size), hex_size)
+			draw_hex(control, origin + Util.hex_coords_to_pixel(Vector2i(q, r), hex_size), hex_size)
 
 static func fill_hex(control: Control, center: Vector2i, hex_size: float, kind: String, angle_offset:float=0):
 	var points = PackedVector2Array()
