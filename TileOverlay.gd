@@ -14,8 +14,8 @@ signal tl_set(position)
 
 var Util = preload("res://util.gd")
 
-var tiles = {}
-var borders = {}
+@export var map_data = { tiles = {}, borders = {} }
+
 var tiles_origin = Vector2i(0,0)
 
 enum UIMode {
@@ -60,6 +60,7 @@ func change_paint_selection(selection, is_tile=true):
 		var new_state = {mode=UIMode.PAINTING_TILES if is_tile else UIMode.PAINTING_BORDERS, selection=selection}
 		new_state.merge(state)
 		state = new_state
+
 func start_calibration():
 	state = {mode=UIMode.CALIBRATING_BL, bottom_left=null, hover=null}
 func choose_bl(new_bl: Vector2):
@@ -141,15 +142,15 @@ func load_calibration_data():
 
 func paint_tile(position_in_axial: Vector2i, kind: String):
 	if kind == "erase-tile":
-		tiles.erase(position_in_axial)
+		map_data.tiles.erase(position_in_axial)
 	else:
-		tiles[position_in_axial] = kind
+		map_data.tiles[position_in_axial] = kind
 	queue_redraw()
 func paint_border(position_in_axial: Vector2, kind: String):
 	if kind == "erase-border":
-		borders.erase(position_in_axial)
+		map_data.borders.erase(position_in_axial)
 	else:
-		borders[position_in_axial] = kind
+		map_data.borders[position_in_axial] = kind
 func paint_selected_border():
 	var hovered = state.hover
 	var origin = state.origin_in_world_coordinates
@@ -162,18 +163,10 @@ func paint_selected_border():
 
 	paint_border(border_center_in_axial, state.selection)
 
-func save_data(data={tiles=tiles,borders=borders}):
-	var file = FileAccess.open("./map.data", FileAccess.WRITE)
-	file.store_var(data)
 
-func load_data():
-	var file = FileAccess.open("./map.data", FileAccess.READ)
-	if file == null:
-		return null
-	return file.get_var()
 
 func new_origin(origin: Vector2i):
-	tiles.clear()
+	map_data.tiles.clear()
 	tiles_origin = Vector2i(origin)
 	emit_signal("origin_set", origin)
 	print_debug(
@@ -183,13 +176,6 @@ func new_origin(origin: Vector2i):
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	var data = load_data()
-	print_debug("loaded: %s"%data)
-	if data != null:
-		tiles = data.get("tiles")
-		borders = data.get("borders")
-		if borders == null:
-			borders = {}
 	var calib_data = load_calibration_data()
 	print_debug("calibration: %s"%calib_data)
 	if calib_data != null:
@@ -326,11 +312,10 @@ func _draw():
 		var origin = state.get("origin_in_world_coordinates")
 		var hex_size = state.get("hex_size")
 		if (origin != null) and (hex_size != null):
-			for tile in tiles:
-				fill_hex(Util.hex_coords_to_pixel(tile, hex_size) + origin, hex_size, tiles[tile])
-			for border_center in borders:
-				var kind = borders[border_center]
-				draw_border(kind, border_center, hex_size, origin)
+			for tile in map_data.tiles:
+				fill_hex(Util.hex_coords_to_pixel(tile, hex_size) + origin, hex_size, map_data.tiles[tile])
+			for border_center in map_data.borders:
+				draw_border(map_data.borders[border_center], border_center, hex_size, origin)
 			if hovered != null:
 				draw_hover(current_mode, hovered, origin, hex_size)
 

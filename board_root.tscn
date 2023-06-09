@@ -1,15 +1,20 @@
-[gd_scene load_steps=6 format=3 uid="uid://bwst2xk4wn3l6"]
+[gd_scene load_steps=7 format=3 uid="uid://bwst2xk4wn3l6"]
 
 [ext_resource type="Script" path="res://BoardRoot.gd" id="1_r6u8w"]
 [ext_resource type="Texture2D" uid="uid://dgr4iw8ue00sq" path="res://docs/La guerre des ducs - Encart.jpg" id="2_w7llp"]
 [ext_resource type="Script" path="res://TileOverlay.gd" id="3_hyvcy"]
 [ext_resource type="Script" path="res://Direct.gd" id="4_q436x"]
 [ext_resource type="Script" path="res://Palette.gd" id="5_qxi0c"]
+[ext_resource type="Script" path="res://MapDataSaveLoad.gd" id="6_m1yso"]
 
 [node name="BoardRoot" type="Node2D"]
 script = ExtResource("1_r6u8w")
 
+[node name="MapDataSaveLoad" type="Node" parent="."]
+script = ExtResource("6_m1yso")
+
 [node name="Background" type="Sprite2D" parent="."]
+self_modulate = Color(1, 1, 1, 0)
 texture = ExtResource("2_w7llp")
 centered = false
 
@@ -21,12 +26,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("3_hyvcy")
+map_data = {}
 
 [node name="UIRoot" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 0
-offset_right = 1150.0
-offset_bottom = 645.0
+offset_right = 1918.0
+offset_bottom = 1076.0
 mouse_filter = 2
 
 [node name="Calibration" type="Panel" parent="UIRoot"]
@@ -34,7 +40,10 @@ layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.3
 anchor_right = 0.7
-offset_bottom = 130.0
+offset_left = 150.6
+offset_top = 19.0
+offset_right = -150.6
+offset_bottom = 238.0
 grow_horizontal = 2
 
 [node name="EditControls" type="VBoxContainer" parent="UIRoot/Calibration"]
@@ -120,20 +129,16 @@ horizontal_alignment = 2
 [node name="TilesHeigh" type="LineEdit" parent="UIRoot/Calibration/EditControls/TilesHeighControls"]
 layout_mode = 2
 
-[node name="SaveMapData" type="Button" parent="UIRoot/Calibration/EditControls"]
-layout_mode = 2
-text = "Save Map Data"
-
 [node name="SaveCalibrationData" type="Button" parent="UIRoot/Calibration/EditControls"]
 layout_mode = 2
 text = "Save Calibration Data"
 
 [node name="Palette" type="Panel" parent="UIRoot"]
 layout_mode = 0
-offset_left = 861.0
-offset_top = 13.0
-offset_right = 1122.0
-offset_bottom = 546.0
+offset_left = 1639.0
+offset_top = 14.0
+offset_right = 1900.0
+offset_bottom = 639.0
 script = ExtResource("5_qxi0c")
 items = Array[String](["Plains", "City", "Forest", "Cliff", "Lake", "Fortress"])
 borders = Array[String](["Road", "River", "Bridge", "Bridge (No Road)"])
@@ -152,6 +157,13 @@ offset_bottom = 103.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="SaveMapData" type="Button" parent="UIRoot/Palette/Items"]
+layout_mode = 2
+text = "Save Map Data"
+
+[node name="HSeparator" type="HSeparator" parent="UIRoot/Palette/Items"]
+layout_mode = 2
+
 [node name="Title" type="HBoxContainer" parent="UIRoot/Palette/Items"]
 layout_mode = 2
 
@@ -162,9 +174,12 @@ text = "Selected:"
 [node name="Selected" type="Label" parent="UIRoot/Palette/Items/Title"]
 layout_mode = 2
 
-[node name="Button" type="Button" parent="UIRoot/Palette/Items/Title"]
+[node name="Button" type="Button" parent="UIRoot/Palette/Items"]
 layout_mode = 2
 text = "Clear Selection"
+
+[node name="HSeparator2" type="HSeparator" parent="UIRoot/Palette/Items"]
+layout_mode = 2
 
 [node name="Tiles" type="VBoxContainer" parent="UIRoot/Palette/Items"]
 layout_mode = 2
@@ -177,6 +192,9 @@ text = "Tiles"
 layout_mode = 2
 text = "Erase Tile"
 
+[node name="HSeparator3" type="HSeparator" parent="UIRoot/Palette/Items"]
+layout_mode = 2
+
 [node name="Borders" type="VBoxContainer" parent="UIRoot/Palette/Items"]
 layout_mode = 2
 
@@ -188,6 +206,9 @@ text = "Borders"
 layout_mode = 2
 text = "Erase Border"
 
+[connection signal="data_load_requested" from="." to="MapDataSaveLoad" method="load_data"]
+[connection signal="data_saved" from="." to="MapDataSaveLoad" method="save_data"]
+[connection signal="data_loaded" from="MapDataSaveLoad" to="." method="_on_map_data_load"]
 [connection signal="bl_set" from="Background/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_bl_set"]
 [connection signal="br_set" from="Background/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_br_set"]
 [connection signal="calibration_mode_entered" from="Background/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/CalibrationMode" method="set_text"]
@@ -198,11 +219,11 @@ text = "Erase Border"
 [connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/PrevNextPoint/Next" to="Background/TileOverlay" method="next_calibration_step"]
 [connection signal="text_changed" from="UIRoot/Calibration/EditControls/TilesWideControls/TilesWide" to="Background/TileOverlay" method="choose_tiles_wide"]
 [connection signal="text_changed" from="UIRoot/Calibration/EditControls/TilesHeighControls/TilesHeigh" to="Background/TileOverlay" method="choose_tiles_heigh"]
-[connection signal="pressed" from="UIRoot/Calibration/EditControls/SaveMapData" to="Background/TileOverlay" method="save_data"]
 [connection signal="pressed" from="UIRoot/Calibration/EditControls/SaveCalibrationData" to="Background/TileOverlay" method="save_calibration_data"]
 [connection signal="palette_border_selected" from="UIRoot/Palette" to="Background/TileOverlay" method="change_paint_selection" binds= [false]]
 [connection signal="palette_selection_cleared" from="UIRoot/Palette" to="Background/TileOverlay" method="change_paint_selection" binds= [""]]
 [connection signal="palette_tile_selected" from="UIRoot/Palette" to="Background/TileOverlay" method="change_paint_selection"]
-[connection signal="pressed" from="UIRoot/Palette/Items/Title/Button" to="UIRoot/Palette" method="clear_selection"]
+[connection signal="pressed" from="UIRoot/Palette/Items/SaveMapData" to="." method="_on_map_data_save"]
+[connection signal="pressed" from="UIRoot/Palette/Items/Button" to="UIRoot/Palette" method="clear_selection"]
 [connection signal="pressed" from="UIRoot/Palette/Items/Tiles/Erase" to="UIRoot/Palette" method="change_selection" binds= ["erase-tile"]]
 [connection signal="pressed" from="UIRoot/Palette/Items/Borders/Erase" to="UIRoot/Palette" method="change_selection" binds= ["erase-border"]]
