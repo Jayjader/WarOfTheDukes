@@ -1,10 +1,16 @@
+@tool
 extends Node2D
 
 var in_tree = false
+
+var EditingGroup: StringName = &"map-edit-ui"
+
 @export var editing: bool:
 	set(value):
 		print_debug("toggling editing to %s" % value)
 		editing = value
+		for ui in get_tree().get_nodes_in_group(EditingGroup):
+			ui.set_visible(editing)
 		if in_tree:
 			$Background.set_self_modulate(Color.WHITE if editing else Color.TRANSPARENT)
 			$UIRoot/Calibration.set_visible(editing)
@@ -16,23 +22,24 @@ signal data_load_requested
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	in_tree = true
+	editing = false
 	data_load_requested.emit()
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	if Input.is_key_pressed(KEY_A):
-		$Background.position.x += 25
-	elif Input.is_key_pressed(KEY_D):
-		$Background.position.x -= 25
-	elif Input.is_key_pressed(KEY_W):
-		$Background.position.y += 25
-	elif Input.is_key_pressed(KEY_S):
-		$Background.position.y -= 25
-		
-		
-func toggle_editing(new_value: bool):
-	editing = new_value
+	if not Engine.is_editor_hint():
+		if Input.is_key_pressed(KEY_A):
+			$Background.position.x += 25
+		if Input.is_key_pressed(KEY_D):
+			$Background.position.x -= 25
+		if Input.is_key_pressed(KEY_W):
+			$Background.position.y += 25
+		if Input.is_key_pressed(KEY_S):
+			$Background.position.y -= 25
+		if Input.is_action_just_pressed("Edit Map Data"):
+			editing = !editing
+
 
 func finish_editing(new_map):
 	var new_data = { map = new_map }

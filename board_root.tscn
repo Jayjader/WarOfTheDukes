@@ -35,7 +35,8 @@ offset_right = 1918.0
 offset_bottom = 1076.0
 mouse_filter = 2
 
-[node name="Calibration" type="Panel" parent="UIRoot"]
+[node name="Calibration" type="Panel" parent="UIRoot" groups=["map-edit-ui"]]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.3
@@ -133,7 +134,8 @@ layout_mode = 2
 layout_mode = 2
 text = "Save Calibration Data"
 
-[node name="Palette" type="Panel" parent="UIRoot"]
+[node name="Palette" type="Panel" parent="UIRoot" groups=["map-edit-ui"]]
+visible = false
 layout_mode = 0
 offset_left = 1639.0
 offset_top = 14.0
