@@ -97,16 +97,16 @@ text = "T-R: null"
 layout_mode = 2
 text = "B-R: null"
 
-[node name="PrevNextPoint" type="VBoxContainer" parent="UIRoot/Calibration/EditControls/OriginControls/Direct"]
+[node name="ChangeCalibrationStep" type="VBoxContainer" parent="UIRoot/Calibration/EditControls/OriginControls/Direct"]
 layout_mode = 2
 
-[node name="Previous" type="Button" parent="UIRoot/Calibration/EditControls/OriginControls/Direct/PrevNextPoint"]
+[node name="Previous" type="Button" parent="UIRoot/Calibration/EditControls/OriginControls/Direct/ChangeCalibrationStep"]
 layout_mode = 2
-text = "Previous Point"
+text = "Previous Step"
 
-[node name="Next" type="Button" parent="UIRoot/Calibration/EditControls/OriginControls/Direct/PrevNextPoint"]
+[node name="Next" type="Button" parent="UIRoot/Calibration/EditControls/OriginControls/Direct/ChangeCalibrationStep"]
 layout_mode = 2
-text = "Next Point"
+text = "Next Step"
 
 [node name="TilesWideControls" type="HBoxContainer" parent="UIRoot/Calibration/EditControls"]
 layout_mode = 2
@@ -221,8 +221,8 @@ text = "Erase Border"
 [connection signal="tl_set" from="Background/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_tl_set"]
 [connection signal="tr_set" from="Background/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_tr_set"]
 [connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/RestartCalibration" to="Background/TileOverlay" method="start_calibration"]
-[connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/PrevNextPoint/Previous" to="Background/TileOverlay" method="previous_calibration_step"]
-[connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/PrevNextPoint/Next" to="Background/TileOverlay" method="next_calibration_step"]
+[connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/ChangeCalibrationStep/Previous" to="Background/TileOverlay" method="previous_calibration_step"]
+[connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/ChangeCalibrationStep/Next" to="Background/TileOverlay" method="next_calibration_step"]
 [connection signal="text_changed" from="UIRoot/Calibration/EditControls/TilesWideControls/TilesWide" to="Background/TileOverlay" method="choose_tiles_wide"]
 [connection signal="text_changed" from="UIRoot/Calibration/EditControls/TilesHeighControls/TilesHeigh" to="Background/TileOverlay" method="choose_tiles_heigh"]
 [connection signal="pressed" from="UIRoot/Calibration/EditControls/SaveCalibrationData" to="Background/TileOverlay" method="save_calibration_data"]
