@@ -9,9 +9,10 @@ var EditingGroup: StringName = &"map-edit-ui"
 	set(value):
 		print_debug("toggling editing to %s" % value)
 		editing = value
-		for ui in get_tree().get_nodes_in_group(EditingGroup):
-			ui.set_visible(editing)
 		if in_tree:
+			for ui in get_tree().get_nodes_in_group(EditingGroup):
+				ui.set_visible(editing)
+
 			$Background.set_self_modulate(Color.WHITE if editing else Color.TRANSPARENT)
 			$UIRoot/Calibration.set_visible(editing)
 			$UIRoot/Palette.set_visible(editing)
