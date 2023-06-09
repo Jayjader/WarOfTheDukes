@@ -161,7 +161,7 @@ func load_calibration_data():
 	return {
 		mode = Enums.UIMode.NORMAL,
 		hex_size = data.hex_size,
-		rigin_in_world_coordinates = data.origin,
+		origin_in_world_coordinates = data.origin,
 	}
 
 
