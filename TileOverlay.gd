@@ -139,17 +139,17 @@ func load_calibration_data():
 	return {mode=UIMode.NORMAL, hex_size=data.hex_size, origin_in_world_coordinates=data.origin}
 
 
-func paint_tile(position: Vector2i, kind: String):
+func paint_tile(position_in_axial: Vector2i, kind: String):
 	if kind == "erase-tile":
-		tiles.erase(position)
+		tiles.erase(position_in_axial)
 	else:
-		tiles[position] = kind
+		tiles[position_in_axial] = kind
 	queue_redraw()
-func paint_border(position: Vector2, kind: String):
+func paint_border(position_in_axial: Vector2, kind: String):
 	if kind == "erase-border":
-		borders.erase(position)
+		borders.erase(position_in_axial)
 	else:
-		borders[position] = kind
+		borders[position_in_axial] = kind
 func paint_selected_border():
 	var hovered = state.hover
 	var origin = state.origin_in_world_coordinates
@@ -243,6 +243,7 @@ func draw_grid(top_left: Vector2, bottom_right: Vector2, origin: Vector2, hex_si
 	var grid_width_hex_count = size_vec.x / Util.horizontal_distance(hex_size)
 	var grid_height_hex_count = size_vec.y / Util.vertical_distance(hex_size)
 	for q in range(grid_width_hex_count):
+		@warning_ignore("integer_division")
 		for r in range(-q/2, -q/2 + grid_height_hex_count):
 			draw_hex(origin + Util.hex_coords_to_pixel(Vector2i(q, r), hex_size), hex_size)
 
@@ -254,7 +255,6 @@ func fill_hex(center: Vector2i, hex_size: float, kind: String, angle_offset:floa
 
 func draw_border(kind, border_center, hex_size, origin):
 	var normals = Util.derive_border_normals_in_cube(Util.axial_to_cube(border_center))
-	var hex_above_border = Util.cube_to_axial(normals[0])
 	var a_hex_touching_border = border_center + Util.cube_to_axial(normals[0]) / 2
 	var hex_index = 0
 	while hex_index < 5 and Util.cube_directions[hex_index] != normals[0]:
