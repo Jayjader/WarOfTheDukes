@@ -3,7 +3,13 @@
 [ext_resource type="Script" path="res://GameSessionRoot.gd" id="1_5bdmu"]
 [ext_resource type="PackedScene" uid="uid://bwst2xk4wn3l6" path="res://board_root.tscn" id="2_e5lid"]
 
-[node name="GameSessionRoot" type="Node2D"]
+[node name="GameSessionRoot" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_5bdmu")
 
 [node name="BoardRoot" parent="." instance=ExtResource("2_e5lid")]
