@@ -112,3 +112,10 @@ static func draw_hover(control: Control, mode, hovered, origin, hex_size):
 			draw_hex(control, nearest_in_pix, hex_size, Color.REBECCA_PURPLE if is_origin else Color.LIGHT_SALMON)
 			control.draw_string_outline(control.get_theme_default_font(), nearest_in_pix, "%s"%nearest_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK)
 			control.draw_string(control.get_theme_default_font(), nearest_in_pix, "%s"%nearest_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE)
+
+static func draw_unit_name(control: Control, unit: Enums.Unit, faction: Enums.Faction, hex: Vector2i, hex_size:float=60):
+	control.draw_string_outline(
+		control.get_theme_default_font(),
+		Util.hex_coords_to_pixel(hex, hex_size),
+		Enums.Unit.find_key(unit)
+	)

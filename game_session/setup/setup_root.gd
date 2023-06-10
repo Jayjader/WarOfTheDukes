@@ -1,6 +1,7 @@
 extends Control
 
 const Enums = preload("res://enums.gd")
+const Drawing = preload("res://drawing.gd")
 
 @export var current_player: Enums.Faction = Enums.Faction.Orfburg:
 	set(value):
@@ -60,7 +61,24 @@ func choose_tile(tile: Vector2i):
 		display_remaining_counts()
 		current_player = Enums.get_other_faction(current_player)
 		selection = get_first_with_remaining(current_player)
+		queue_redraw()
 
+func _draw():
+	# todo: this might need to be moved into the tile overlay or else we need
+	# to find another way of knowing the hex size for the hex_to_pix conversion
+	# options:
+	#	- propagate through signals and/or exported vars
+	#	- introduce default value for hex size param, as the size only changes
+	#	  when editing the map data (which doesn't involve drawing units
+	#	  anyways), so we won't be specifying the hex size anywhere outside the
+	#	  overlay
+	for faction in [Enums.Faction.Orfburg, Enums.Faction.Wulfenburg]:
+		var duke = pieces[faction][Enums.Unit.Duke]
+		if duke != null:
+			Drawing.draw_unit_name(self, Enums.Unit.Duke, faction, duke)
+		for kind in [Enums.Unit.Infantry, Enums.Unit.Cavalry, Enums.Unit.Artillery]:
+			for hex_in_axial in pieces[faction][kind]:
+				Drawing.draw_unit_name(self, kind, faction, hex_in_axial)
 
 func _ready():
 	display_remaining_counts()
