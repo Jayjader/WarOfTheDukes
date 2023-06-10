@@ -1,0 +1,55 @@
+[gd_scene load_steps=3 format=3 uid="uid://urgscxvof7o8"]
+
+[ext_resource type="Script" path="res://setup_root.gd" id="1_mwd34"]
+[ext_resource type="Script" path="res://PlayerValue.gd" id="1_qrnpm"]
+
+[node name="SetupRoot" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_mwd34")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -22.5
+offset_right = 22.5
+offset_bottom = 40.0
+grow_horizontal = 2
+
+[node name="Margins" type="MarginContainer" parent="PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+
+[node name="HBox" type="HBoxContainer" parent="PanelContainer/Margins"]
+layout_mode = 2
+alignment = 1
+
+[node name="VBox" type="VBoxContainer" parent="PanelContainer/Margins/HBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="PanelContainer/Margins/HBox/VBox"]
+layout_mode = 2
+text = "Setup"
+horizontal_alignment = 1
+
+[node name="CurrentPlayer" type="HBoxContainer" parent="PanelContainer/Margins/HBox/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="PanelContainer/Margins/HBox/VBox/CurrentPlayer"]
+layout_mode = 2
+text = "Current Player:"
+
+[node name="Value" type="Label" parent="PanelContainer/Margins/HBox/VBox/CurrentPlayer"]
+layout_mode = 2
+text = "Orfburg"
+script = ExtResource("1_qrnpm")
