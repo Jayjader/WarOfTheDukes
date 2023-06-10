@@ -51,7 +51,7 @@ func get_first_with_remaining(faction: Enums.Faction):
 
 
 func choose_tile(tile: Vector2i):
-	print_debug("choose tile % for unit %s for player %s" % [ tile, selection, current_player ])
+	print_debug("choose tile %s for unit %s for player %s" % [ tile, selection, current_player ])
 	if selection != null:
 		if selection == Enums.Unit.Duke:
 			pieces[current_player][selection] = tile
