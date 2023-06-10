@@ -21,3 +21,4 @@ report_clicked_hex = true
 layout_mode = 1
 
 [connection signal="hex_clicked" from="BoardRoot" to="SetupRoot" method="choose_tile"]
+[connection signal="toggled_editing" from="BoardRoot" to="." method="_on_board_root_toggled_editing"]

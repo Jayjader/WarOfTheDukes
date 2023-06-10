@@ -34,3 +34,7 @@ func game_over(result: Enums.GameResult, winner=null):
 	#game_over.result = result
 	#game_over.winner = winner
 	#add_child(game_over)
+
+
+func _on_board_root_toggled_editing(editing: bool):
+	get_child(1).set_visible(not editing)

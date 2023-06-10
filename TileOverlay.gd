@@ -231,6 +231,10 @@ func _gui_input(event):
 		accept_event()
 		var integer_pix = Vector2i(event.position)
 		match current_mode:
+			Enums.TileOverlayMode.READ_ONLY:
+				if report_clicked_hex:
+					print_debug("hex clicked at pix %s" % state.hover)
+					hex_clicked.emit(Util.nearest_hex_in_axial(state.hover, Vector2i(0, 0), hex_draw_size))
 			Enums.TileOverlayMode.CALIBRATING:
 				match calibration.mode:
 					Enums.TileOverlayCalibration.CALIBRATING_BL:
@@ -247,13 +251,9 @@ func _gui_input(event):
 				paint_tile(Util.nearest_hex_in_axial(integer_pix, calibration.origin_in_world_coordinates, calibration.hex_size), state.selection)
 			Enums.TileOverlayMode.PAINTING_BORDERS:
 				paint_selected_border()
-			Enums.TileOverlayMode.READ_ONLY:
-				if report_clicked_hex:
-					print_debug("hex clicked at pix %s" % state.hover)
-					hex_clicked.emit(Util.nearest_hex_in_axial(state.hover, Vector2i(0, 0), hex_draw_size))
 		queue_redraw()
 	elif event is InputEventMouseMotion and (current_mode != Enums.TileOverlayMode.EDITING_BASE or (current_mode == Enums.TileOverlayMode.CALIBRATING and calibration.mode != Enums.TileOverlayCalibration.CALIBRATING_SIZE)):
 		state.hover = Vector2i(event.position)
 		if report_hovered_hex and current_mode == Enums.TileOverlayMode.READ_ONLY:
-			hex_hovered.emit(Util.nearest_hex_in_axial(state.hover, state.origin_in_world_coordinates, hex_draw_size))
+			hex_hovered.emit(Util.nearest_hex_in_axial(state.hover, tiles_origin, hex_draw_size))
 		queue_redraw()
