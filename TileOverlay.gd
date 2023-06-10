@@ -233,8 +233,8 @@ func _gui_input(event):
 		match current_mode:
 			Enums.TileOverlayMode.READ_ONLY:
 				if report_clicked_hex:
-					print_debug("hex clicked at pix %s" % state.hover)
-					hex_clicked.emit(Util.nearest_hex_in_axial(state.hover, Vector2i(0, 0), hex_draw_size))
+					print_debug("hex clicked at pix %s" % event.position)
+					hex_clicked.emit(Util.nearest_hex_in_axial(event.position, Vector2i(0, 0), hex_draw_size))
 			Enums.TileOverlayMode.CALIBRATING:
 				match calibration.mode:
 					Enums.TileOverlayCalibration.CALIBRATING_BL:
