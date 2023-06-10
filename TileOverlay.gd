@@ -197,6 +197,8 @@ func _draw():
 	if current_mode == Enums.TileOverlayMode.READ_ONLY:
 		for tile in map_data.tiles:
 			Drawing.fill_hex(self, Util.hex_coords_to_pixel(tile, hex_draw_size), hex_draw_size, map_data.tiles[tile])
+		if state.get("hover") != null:
+			Drawing.draw_hover(self, current_mode, state.hover, Vector2i(0, 0), hex_draw_size)
 		
 	elif current_mode == Enums.TileOverlayMode.CALIBRATING:
 		if calibration.mode <= Enums.TileOverlayCalibration.CALIBRATING_SIZE:
@@ -252,8 +254,17 @@ func _gui_input(event):
 			Enums.TileOverlayMode.PAINTING_BORDERS:
 				paint_selected_border()
 		queue_redraw()
-	elif event is InputEventMouseMotion and (current_mode != Enums.TileOverlayMode.EDITING_BASE or (current_mode == Enums.TileOverlayMode.CALIBRATING and calibration.mode != Enums.TileOverlayCalibration.CALIBRATING_SIZE)):
-		state.hover = Vector2i(event.position)
-		if report_hovered_hex and current_mode == Enums.TileOverlayMode.READ_ONLY:
-			hex_hovered.emit(Util.nearest_hex_in_axial(state.hover, tiles_origin, hex_draw_size))
-		queue_redraw()
+	elif event is InputEventMouseMotion:
+		var capture = false
+		match current_mode:
+			Enums.TileOverlayMode.READ_ONLY:
+				capture = report_hovered_hex
+			Enums.TileOverlayMode.PAINTING_BORDERS, Enums.TileOverlayMode.PAINTING_TILES:
+				capture = true
+			Enums.TileOverlayMode.CALIBRATING:
+				capture = calibration.mode != Enums.TileOverlayCalibration.CALIBRATING_SIZE
+		if capture:
+			state.hover = Vector2i(event.position)
+			if report_hovered_hex:
+				hex_hovered.emit(Util.nearest_hex_in_axial(state.hover, tiles_origin, hex_draw_size))
+			queue_redraw()
