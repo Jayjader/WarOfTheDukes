@@ -90,24 +90,25 @@ static func draw_border(control: Control, kind, border_center, hex_size, origin)
 
 static func draw_hover(control: Control, mode, hovered, origin, hex_size):
 	var nearest_in_axial = Util.nearest_hex_in_axial(hovered, origin, hex_size)
-	var nearest = Util.hex_coords_to_pixel(nearest_in_axial, hex_size) + origin
+	var nearest_in_pix = Util.hex_coords_to_pixel(nearest_in_axial, hex_size) + Vector2(origin)
 	var is_origin = nearest_in_axial == Vector2i(0, 0)
 
-	if mode == Enums.TileOverlayMode.PAINTING_BORDERS:
-		var relative_to_center_in_axial = Vector2(nearest_in_axial) - Util.pixel_coords_to_hex(Vector2(hovered) - origin, hex_size)
-		var in_cube = Util.axial_to_cube(relative_to_center_in_axial)
-		var direction_to_nearest_center = Util.direction_to_center_in_cube(in_cube)
-		var border_center_in_axial = Vector2(nearest_in_axial) + Util.cube_to_axial(direction_to_nearest_center) / 2
-		control.draw_circle(Util.hex_coords_to_pixel(border_center_in_axial, hex_size) + origin, 20, Color.DEEP_PINK)
-		var normals = Util.derive_border_normals_in_cube(Util.axial_to_cube(border_center_in_axial))
-		control.draw_line(
-			Util.hex_coords_to_pixel(border_center_in_axial + Util.cube_to_axial(Vector3(normals[0]))/2, hex_size) + origin,
-			Util.hex_coords_to_pixel(border_center_in_axial + Util.cube_to_axial(Vector3(normals[1]))/2, hex_size) + origin,
-			Color.GREEN, 10)
-		control.draw_string_outline(control.get_theme_default_font(), nearest, "%s"%border_center_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK)
-		control.draw_string(control.get_theme_default_font(), nearest, "%s"%border_center_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE)
+	match mode:
+		Enums.TileOverlayMode.PAINTING_BORDERS:
+			var relative_to_center_in_axial = Vector2(nearest_in_axial) - Util.pixel_coords_to_hex(Vector2(hovered) - origin, hex_size)
+			var in_cube = Util.axial_to_cube(relative_to_center_in_axial)
+			var direction_to_nearest_center = Util.direction_to_center_in_cube(in_cube)
+			var border_center_in_axial = Vector2(nearest_in_axial) + Util.cube_to_axial(direction_to_nearest_center) / 2
+			control.draw_circle(Util.hex_coords_to_pixel(border_center_in_axial, hex_size) + origin, 20, Color.DEEP_PINK)
+			var normals = Util.derive_border_normals_in_cube(Util.axial_to_cube(border_center_in_axial))
+			control.draw_line(
+				Util.hex_coords_to_pixel(border_center_in_axial + Util.cube_to_axial(Vector3(normals[0]))/2, hex_size) + origin,
+				Util.hex_coords_to_pixel(border_center_in_axial + Util.cube_to_axial(Vector3(normals[1]))/2, hex_size) + origin,
+				Color.GREEN, 10)
+			control.draw_string_outline(control.get_theme_default_font(), nearest_in_pix, "%s"%border_center_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK)
+			control.draw_string(control.get_theme_default_font(), nearest_in_pix, "%s"%border_center_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE)
 
-	elif mode == Enums.TileOverlayMode.PAINTING_TILES or mode == Enums.TileOverlayMode.EDITING_BASE:
-		draw_hex(control, nearest, hex_size, Color.REBECCA_PURPLE if is_origin else Color.LIGHT_SALMON)
-		control.draw_string_outline(control.get_theme_default_font(), nearest, "%s"%nearest_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK)
-		control.draw_string(control.get_theme_default_font(), nearest, "%s"%nearest_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE)
+		Enums.TileOverlayMode.READ_ONLY, Enums.TileOverlayMode.PAINTING_TILES, Enums.TileOverlayMode.EDITING_BASE:
+			draw_hex(control, nearest_in_pix, hex_size, Color.REBECCA_PURPLE if is_origin else Color.LIGHT_SALMON)
+			control.draw_string_outline(control.get_theme_default_font(), nearest_in_pix, "%s"%nearest_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK)
+			control.draw_string(control.get_theme_default_font(), nearest_in_pix, "%s"%nearest_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE)
