@@ -5,9 +5,9 @@ const Enums = preload("res://enums.gd")
 @export var tiles = {}
 
 
-@export_enum(Enums.Orfburg, Enums.Wulfenburg) var player_1:
+@export var player_1: Enums.Faction:
 	set(value):
-		player_2 = Enums.Wulfenburg if value == Enums.Orfburg else Enums.Orfburg
+		player_2 = Enums.Faction.Wulfenburg if value == Enums.Faction.Orfburg else Enums.Faction.Orfburg
 		player_1 = value
 var player_2
 
@@ -15,8 +15,8 @@ var player_2
 func init_state():
 	return {
 		"mode": Enums.SessionMode.SETUP,
-		Enums.Orfburg: { Enums.Duke: null, Enums.Infantry: [], Enums.Cavalry: [], Enums.Artillery: [] },
-		Enums.Wulfenburg: { Enums.Duke: null, Enums.Infantry: [], Enums.Cavalry: [], Enums.Artillery: [] },
+		Enums.Faction.Orfburg: { Enums.Unit.Duke: null, Enums.Unit.Infantry: [], Enums.Unit.Cavalry: [], Enums.Unit.Artillery: [] },
+		Enums.Faction.Wulfenburg: { Enums.Unit.Duke: null, Enums.Unit.Infantry: [], Enums.Unit.Cavalry: [], Enums.Unit.Artillery: [] },
 	}
 
 var state = init_state():
@@ -27,7 +27,7 @@ var state = init_state():
 const MAX_TURNS = 15
 
 func setup_piece(tile: Vector2i, kind: String, player: String):
-		if kind == Enums.Duke:
+		if kind == Enums.Unit.find_key(Enums.Unit.Duke):
 			state[player][kind] = tile
 		else:
 			state[player][kind].append(tile)
@@ -36,12 +36,12 @@ func finish_setup():
 	state = {
 		"mode": Enums.SessionMode.PLAY,
 		"turn": 1,
-		"player": Enums.Orfburg,
+		"player": Enums.Faction.Orfburg,
 		"phase": Enums.SessionPhase.MOVEMENT,
 		"subphase": Enums.MovementSubPhase.CHOOSE_UNIT,
 		"moved": {},
-		Enums.Orfburg: state[Enums.Orfburg],
-		Enums.Wulfenburg: state[Enums.Wulfenburg],
+		Enums.Faction.Orfburg: state[Enums.Faction.Orfburg],
+		Enums.Faction.Wulfenburg: state[Enums.Faction.Wulfenburg],
 	}
 
 func select_unit(unit_tile: Vector2i):
@@ -61,8 +61,8 @@ func select_destination(destination_tile: Vector2i):
 		"phase": Enums.SessionPhase.MOVEMENT,
 		"subphase": Enums.MovementSubPhase.CHOOSE_UNIT,
 		"moved": state.moved,
-		Enums.Orfburg: state[Enums.Orfburg],
-		Enums.Wulfenburg: state[Enums.Wulfenburg],
+		Enums.Faction.Orfburg: state[Enums.Faction.Orfburg],
+		Enums.Faction.Wulfenburg: state[Enums.Faction.Wulfenburg],
 	}
 
 func confirm_movement():
@@ -74,8 +74,8 @@ func confirm_movement():
 		"subphase": Enums.CombatSubPhase.CHOOSE_ATTACKERS,
 		"attacked": {},
 		"attacking": [],
-		Enums.Orfburg: state[Enums.Orfburg],
-		Enums.Wulfenburg: state[Enums.Wulfenburg],
+		Enums.Faction.Orfburg: state[Enums.Faction.Orfburg],
+		Enums.Faction.Wulfenburg: state[Enums.Faction.Wulfenburg],
 	}
 
 func choose_attacker(attacker_tile: Vector2i):
@@ -94,8 +94,8 @@ func choose_defender(defender_tile: Vector2i):
 		"subphase": Enums.CombatSubPhase.CHOOSE_ATTACKERS,
 		"attacked": state.attacked,
 		"attacking": [],
-		Enums.Orfburg: state[Enums.Orfburg],
-		Enums.Wulfenburg: state[Enums.Wulfenburg],
+		Enums.Faction.Orfburg: state[Enums.Faction.Orfburg],
+		Enums.Faction.Wulfenburg: state[Enums.Faction.Wulfenburg],
 	}
 	new_state.merge(state)
 	state = new_state
@@ -103,10 +103,10 @@ func choose_defender(defender_tile: Vector2i):
 func confirm_combat():
 	state = {
 		"mode": Enums.SessionMode.PLAY,
-		"turn": state.turn + int(state.player == Enums.Wulfenburg),
+		"turn": state.turn + (1 - int(state.player)),  # player == 0 if Orf, 1 if Wulfen
 		"phase": Enums.SessionPhase.MOVEMENT,
 		"subphase": Enums.MovementSubPhase.CHOOSE_UNIT,
 		"moved": {},
-		Enums.Orfburg: state[Enums.Orfburg],
-		Enums.Wulfenburg: state[Enums.Wulfenburg],
+		Enums.Faction.Orfburg: state[Enums.Faction.Orfburg],
+		Enums.Faction.Wulfenburg: state[Enums.Faction.Wulfenburg],
 	}

@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://bq2ere0f57kax"]
+[gd_scene load_steps=2 format=3 uid="uid://bq2ere0f57kax"]
+
+[ext_resource type="Script" path="res://main_menu_root.gd" id="1_ms7f6"]
 
 [node name="MainMenuRoot" type="Control"]
 layout_mode = 3
@@ -7,6 +9,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_ms7f6")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 1
@@ -29,3 +32,5 @@ text = "War Of The Dukes"
 [node name="NewGame" type="Button" parent="HBoxContainer/VBoxContainer"]
 layout_mode = 2
 text = "New Game"
+
+[connection signal="pressed" from="HBoxContainer/VBoxContainer/NewGame" to="." method="_on_new_game_pressed"]

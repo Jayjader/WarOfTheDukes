@@ -13,20 +13,14 @@ enum UIMode {
 	PAINTING_BORDERS,
 }
 
-const Orfburg = "Orfburg"
-const Wulfenburg = "Wulfenburg"
+enum Faction { Orfburg, Wulfenburg }
 
-enum SessionMode {
-	SETUP,
-	PLAY,
-	GAME_OVER,
-}
+enum SessionMode { SETUP, PLAY, GAME_OVER }
 
 enum SessionPhase { MOVEMENT, COMBAT }
 enum MovementSubPhase { CHOOSE_UNIT, CHOOSE_DESTINATION }
 enum CombatSubPhase { CHOOSE_ATTACKERS, CHOOSE_DEFENDER }
 
-const Duke = "Duke"
-const Infantry = "Infantry"
-const Cavalry = "Cavalry"
-const Artillery = "Artillery"
+enum Unit { Duke, Infantry, Cavalry, Artillery }
+
+enum MainMode { MainMenu, NewGameLobby, InGame, GameOver  }

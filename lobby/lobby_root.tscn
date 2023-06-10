@@ -1,0 +1,84 @@
+[gd_scene load_steps=4 format=3 uid="uid://b13hl7reavp6q"]
+
+[ext_resource type="Script" path="res://lobby/lobby_root.gd" id="1_lrfw5"]
+[ext_resource type="ButtonGroup" uid="uid://hlyc51m413nx" path="res://lobby/player_1_faction_choice.tres" id="2_dphmm"]
+[ext_resource type="Script" path="res://lobby/FactionDetails.gd" id="3_jgbwk"]
+
+[node name="LobbyRoot" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_lrfw5")
+
+[node name="HBox" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="PanelContainer" type="PanelContainer" parent="HBox"]
+layout_mode = 2
+
+[node name="Margins" type="MarginContainer" parent="HBox/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 64
+theme_override_constants/margin_right = 16
+
+[node name="VBox" type="VBoxContainer" parent="HBox/PanelContainer/Margins"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="HBox/PanelContainer/Margins/VBox"]
+layout_mode = 2
+text = "Choose your Faction:"
+horizontal_alignment = 1
+
+[node name="Choice" type="HBoxContainer" parent="HBox/PanelContainer/Margins/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="Orfburg" type="Button" parent="HBox/PanelContainer/Margins/VBox/Choice"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+button_group = ExtResource("2_dphmm")
+text = "Orfburg"
+
+[node name="Wulfenburg" type="Button" parent="HBox/PanelContainer/Margins/VBox/Choice"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+button_group = ExtResource("2_dphmm")
+text = "Wulfenburg"
+
+[node name="Hint" type="Label" parent="HBox/PanelContainer/Margins/VBox"]
+layout_mode = 2
+text = "(Orfburg goes first)"
+horizontal_alignment = 1
+
+[node name="FactionDetails" type="Label" parent="HBox/PanelContainer/Margins/VBox"]
+layout_mode = 2
+text = "The Duchy of Orfburg wins by seizing the city of Kaiserburg, all while maintaining control of the territory between the two smaller rivers.
+
+Minor Victory: Control the city of Kaiserburg and all of your existing territory in the map corner delimited by the smaller rivers and the cities of Mursk, Urft, and Grossburg.
+
+Total Victory: Control the city of Wulfenburg or kill the Duke of Wulfenburg."
+autowrap_mode = 3
+script = ExtResource("3_jgbwk")
+
+[node name="Confirm" type="Button" parent="HBox/PanelContainer/Margins/VBox"]
+layout_mode = 2
+text = "Confirm"
+
+[connection signal="player_1_faction_chosen" from="." to="HBox/PanelContainer/Margins/VBox/FactionDetails" method="faction_selected"]
+[connection signal="toggled" from="HBox/PanelContainer/Margins/VBox/Choice/Wulfenburg" to="." method="_on_wulfen_is_toggled_for_player_1"]
+[connection signal="pressed" from="HBox/PanelContainer/Margins/VBox/Confirm" to="." method="_on_confirm_pressed"]
