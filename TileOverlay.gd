@@ -39,7 +39,7 @@ const Drawing = preload("res://drawing.gd")
 		calibration = value
 		queue_redraw()
 
-var tiles_origin = Vector2i(0,0)
+var tiles_origin = Vector2i(0, 0)
 
 
 var MODES = len(Enums.TileOverlayMode.keys())
