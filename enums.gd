@@ -1,6 +1,6 @@
 extends Node
 
-enum UIMode {
+enum TileOverlayCalibration {
 	UNCALIBRATED,
 	CALIBRATING_BL,
 	CALIBRATING_BR,
@@ -8,7 +8,15 @@ enum UIMode {
 	CALIBRATING_TL,
 	CALIBRATING_SIZE,
 	CHOOSING_ORIGIN,
-	NORMAL,
+	CALIBRATED,
+}
+static func calibration_step_name(step: TileOverlayCalibration):
+	return TileOverlayCalibration.find_key(step)
+
+enum TileOverlayMode {
+	READ_ONLY,
+	CALIBRATING,
+	EDITING_BASE,
 	PAINTING_TILES,
 	PAINTING_BORDERS,
 }

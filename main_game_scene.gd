@@ -4,7 +4,7 @@ const Enums = preload("res://enums.gd")
 const Lobby = preload("res://lobby/lobby_root.tscn")
 
 const MainMenu = preload("res://main_menu_root.tscn")
-const GameSession = preload("res://game_session_root.tscn")
+const GameSession = preload("res://game_session/game_session_root.tscn")
 
 var data
 @export var mode: Enums.MainMode:

@@ -19,6 +19,7 @@ texture = ExtResource("2_w7llp")
 centered = false
 
 [node name="TileOverlay" type="Control" parent="Background"]
+unique_name_in_owner = true
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -214,10 +215,14 @@ text = "Erase Border"
 
 [connection signal="data_load_requested" from="." to="MapDataSaveLoad" method="load_data"]
 [connection signal="data_saved" from="." to="MapDataSaveLoad" method="save_data"]
+[connection signal="toggled_editing" from="." to="Background/TileOverlay" method="toggle_editing"]
 [connection signal="data_loaded" from="MapDataSaveLoad" to="." method="_on_map_data_load"]
 [connection signal="bl_set" from="Background/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_bl_set"]
 [connection signal="br_set" from="Background/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_br_set"]
-[connection signal="calibration_mode_entered" from="Background/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/CalibrationMode" method="set_text"]
+[connection signal="calibration_step_changed" from="Background/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/CalibrationMode" method="set_text"]
+[connection signal="display_mode_changed" from="Background/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/CalibrationMode" method="set_text"]
+[connection signal="hex_clicked" from="Background/TileOverlay" to="." method="_on_tile_overlay_hex_clicked"]
+[connection signal="hex_hovered" from="Background/TileOverlay" to="." method="_on_tile_overlay_hex_hovered"]
 [connection signal="tl_set" from="Background/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_tl_set"]
 [connection signal="tr_set" from="Background/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_tr_set"]
 [connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/RestartCalibration" to="Background/TileOverlay" method="start_calibration"]

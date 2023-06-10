@@ -1,0 +1,171 @@
+[gd_scene load_steps=4 format=3 uid="uid://urgscxvof7o8"]
+
+[ext_resource type="Script" path="res://game_session/setup/setup_root.gd" id="1_autkv"]
+[ext_resource type="Script" path="res://PlayerValue.gd" id="2_ps5h7"]
+[ext_resource type="ButtonGroup" uid="uid://bfis28ta025kj" path="res://game_session/setup/unit_selection_button_group.tres" id="3_fneyt"]
+
+[node name="SetupRoot" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_autkv")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -22.5
+offset_right = 22.5
+offset_bottom = 40.0
+grow_horizontal = 2
+
+[node name="Margins" type="MarginContainer" parent="PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+
+[node name="HBox" type="HBoxContainer" parent="PanelContainer/Margins"]
+layout_mode = 2
+alignment = 1
+
+[node name="VBox" type="VBoxContainer" parent="PanelContainer/Margins/HBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="PanelContainer/Margins/HBox/VBox"]
+layout_mode = 2
+text = "Setup"
+horizontal_alignment = 1
+
+[node name="CurrentPlayer" type="HBoxContainer" parent="PanelContainer/Margins/HBox/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="PanelContainer/Margins/HBox/VBox/CurrentPlayer"]
+layout_mode = 2
+text = "Current Player:"
+
+[node name="Value" type="Label" parent="PanelContainer/Margins/HBox/VBox/CurrentPlayer"]
+layout_mode = 2
+text = "Orfburg"
+script = ExtResource("2_ps5h7")
+
+[node name="HSeparator2" type="HSeparator" parent="PanelContainer/Margins/HBox/VBox"]
+layout_mode = 2
+
+[node name="Selection" type="VBoxContainer" parent="PanelContainer/Margins/HBox/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Title" type="Label" parent="PanelContainer/Margins/HBox/VBox/Selection"]
+layout_mode = 2
+text = "Place:"
+horizontal_alignment = 1
+
+[node name="Buttons" type="HBoxContainer" parent="PanelContainer/Margins/HBox/VBox/Selection"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="Infantry" type="Button" parent="PanelContainer/Margins/HBox/VBox/Selection/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+button_group = ExtResource("3_fneyt")
+text = "Infantry"
+
+[node name="Cavalry" type="Button" parent="PanelContainer/Margins/HBox/VBox/Selection/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+button_group = ExtResource("3_fneyt")
+text = "Cavalry"
+
+[node name="Artillery" type="Button" parent="PanelContainer/Margins/HBox/VBox/Selection/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+button_group = ExtResource("3_fneyt")
+text = "Artillery"
+
+[node name="Duke" type="Button" parent="PanelContainer/Margins/HBox/VBox/Selection/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+button_group = ExtResource("3_fneyt")
+text = "Duke"
+
+[node name="HSeparator" type="HSeparator" parent="PanelContainer/Margins/HBox/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/Margins/HBox/VBox"]
+layout_mode = 2
+text = "Units remaining to be placed:"
+
+[node name="UnitRemainingCounts" type="GridContainer" parent="PanelContainer/Margins/HBox/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 5
+
+[node name="FactionHeader" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+visible = false
+layout_mode = 2
+text = "Faction"
+
+[node name="EmptySpacer" type="Control" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+layout_mode = 2
+
+[node name="InfantryHeader" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+layout_mode = 2
+text = "Infantry"
+
+[node name="CavalryHeader" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+layout_mode = 2
+text = "Cavalry"
+
+[node name="ArtilleryHeader" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+layout_mode = 2
+text = "Artillery"
+
+[node name="DukeHeader" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+layout_mode = 2
+text = "Duke"
+
+[node name="Orfburg" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+layout_mode = 2
+text = "Orfburg"
+
+[node name="OrfburgInfantry" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+layout_mode = 2
+
+[node name="OrfburgCavalry" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+layout_mode = 2
+
+[node name="OrfburgArtillery" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+layout_mode = 2
+
+[node name="OrfburgDuke" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+layout_mode = 2
+
+[node name="Wulfenburg" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+layout_mode = 2
+text = "WulfenBurg"
+
+[node name="WulfenburgInfantry" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+layout_mode = 2
+
+[node name="WulfenburgCavalry" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+layout_mode = 2
+
+[node name="WulfenburgArtillery" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+layout_mode = 2
+
+[node name="WulfenburgDuke" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+layout_mode = 2

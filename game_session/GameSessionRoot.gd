@@ -2,8 +2,8 @@ extends Control
 
 const Enums = preload("res://enums.gd")
 
-const Setup = preload("res://setup_root.tscn")
-const GamePlay = preload("res://game_play/game_play_root.tscn")
+const Setup = preload("res://game_session/setup/setup_root.tscn")
+const GamePlay = preload("res://game_session/game_play/game_play_root.tscn")
 
 
 @export var tiles = {}

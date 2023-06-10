@@ -93,7 +93,7 @@ static func draw_hover(control: Control, mode, hovered, origin, hex_size):
 	var nearest = Util.hex_coords_to_pixel(nearest_in_axial, hex_size) + origin
 	var is_origin = nearest_in_axial == Vector2i(0, 0)
 
-	if mode == Enums.UIMode.PAINTING_BORDERS:
+	if mode == Enums.TileOverlayMode.PAINTING_BORDERS:
 		var relative_to_center_in_axial = Vector2(nearest_in_axial) - Util.pixel_coords_to_hex(Vector2(hovered) - origin, hex_size)
 		var in_cube = Util.axial_to_cube(relative_to_center_in_axial)
 		var direction_to_nearest_center = Util.direction_to_center_in_cube(in_cube)
@@ -107,7 +107,7 @@ static func draw_hover(control: Control, mode, hovered, origin, hex_size):
 		control.draw_string_outline(control.get_theme_default_font(), nearest, "%s"%border_center_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK)
 		control.draw_string(control.get_theme_default_font(), nearest, "%s"%border_center_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE)
 
-	elif mode == Enums.UIMode.PAINTING_TILES or mode == Enums.UIMode.NORMAL:
+	elif mode == Enums.TileOverlayMode.PAINTING_TILES or mode == Enums.TileOverlayMode.EDITING_BASE:
 		draw_hex(control, nearest, hex_size, Color.REBECCA_PURPLE if is_origin else Color.LIGHT_SALMON)
 		control.draw_string_outline(control.get_theme_default_font(), nearest, "%s"%nearest_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK)
 		control.draw_string(control.get_theme_default_font(), nearest, "%s"%nearest_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE)
