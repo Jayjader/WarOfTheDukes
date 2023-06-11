@@ -5,6 +5,7 @@ const Util = preload("res://util.gd")
 const Drawing = preload("res://drawing.gd")
 
 signal unit_placed(tile: Vector2i, kind: Enums.Unit, faction: Enums.Faction)
+signal setup_finished(units: Dictionary)
 
 @export var current_player: Enums.Faction = Enums.Faction.Orfburg:
 	set(value):
@@ -113,8 +114,8 @@ func choose_tile(tile: Vector2i, kind: String):
 		if selection_button != null:
 			selection_button.grab_focus()
 			selection_button.set_pressed(true)
-		#else:
-		#	setup_finished.emit(pieces)
+		else:
+			setup_finished.emit(pieces)
 
 
 func _ready():

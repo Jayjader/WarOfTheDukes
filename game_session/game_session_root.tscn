@@ -40,4 +40,5 @@ layout_mode = 1
 
 [connection signal="hex_clicked" from="SubViewportContainer/SubViewport/BoardRoot" to="SetupRoot" method="choose_tile"]
 [connection signal="toggled_editing" from="SubViewportContainer/SubViewport/BoardRoot" to="." method="_on_board_root_toggled_editing"]
+[connection signal="setup_finished" from="SetupRoot" to="." method="finish_setup"]
 [connection signal="unit_placed" from="SetupRoot" to="SubViewportContainer/SubViewport/BoardRoot/UnitLayerRoot" method="_place_piece"]
