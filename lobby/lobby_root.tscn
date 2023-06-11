@@ -24,6 +24,7 @@ grow_vertical = 2
 alignment = 1
 
 [node name="PanelContainer" type="PanelContainer" parent="HBox"]
+custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 
 [node name="Margins" type="MarginContainer" parent="HBox/PanelContainer"]
