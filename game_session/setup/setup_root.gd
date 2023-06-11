@@ -53,47 +53,68 @@ func get_first_with_remaining(faction: Enums.Faction):
 	if pieces_remaining(faction, Enums.Unit.Duke) > 0:
 		return Enums.Unit.Duke
 
-func unit_on(tile: Vector2i):
+func units_on(tile: Vector2i):
+	var units = []
 	if pieces[Enums.Faction.Orfburg][Enums.Unit.Duke] == tile:
-		return [Enums.Unit.Duke, Enums.Faction.Orfburg]
+		units.append([Enums.Unit.Duke, Enums.Faction.Orfburg])
 	if pieces[Enums.Faction.Wulfenburg][Enums.Unit.Duke] == tile:
-		return [Enums.Unit.Duke, Enums.Faction.Wulfenburg]
+		units.append([Enums.Unit.Duke, Enums.Faction.Wulfenburg])
 	if pieces[Enums.Faction.Orfburg][Enums.Unit.Infantry].find(tile) != -1:
-		return [Enums.Unit.Infantry, Enums.Faction.Orfburg]
+		units.append([Enums.Unit.Infantry, Enums.Faction.Orfburg])
 	if pieces[Enums.Faction.Wulfenburg][Enums.Unit.Infantry].find(tile) != -1:
-		return [Enums.Unit.Infantry, Enums.Faction.Wulfenburg]
+		units.append([Enums.Unit.Infantry, Enums.Faction.Wulfenburg])
 	if pieces[Enums.Faction.Orfburg][Enums.Unit.Cavalry].find(tile) != -1:
-		return [Enums.Unit.Cavalry, Enums.Faction.Orfburg]
+		units.append([Enums.Unit.Cavalry, Enums.Faction.Orfburg])
 	if pieces[Enums.Faction.Wulfenburg][Enums.Unit.Cavalry].find(tile) != -1:
-		return [Enums.Unit.Cavalry, Enums.Faction.Wulfenburg]
+		units.append([Enums.Unit.Cavalry, Enums.Faction.Wulfenburg])
 	if pieces[Enums.Faction.Orfburg][Enums.Unit.Artillery].find(tile) != -1:
-		return [Enums.Unit.Artillery, Enums.Faction.Orfburg]
+		units.append([Enums.Unit.Artillery, Enums.Faction.Orfburg])
 	if pieces[Enums.Faction.Wulfenburg][Enums.Unit.Artillery].find(tile) != -1:
-		return [Enums.Unit.Cavalry, Enums.Faction.Wulfenburg]
+		units.append([Enums.Unit.Cavalry, Enums.Faction.Wulfenburg])
+	return units
 
-func choose_tile(tile: Vector2i):
+func choose_tile(tile: Vector2i, kind: String):
 	print_debug("choose tile %s for unit %s for player %s" % [ tile, Enums.Unit.find_key(selection), Enums.Faction.find_key(current_player) ])
 	if selection != null:
+		var already_there = units_on(tile)
+		if len(already_there) > 0:
+			if len(already_there) > 1:
+				return
+			var unit_faction_tuple = already_there[0]
+			if kind != "City" and kind != "Fortress":
+				return
+			if unit_faction_tuple[1] != current_player:
+				return
+			if unit_faction_tuple[0] != Enums.Unit.Duke and selection != Enums.Unit.Duke:
+				return
 		if selection == Enums.Unit.Duke:
 			pieces[current_player][selection] = tile
 		else:
-			if unit_on(tile) != null:
-				return
 			pieces[current_player][selection].append(tile)
 		display_remaining_counts()
 		unit_placed.emit(tile, selection, current_player)
 
 		current_player = Enums.get_other_faction(current_player)
-		selection = get_first_with_remaining(current_player)
-		match selection:
-			Enums.Unit.Infantry:
-				%Selection/Buttons/Infantry.set_pressed(true)
-			Enums.Unit.Cavalry:
-				%Selection/Buttons/Cavalry.set_pressed(true)
-			Enums.Unit.Artillery:
-				%Selection/Buttons/Artillery.set_pressed(true)
+		%Selection/Buttons/Infantry.disabled = pieces_remaining(current_player, Enums.Unit.Infantry) == 0
+		%Selection/Buttons/Cavalry.disabled = pieces_remaining(current_player, Enums.Unit.Cavalry) == 0
+		%Selection/Buttons/Artillery.disabled = pieces_remaining(current_player, Enums.Unit.Artillery) == 0
+		%Selection/Buttons/Duke.disabled = pieces_remaining(current_player, Enums.Unit.Duke) == 0
+		var new_selection = get_first_with_remaining(current_player)
+		var selection_button
+		match new_selection:
 			Enums.Unit.Duke:
-				%Selection/Buttons/Duke.set_pressed(true)
+				selection_button = %Selection/Buttons/Duke
+			Enums.Unit.Infantry:
+				selection_button = %Selection/Buttons/Infantry
+			Enums.Unit.Cavalry:
+				selection_button = %Selection/Buttons/Cavalry
+			Enums.Unit.Artillery:
+				selection_button = %Selection/Buttons/Artillery
+		if selection_button != null:
+			selection_button.grab_focus()
+			selection_button.set_pressed(true)
+		#else:
+		#	setup_finished.emit(pieces)
 
 
 func _ready():

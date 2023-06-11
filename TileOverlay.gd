@@ -7,7 +7,7 @@ signal display_mode_changed(new_mode: String)
 signal calibration_step_changed(new_step: String)
 
 signal hex_hovered(Vector2i)
-signal hex_clicked(Vector2i)
+signal hex_clicked(tile: Vector2i, kind)
 
 signal bl_set(position)
 signal br_set(position)
@@ -100,11 +100,9 @@ func choose_tl(new_tl: Vector2):
 func choose_tiles_wide(tiles_wide: String):
 	calibration.tiles_wide = float(tiles_wide)
 	calibration = calibration
-
 func choose_tiles_heigh(tiles_heigh: String):
 	calibration.tiles_heigh = float(tiles_heigh)
 	calibration = calibration
-
 func complete_size_calibration():
 	var hex_width = (Vector2(
 			calibration.bottom_right - calibration.bottom_left
@@ -130,7 +128,6 @@ func previous_calibration_step():
 	if state.mode == Enums.TileOverlayMode.CALIBRATING and calibration.mode > Enums.TileOverlayCalibration.UNCALIBRATED:
 		calibration.mode = ((calibration.mode + len(Enums.TileOverlayCalibration.keys()) - 1) % len(Enums.TileOverlayCalibration.keys())) as Enums.TileOverlayCalibration
 		calibration = calibration
-
 func next_calibration_step():
 	if state.mode == Enums.TileOverlayMode.CALIBRATING:
 		if calibration.mode < Enums.TileOverlayCalibration.CALIBRATING_SIZE:
@@ -147,7 +144,6 @@ func save_calibration_data(data=calibration):
 	if data.mode == Enums.TileOverlayCalibration.CALIBRATED:
 		var file = FileAccess.open("./calibration.data", FileAccess.WRITE)
 		file.store_var(calibration)
-
 func load_calibration_data():
 	var file = FileAccess.open("./calibration.data", FileAccess.READ)
 	if file == null:
@@ -238,7 +234,8 @@ func _gui_input(event):
 			Enums.TileOverlayMode.READ_ONLY:
 				if report_clicked_hex:
 					print_debug("hex clicked at pix %s" % event.position)
-					hex_clicked.emit(Util.nearest_hex_in_axial(event.position, Vector2i(0, 0), hex_draw_size))
+					var tile = Util.nearest_hex_in_axial(event.position, Vector2i(0, 0), hex_draw_size)
+					hex_clicked.emit(tile, map_data.tiles.get(tile))
 			Enums.TileOverlayMode.CALIBRATING:
 				match calibration.mode:
 					Enums.TileOverlayCalibration.CALIBRATING_BL:

@@ -7,8 +7,8 @@ var EditingGroup: StringName = &"map-edit-ui"
 
 signal toggled_editing(bool)
 
-signal hex_hovered(Vector2i)
-signal hex_clicked(Vector2i)
+signal hex_hovered(tile: Vector2i)
+signal hex_clicked(tile: Vector2i, kind)
 
 @export var editing: bool:
 	set(value):
@@ -70,5 +70,6 @@ func _on_map_data_save():
 
 func _on_tile_overlay_hex_hovered(axial: Vector2i):
 	hex_hovered.emit(axial)
-func _on_tile_overlay_hex_clicked(axial: Vector2i):
-	hex_clicked.emit(axial)
+func _on_tile_overlay_hex_clicked(axial: Vector2i, kind):
+	print_debug("hex clicked: %s" % axial)
+	hex_clicked.emit(axial, kind)
