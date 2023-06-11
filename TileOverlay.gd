@@ -197,6 +197,8 @@ func _draw():
 	if current_mode == Enums.TileOverlayMode.READ_ONLY:
 		for tile in map_data.tiles:
 			Drawing.fill_hex(self, Util.hex_coords_to_pixel(tile, hex_draw_size), hex_draw_size, map_data.tiles[tile])
+		for border_center in map_data.borders:
+				Drawing.draw_border(self, map_data.borders[border_center], border_center, hex_draw_size, Vector2(0, 0))
 		if state.get("hover") != null:
 			Drawing.draw_hover(self, current_mode, state.hover, Vector2i(0, 0), hex_draw_size)
 		
