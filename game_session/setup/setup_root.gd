@@ -1,7 +1,10 @@
 extends Control
 
 const Enums = preload("res://enums.gd")
+const Util = preload("res://util.gd")
 const Drawing = preload("res://drawing.gd")
+
+const Unit = preload("res://game_session/setup/unit_root.tscn")
 
 @export var current_player: Enums.Faction = Enums.Faction.Orfburg:
 	set(value):
@@ -52,18 +55,39 @@ func get_first_with_remaining(faction: Enums.Faction):
 
 
 func choose_tile(tile: Vector2i):
-	print_debug("choose tile %s for unit %s for player %s" % [ tile, selection, current_player ])
+	print_debug("choose tile %s for unit %s for player %s" % [ tile, Enums.Unit.find_key(selection), Enums.Faction.find_key(current_player) ])
 	if selection != null:
 		if selection == Enums.Unit.Duke:
 			pieces[current_player][selection] = tile
 		else:
 			pieces[current_player][selection].append(tile)
 		display_remaining_counts()
+
+		# todo: this might need to be moved into the tile overlay or game
+		# session scene root script and emit a signal here instead.
+		# also we need a camera for many things including panning w/ acceleration, zooming,
+		# easier syncing of different scene's positions and coordinates
+		var unit = Unit.instantiate()
+		add_child(unit)
+		unit.kind = selection as Enums.Unit
+		unit.faction = current_player
+		unit.position = Util.hex_coords_to_pixel(tile, 60)
+
 		current_player = Enums.get_other_faction(current_player)
 		selection = get_first_with_remaining(current_player)
+		match selection:
+			Enums.Unit.Infantry:
+				%Selection/Buttons/Infantry.set_pressed(true)
+			Enums.Unit.Cavalry:
+				%Selection/Buttons/Cavalry.set_pressed(true)
+			Enums.Unit.Artillery:
+				%Selection/Buttons/Artillery.set_pressed(true)
+			Enums.Unit.Duke:
+				%Selection/Buttons/Duke.set_pressed(true)
 		queue_redraw()
 
 func _draw():
+	pass
 	# todo: this might need to be moved into the tile overlay or else we need
 	# to find another way of knowing the hex size for the hex_to_pix conversion
 	# options:
@@ -72,13 +96,13 @@ func _draw():
 	#	  when editing the map data (which doesn't involve drawing units
 	#	  anyways), so we won't be specifying the hex size anywhere outside the
 	#	  overlay
-	for faction in [Enums.Faction.Orfburg, Enums.Faction.Wulfenburg]:
-		var duke = pieces[faction][Enums.Unit.Duke]
-		if duke != null:
-			Drawing.draw_unit_name(self, Enums.Unit.Duke, faction, duke)
-		for kind in [Enums.Unit.Infantry, Enums.Unit.Cavalry, Enums.Unit.Artillery]:
-			for hex_in_axial in pieces[faction][kind]:
-				Drawing.draw_unit_name(self, kind, faction, hex_in_axial)
+	#for faction in [Enums.Faction.Orfburg, Enums.Faction.Wulfenburg]:
+	#	var duke = pieces[faction][Enums.Unit.Duke]
+	#	if duke != null:
+	#		Drawing.draw_unit_name(self, Enums.Unit.Duke, faction, duke)
+	#	for kind in [Enums.Unit.Infantry, Enums.Unit.Cavalry, Enums.Unit.Artillery]:
+	#		for hex_in_axial in pieces[faction][kind]:
+	#			Drawing.draw_unit_name(self, kind, faction, hex_in_axial)
 
 func _ready():
 	display_remaining_counts()

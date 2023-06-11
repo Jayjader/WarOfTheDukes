@@ -29,6 +29,7 @@ layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
 
 [node name="HBox" type="HBoxContainer" parent="PanelContainer/Margins"]
 layout_mode = 2
@@ -36,6 +37,7 @@ alignment = 1
 
 [node name="VBox" type="VBoxContainer" parent="PanelContainer/Margins/HBox"]
 layout_mode = 2
+theme_override_constants/separation = 10
 
 [node name="Title" type="Label" parent="PanelContainer/Margins/HBox/VBox"]
 layout_mode = 2
@@ -145,15 +147,19 @@ text = "Orfburg"
 
 [node name="OrfburgInfantry" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
+horizontal_alignment = 2
 
 [node name="OrfburgCavalry" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
+horizontal_alignment = 2
 
 [node name="OrfburgArtillery" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
+horizontal_alignment = 2
 
 [node name="OrfburgDuke" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
+horizontal_alignment = 2
 
 [node name="Wulfenburg" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
@@ -161,12 +167,16 @@ text = "WulfenBurg"
 
 [node name="WulfenburgInfantry" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
+horizontal_alignment = 2
 
 [node name="WulfenburgCavalry" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
+horizontal_alignment = 2
 
 [node name="WulfenburgArtillery" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
+horizontal_alignment = 2
 
 [node name="WulfenburgDuke" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
+horizontal_alignment = 2
