@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://owh1v0ln32rm"]
+
+[ext_resource type="Script" path="res://game_session/unit_layer/unit_layer_root.gd" id="1_3rt5o"]
+
+[node name="UnitLayerRoot" type="Node2D"]
+script = ExtResource("1_3rt5o")

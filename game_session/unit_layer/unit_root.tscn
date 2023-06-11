@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=3 uid="uid://bw38xklp365ls"]
+
+[ext_resource type="Script" path="res://game_session/unit_layer/unit_root.gd" id="1_euwlh"]
+
+[node name="UnitRoot" type="Node2D"]
+script = ExtResource("1_euwlh")
+
+[node name="Label" type="Label" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1

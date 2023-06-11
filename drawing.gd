@@ -10,7 +10,7 @@ static func draw_hex(control: Control, center: Vector2i, hex_size: float, color:
 			Util.hex_corner_trig(center, hex_size, i+1, angle_offset),
 			color, 4)
 
-const colors = {
+const tile_colors = {
 	Plains=Color.BEIGE,
 	City=Color.SLATE_GRAY,
 	Forest=Color.DARK_GREEN,
@@ -21,6 +21,10 @@ const colors = {
 	River=Color.BLUE,
 	Bridge=Color.DIM_GRAY,
 	"Bridge (No Road)"=Color.SADDLE_BROWN,
+}
+const faction_colors = {
+	Enums.Faction.Orfburg: Color.ROYAL_BLUE,
+	Enums.Faction.Wulfenburg: Color.DARK_RED,
 }
 
 static func draw_calibration(control: Control, calibration: Dictionary, hex_size: float, hover):
@@ -58,7 +62,7 @@ static func fill_hex(control: Control, center: Vector2i, hex_size: float, kind: 
 	var points = PackedVector2Array()
 	for i in range(6):
 		points.append(Util.hex_corner_trig(center, hex_size, i, angle_offset))
-	control.draw_colored_polygon(points, Color(colors[kind], 0.8))
+	control.draw_colored_polygon(points, Color(tile_colors[kind], 0.8))
 
 static func draw_border(control: Control, kind, border_center, hex_size, origin):
 	var normals = Util.derive_border_normals_in_cube(Util.axial_to_cube(border_center))
@@ -69,10 +73,10 @@ static func draw_border(control: Control, kind, border_center, hex_size, origin)
 	var first_corner = origin + Util.hex_corner_trig(Util.hex_coords_to_pixel(a_hex_touching_border, hex_size), hex_size, (hex_index+2)%6)
 	var second_corner = origin + Util.hex_corner_trig(Util.hex_coords_to_pixel(a_hex_touching_border, hex_size), hex_size, (hex_index+3)%6)
 	if kind != "Road":
-		control.draw_line(first_corner, second_corner, colors[kind if not kind.begins_with("Bridge") else "River"], 10)
+		control.draw_line(first_corner, second_corner, tile_colors[kind if not kind.begins_with("Bridge") else "River"], 10)
 	else:
-		control.draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[0]) / 3, hex_size), origin + Util.hex_coords_to_pixel(border_center, hex_size), colors[kind], 10)
-		control.draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[1]) / 3, hex_size), origin + Util.hex_coords_to_pixel(border_center, hex_size), colors[kind], 10)
+		control.draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[0]) / 3, hex_size), origin + Util.hex_coords_to_pixel(border_center, hex_size), tile_colors[kind], 10)
+		control.draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[1]) / 3, hex_size), origin + Util.hex_coords_to_pixel(border_center, hex_size), tile_colors[kind], 10)
 	if kind.begins_with("Bridge"):
 		var bridge_width = hex_size / 6
 
@@ -83,10 +87,10 @@ static func draw_border(control: Control, kind, border_center, hex_size, origin)
 		var second_rem = Util.cube_directions[(basis_index+7)%6]
 
 		var bridge_offset_basis = Util.cube_to_axial(bridge_width * (first_rem - second_rem))
-		control.draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[0]) / 3, hex_size) + bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) + bridge_offset_basis, colors[kind], 10)
-		control.draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[0]) / 3, hex_size) - bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) - bridge_offset_basis, colors[kind], 10)
-		control.draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[1]) / 3, hex_size) + bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) + bridge_offset_basis, colors[kind], 10)
-		control.draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[1]) / 3, hex_size) - bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) - bridge_offset_basis, colors[kind], 10)
+		control.draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[0]) / 3, hex_size) + bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) + bridge_offset_basis, tile_colors[kind], 10)
+		control.draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[0]) / 3, hex_size) - bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) - bridge_offset_basis, tile_colors[kind], 10)
+		control.draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[1]) / 3, hex_size) + bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) + bridge_offset_basis, tile_colors[kind], 10)
+		control.draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[1]) / 3, hex_size) - bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) - bridge_offset_basis, tile_colors[kind], 10)
 
 static func draw_hover(control: Control, mode, hovered, origin, hex_size):
 	var nearest_in_axial = Util.nearest_hex_in_axial(hovered, origin, hex_size)
@@ -117,5 +121,9 @@ static func draw_unit_name(control: Control, unit: Enums.Unit, faction: Enums.Fa
 	control.draw_string_outline(
 		control.get_theme_default_font(),
 		Util.hex_coords_to_pixel(hex, hex_size),
-		Enums.Unit.find_key(unit)
+		Enums.Unit.find_key(unit),
+		HORIZONTAL_ALIGNMENT_CENTER,
+		-1,
+		16,
+		faction_colors[faction]
 	)
