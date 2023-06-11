@@ -14,15 +14,30 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_7lw6w")
 
-[node name="BoardRoot" parent="." instance=ExtResource("2_varfx")]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
+disable_3d = true
+handle_input_locally = false
+size = Vector2i(1920, 1080)
+render_target_update_mode = 4
+
+[node name="BoardRoot" parent="SubViewportContainer/SubViewport" instance=ExtResource("2_varfx")]
 report_hovered_hex = true
 report_clicked_hex = true
 
-[node name="UnitLayerRoot" parent="BoardRoot" instance=ExtResource("4_6kihs")]
+[node name="UnitLayerRoot" parent="SubViewportContainer/SubViewport/BoardRoot" instance=ExtResource("4_6kihs")]
 
 [node name="SetupRoot" parent="." instance=ExtResource("3_2cv6m")]
 layout_mode = 1
 
-[connection signal="hex_clicked" from="BoardRoot" to="SetupRoot" method="choose_tile"]
-[connection signal="toggled_editing" from="BoardRoot" to="." method="_on_board_root_toggled_editing"]
-[connection signal="unit_placed" from="SetupRoot" to="BoardRoot/UnitLayerRoot" method="_place_piece"]
+[connection signal="hex_clicked" from="SubViewportContainer/SubViewport/BoardRoot" to="SetupRoot" method="choose_tile"]
+[connection signal="toggled_editing" from="SubViewportContainer/SubViewport/BoardRoot" to="." method="_on_board_root_toggled_editing"]
+[connection signal="unit_placed" from="SetupRoot" to="SubViewportContainer/SubViewport/BoardRoot/UnitLayerRoot" method="_place_piece"]

@@ -49,9 +49,9 @@ situations are not symmetrical: they do not exactly share the same winning condi
 #### Setting up the Pawns
 
 Each player places one of their units on each city or fortress tile they own.
-Next, they take turns placing their remaining units on tiles they possess until
-all have been placed.  
-The player owning Orfburg always plays first.
+Next, they take turns placing their remaining units on tiles inside their
+borders until all have been placed.  
+The player playing as the Duchy of Orfburg always goes first.
 
 #### Game Length
 

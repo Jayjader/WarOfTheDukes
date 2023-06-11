@@ -14,169 +14,173 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_autkv")
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -22.5
-offset_right = 22.5
-offset_bottom = 40.0
+offset_left = -188.0
+offset_right = 188.0
+offset_bottom = 325.0
 grow_horizontal = 2
+theme_override_constants/margin_top = 20
 
-[node name="Margins" type="MarginContainer" parent="PanelContainer"]
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="Margins" type="MarginContainer" parent="MarginContainer/PanelContainer"]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="HBox" type="HBoxContainer" parent="PanelContainer/Margins"]
+[node name="HBox" type="HBoxContainer" parent="MarginContainer/PanelContainer/Margins"]
 layout_mode = 2
 alignment = 1
 
-[node name="VBox" type="VBoxContainer" parent="PanelContainer/Margins/HBox"]
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/PanelContainer/Margins/HBox"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Title" type="Label" parent="PanelContainer/Margins/HBox/VBox"]
+[node name="Title" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox"]
 layout_mode = 2
 text = "Setup"
 horizontal_alignment = 1
 
-[node name="CurrentPlayer" type="HBoxContainer" parent="PanelContainer/Margins/HBox/VBox"]
+[node name="CurrentPlayer" type="HBoxContainer" parent="MarginContainer/PanelContainer/Margins/HBox/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="PanelContainer/Margins/HBox/VBox/CurrentPlayer"]
+[node name="Label" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/CurrentPlayer"]
 layout_mode = 2
 text = "Current Player:"
 
-[node name="Value" type="Label" parent="PanelContainer/Margins/HBox/VBox/CurrentPlayer"]
+[node name="Value" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/CurrentPlayer"]
 layout_mode = 2
 text = "Orfburg"
 script = ExtResource("2_ps5h7")
 
-[node name="HSeparator2" type="HSeparator" parent="PanelContainer/Margins/HBox/VBox"]
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/PanelContainer/Margins/HBox/VBox"]
 layout_mode = 2
 
-[node name="Selection" type="VBoxContainer" parent="PanelContainer/Margins/HBox/VBox"]
+[node name="Selection" type="VBoxContainer" parent="MarginContainer/PanelContainer/Margins/HBox/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Title" type="Label" parent="PanelContainer/Margins/HBox/VBox/Selection"]
+[node name="Title" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/Selection"]
 layout_mode = 2
 text = "Place:"
 horizontal_alignment = 1
 
-[node name="Buttons" type="HBoxContainer" parent="PanelContainer/Margins/HBox/VBox/Selection"]
+[node name="Buttons" type="HBoxContainer" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/Selection"]
 layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="Infantry" type="Button" parent="PanelContainer/Margins/HBox/VBox/Selection/Buttons"]
+[node name="Infantry" type="Button" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/Selection/Buttons"]
 layout_mode = 2
 size_flags_horizontal = 3
 toggle_mode = true
 button_group = ExtResource("3_fneyt")
 text = "Infantry"
 
-[node name="Cavalry" type="Button" parent="PanelContainer/Margins/HBox/VBox/Selection/Buttons"]
+[node name="Cavalry" type="Button" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/Selection/Buttons"]
 layout_mode = 2
 size_flags_horizontal = 3
 toggle_mode = true
 button_group = ExtResource("3_fneyt")
 text = "Cavalry"
 
-[node name="Artillery" type="Button" parent="PanelContainer/Margins/HBox/VBox/Selection/Buttons"]
+[node name="Artillery" type="Button" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/Selection/Buttons"]
 layout_mode = 2
 size_flags_horizontal = 3
 toggle_mode = true
 button_group = ExtResource("3_fneyt")
 text = "Artillery"
 
-[node name="Duke" type="Button" parent="PanelContainer/Margins/HBox/VBox/Selection/Buttons"]
+[node name="Duke" type="Button" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/Selection/Buttons"]
 layout_mode = 2
 size_flags_horizontal = 3
 toggle_mode = true
 button_group = ExtResource("3_fneyt")
 text = "Duke"
 
-[node name="HSeparator" type="HSeparator" parent="PanelContainer/Margins/HBox/VBox"]
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/PanelContainer/Margins/HBox/VBox"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="PanelContainer/Margins/HBox/VBox"]
+[node name="Label" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox"]
 layout_mode = 2
 text = "Units remaining to be placed:"
 
-[node name="UnitRemainingCounts" type="GridContainer" parent="PanelContainer/Margins/HBox/VBox"]
+[node name="UnitRemainingCounts" type="GridContainer" parent="MarginContainer/PanelContainer/Margins/HBox/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/h_separation = 10
 theme_override_constants/v_separation = 10
 columns = 5
 
-[node name="FactionHeader" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+[node name="FactionHeader" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 visible = false
 layout_mode = 2
 text = "Faction"
 
-[node name="EmptySpacer" type="Control" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+[node name="EmptySpacer" type="Control" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
 
-[node name="InfantryHeader" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+[node name="InfantryHeader" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
 text = "Infantry"
 
-[node name="CavalryHeader" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+[node name="CavalryHeader" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
 text = "Cavalry"
 
-[node name="ArtilleryHeader" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+[node name="ArtilleryHeader" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
 text = "Artillery"
 
-[node name="DukeHeader" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+[node name="DukeHeader" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
 text = "Duke"
 
-[node name="Orfburg" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+[node name="Orfburg" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
 text = "Orfburg"
 
-[node name="OrfburgInfantry" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+[node name="OrfburgInfantry" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
 horizontal_alignment = 2
 
-[node name="OrfburgCavalry" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+[node name="OrfburgCavalry" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
 horizontal_alignment = 2
 
-[node name="OrfburgArtillery" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+[node name="OrfburgArtillery" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
 horizontal_alignment = 2
 
-[node name="OrfburgDuke" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+[node name="OrfburgDuke" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
 horizontal_alignment = 2
 
-[node name="Wulfenburg" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+[node name="Wulfenburg" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
 text = "WulfenBurg"
 
-[node name="WulfenburgInfantry" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+[node name="WulfenburgInfantry" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
 horizontal_alignment = 2
 
-[node name="WulfenburgCavalry" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+[node name="WulfenburgCavalry" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
 horizontal_alignment = 2
 
-[node name="WulfenburgArtillery" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+[node name="WulfenburgArtillery" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
 horizontal_alignment = 2
 
-[node name="WulfenburgDuke" type="Label" parent="PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
+[node name="WulfenburgDuke" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
 horizontal_alignment = 2

@@ -30,18 +30,9 @@ func _ready():
 	editing = false
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta):
+func _unhandled_input(event):
 	if not Engine.is_editor_hint():
-		if Input.is_key_pressed(KEY_A):
-			$Background.position.x += 25
-		if Input.is_key_pressed(KEY_D):
-			$Background.position.x -= 25
-		if Input.is_key_pressed(KEY_W):
-			$Background.position.y += 25
-		if Input.is_key_pressed(KEY_S):
-			$Background.position.y -= 25
-		if Input.is_action_just_pressed("Edit Map Data"):
+		if event.is_action_pressed("Edit Map Data"):
 			editing = !editing
 
 
