@@ -53,6 +53,23 @@ func get_first_with_remaining(faction: Enums.Faction):
 	if pieces_remaining(faction, Enums.Unit.Duke) > 0:
 		return Enums.Unit.Duke
 
+func unit_on(tile: Vector2i):
+	if pieces[Enums.Faction.Orfburg][Enums.Unit.Duke] == tile:
+		return [Enums.Unit.Duke, Enums.Faction.Orfburg]
+	if pieces[Enums.Faction.Wulfenburg][Enums.Unit.Duke] == tile:
+		return [Enums.Unit.Duke, Enums.Faction.Wulfenburg]
+	if pieces[Enums.Faction.Orfburg][Enums.Unit.Infantry].find(tile) != -1:
+		return [Enums.Unit.Infantry, Enums.Faction.Orfburg]
+	if pieces[Enums.Faction.Wulfenburg][Enums.Unit.Infantry].find(tile) != -1:
+		return [Enums.Unit.Infantry, Enums.Faction.Wulfenburg]
+	if pieces[Enums.Faction.Orfburg][Enums.Unit.Cavalry].find(tile) != -1:
+		return [Enums.Unit.Cavalry, Enums.Faction.Orfburg]
+	if pieces[Enums.Faction.Wulfenburg][Enums.Unit.Cavalry].find(tile) != -1:
+		return [Enums.Unit.Cavalry, Enums.Faction.Wulfenburg]
+	if pieces[Enums.Faction.Orfburg][Enums.Unit.Artillery].find(tile) != -1:
+		return [Enums.Unit.Artillery, Enums.Faction.Orfburg]
+	if pieces[Enums.Faction.Wulfenburg][Enums.Unit.Artillery].find(tile) != -1:
+		return [Enums.Unit.Cavalry, Enums.Faction.Wulfenburg]
 
 func choose_tile(tile: Vector2i):
 	print_debug("choose tile %s for unit %s for player %s" % [ tile, Enums.Unit.find_key(selection), Enums.Faction.find_key(current_player) ])
@@ -60,6 +77,8 @@ func choose_tile(tile: Vector2i):
 		if selection == Enums.Unit.Duke:
 			pieces[current_player][selection] = tile
 		else:
+			if unit_on(tile) != null:
+				return
 			pieces[current_player][selection].append(tile)
 		display_remaining_counts()
 		unit_placed.emit(tile, selection, current_player)
