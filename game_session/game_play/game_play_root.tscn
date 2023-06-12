@@ -10,3 +10,55 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_kicvc")
+current_phase = 1
+
+[node name="TopMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.5
+offset_right = 20.5
+offset_bottom = 40.0
+grow_horizontal = 2
+theme_override_constants/margin_top = 20
+
+[node name="Panel" type="PanelContainer" parent="TopMargin"]
+layout_mode = 2
+
+[node name="Margins" type="MarginContainer" parent="TopMargin/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="HBox" type="HBoxContainer" parent="TopMargin/Panel/Margins"]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="TopMargin/Panel/Margins/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="Turn" type="Label" parent="TopMargin/Panel/Margins/HBox/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Turn:"
+
+[node name="Player" type="Label" parent="TopMargin/Panel/Margins/HBox/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Current Player:"
+
+[node name="Phase" type="Label" parent="TopMargin/Panel/Margins/HBox/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="PhaseInstruction" type="Label" parent="TopMargin/Panel/Margins/HBox/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SubPhaseInstruction" type="Label" parent="TopMargin/Panel/Margins/HBox/VBox"]
+unique_name_in_owner = true
+layout_mode = 2

@@ -7,13 +7,48 @@ signal game_over(result: Enums.GameResult, winner)
 @export var pieces: Dictionary
 
 const MAX_TURNS = 15
-@export var turn: int = 1
+@export var turn: int = 1:
+	set(value):
+		if value > 0 and value <= MAX_TURNS:
+			print_debug("turn set: %s -> %s" % [ turn, value ])
+			turn = value
+			%Turn.set_text("Turn: %s" % turn)
 
-@export var current_player: Enums.Faction = Enums.Faction.Orfburg
+@export var current_player: Enums.Faction = Enums.Faction.Orfburg:
+	set(value):
+		current_player = value
+		%Player.set_text("Current Player: %s" % Enums.Faction.find_key(current_player))
 
-@export var current_phase: Enums.SessionPhase = Enums.SessionPhase.MOVEMENT
+const PHASE_INSTRUCTIONS = {
+	Enums.SessionPhase.MOVEMENT: """Each of your units can move once during this phase, and each is limited in the total distance it can move.
+This limit is affected by the unit type, as well as the terrain you make your units cross.
+Mounted units (Cavalry and Dukes) start each turn with 6 movement points.
+Units on foot (Infantry and Artillery) start each turn with 3 movement points.
+Any movement points not spent are lost at the end of the Movement Phase.
+The cost in movement points to enter a tile depends on the terrain on that tile, as well as any features on its border with the tile from which a piece is leaving.
+Roads cost 1/2 points to cross.
+Cities cost 1/2 points to enter.
+Bridges cost 1 point to cross (but only 1/2 points if a Road crosses the Bridge as well).
+Plains cost 1 point to enter.
+Woods and Cliffs cost 2 points to enter.
+Lakes can not be entered.
+Rivers can not be crossed (but a Bridge over a River can be crossed - cost as specified above).
+""",
+	Enums.SessionPhase.COMBAT: """blablabla hit stuff win fights"""
+}
+@export var current_phase: Enums.SessionPhase = Enums.SessionPhase.MOVEMENT:
+	set(value):
+		current_phase = value
+		%Phase.set_text("Movement Phase" if current_phase == Enums.SessionPhase.MOVEMENT else "Combat Phase")
+		%PhaseInstruction.set_text(PHASE_INSTRUCTIONS[current_phase])
 
-var data: Dictionary
+const INSTRUCTIONS = {
+	Enums.MovementSubPhase.CHOOSE_UNIT: "", 
+}
+var data: Dictionary:
+	set(value):
+		data = value
+		%SubPhaseInstruction.set_text()
 
 
 func _ready():
@@ -56,6 +91,21 @@ func choose_attacker(attacker_tile: Vector2i):
 		attacking = data.attacking,
 		attacked = data.attacked,
 	}
+
+const CR = Enums.CombatResult
+const COMBAT_RESULTs = {
+	Vector2i(1, 5): [CR.AttackerRetreats, CR.AttackerEliminated, CR.AttackerEliminated, CR.AttackerEliminated, CR.AttackerEliminated, CR.AttackerEliminated],
+	Vector2i(1, 4): [CR.AttackerRetreats, CR.AttackerRetreats, CR.AttackerEliminated, CR.AttackerEliminated, CR.AttackerEliminated, CR.AttackerEliminated],
+	Vector2i(1, 3): [CR.DefenderRetreats, CR.AttackerRetreats, CR.AttackerRetreats, CR.AttackerEliminated, CR.AttackerEliminated, CR.AttackerEliminated],
+	Vector2i(1, 2): [CR.DefenderRetreats, CR.DefenderRetreats, CR.AttackerRetreats, CR.AttackerRetreats, CR.AttackerRetreats, CR.AttackerRetreats],
+	Vector2i(1, 1): [CR.DefenderRetreats, CR.DefenderRetreats, CR.DefenderRetreats, CR.AttackerRetreats, CR.AttackerRetreats, CR.AttackerRetreats],
+	Vector2i(2, 1): [CR.DefenderRetreats, CR.DefenderRetreats, CR.DefenderRetreats, CR.DefenderRetreats, CR.AttackerRetreats, CR.AttackerRetreats],
+	Vector2i(3, 1): [CR.DefenderRetreats, CR.DefenderRetreats, CR.DefenderRetreats, CR.DefenderRetreats, CR.DefenderRetreats, CR.AttackerRetreats],
+	Vector2i(4, 1): [CR.DefenderEliminated, CR.DefenderRetreats, CR.DefenderRetreats, CR.DefenderRetreats, CR.DefenderRetreats, CR.Exchange],
+	Vector2i(5, 1): [CR.DefenderEliminated, CR.DefenderEliminated, CR.DefenderEliminated, CR.DefenderRetreats, CR.DefenderRetreats, CR.Exchange],
+	Vector2i(1, 6): [CR.DefenderEliminated, CR.DefenderEliminated, CR.DefenderEliminated, CR.DefenderEliminated, CR.Exchange, CR.Exchange],
+}
+
 
 func choose_defender(defender_tile: Vector2i):
 	for attacker in data.attacking:

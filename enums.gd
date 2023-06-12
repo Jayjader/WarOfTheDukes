@@ -42,6 +42,14 @@ const MaxUnitCount = {
 	Unit.Artillery: 10,
 }
 
+enum CombatResult {
+	AttackerEliminated,
+	AttackerRetreats,
+	Exchange,
+	DefenderRetreats,
+	DefenderEliminated,
+}
+
 enum MainMode { MainMenu, NewGameLobby, InGame, GameOver  }
 
 enum GameResult { DRAW, MINOR_VICTORY, TOTAL_VICTORY }
