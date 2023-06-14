@@ -21,6 +21,10 @@ window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/ios/hide_status_bar=false
 
+[gui]
+
+theme/default_theme_scale=2.0
+
 [input]
 
 "Edit Map Data"={

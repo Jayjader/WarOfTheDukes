@@ -19,7 +19,11 @@ const Util = preload("res://util.gd")
 const Enums = preload("res://enums.gd")
 const Drawing = preload("res://drawing.gd")
 
-@export var map_data = { tiles = {}, borders = {} }
+@export var map_data = {
+	tiles = {},
+	borders = {},
+	zones = { Orfburg = [], Wulfenburg = [], Kaiserburg = [], BetweenRivers = [], OrfburgTerritory = [], WulfenburgTerritory = [] }
+	}
 @export var hex_draw_size: float = 60
 @export var report_hovered_hex: bool = false
 @export var report_clicked_hex: bool = false
@@ -55,19 +59,22 @@ var state = { mode = Enums.TileOverlayMode.READ_ONLY }:
 func toggle_editing(is_editing: bool):
 	read_only = not is_editing
 
-func change_paint_selection(selection, is_tile=true):
-	if selection == "":
-		var new_state = { mode = Enums.TileOverlayMode.EDITING_BASE }
-		new_state.merge(state)
-		new_state.erase("selection")
-		state = new_state
-	else:
-		var new_state = {
-			mode = Enums.TileOverlayMode.PAINTING_TILES if is_tile else Enums.TileOverlayMode.PAINTING_BORDERS,
-			selection = selection,
-			}
-		new_state.merge(state)
-		state = new_state
+func clear_paint_selection():
+	var new_state = { mode = Enums.TileOverlayMode.EDITING_BASE }
+	new_state.merge(state)
+	new_state.erase("selection")
+	state = new_state
+func change_paint_selection(selection, kind: Enums.TileOverlayPaletteItem):
+	var new_state = { selection = selection }
+	match kind:
+		Enums.TileOverlayPaletteItem.TILE:
+			new_state.mode = Enums.TileOverlayMode.PAINTING_TILES
+		Enums.TileOverlayPaletteItem.BORDER:
+			new_state.mode = Enums.TileOverlayMode.PAINTING_BORDERS
+		Enums.TileOverlayPaletteItem.ZONE:
+			new_state.mode = Enums.TileOverlayMode.PAINTING_ZONES
+	new_state.merge(state)
+	state = new_state
 
 func start_calibration():
 	state = { mode = Enums.TileOverlayMode.CALIBRATING }
@@ -155,13 +162,13 @@ func load_calibration_data():
 
 
 func paint_tile(position_in_axial: Vector2i, kind: String):
-	if kind == "erase-tile":
+	if kind == "EraseTile":
 		map_data.tiles.erase(position_in_axial)
 	else:
 		map_data.tiles[position_in_axial] = kind
 	queue_redraw()
 func paint_border(position_in_axial: Vector2, kind: String):
-	if kind == "erase-border":
+	if kind == "EraseBorder":
 		map_data.borders.erase(position_in_axial)
 	else:
 		map_data.borders[position_in_axial] = kind
@@ -176,6 +183,13 @@ func paint_selected_border():
 	var border_center_in_axial = Vector2(nearest_in_axial) + Util.cube_to_axial(direction_to_nearest_center) / 2
 
 	paint_border(border_center_in_axial, state.selection)
+func paint_zone(position_in_axial: Vector2i, kind: String):
+	if kind == "EraseZone":
+		for zone_kind in map_data.zones:
+			map_data.zones[zone_kind].erase(position_in_axial)
+	else:
+		map_data.zones[kind].append(position_in_axial)
+	map_data = map_data
 
 
 # Called when the node enters the scene tree for the first time.
@@ -221,6 +235,8 @@ func _draw():
 				Drawing.fill_hex(self, Util.hex_coords_to_pixel(tile, hex_size) + origin, hex_size, map_data.tiles[tile])
 			for border_center in map_data.borders:
 				Drawing.draw_border(self, map_data.borders[border_center], border_center, hex_size, origin)
+			for zone_kind in map_data.get("zones", []):
+				Drawing.draw_zone(self, zone_kind, map_data.zones[zone_kind], hex_size, origin)
 			if hovered != null:
 				Drawing.draw_hover(self, current_mode, hovered, origin, hex_size)
 
@@ -252,6 +268,8 @@ func _gui_input(event):
 				paint_tile(Util.nearest_hex_in_axial(integer_pix, calibration.origin_in_world_coordinates, calibration.hex_size), state.selection)
 			Enums.TileOverlayMode.PAINTING_BORDERS:
 				paint_selected_border()
+			Enums.TileOverlayMode.PAINTING_ZONES:
+				paint_zone(Util.nearest_hex_in_axial(integer_pix, calibration.origin_in_world_coordinates, calibration.hex_size), state.selection)
 		queue_redraw()
 	elif event is InputEventMouseMotion:
 		var capture = false

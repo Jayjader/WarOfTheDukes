@@ -19,5 +19,11 @@ func load_data():
 		data.tiles = {}
 	if data.get("borders") == null:
 		data.borders = {}
-	print_debug("loaded: %s borders, %s tiles" % [len(data.tiles.keys()), len(data.borders.keys())])
+	data.zones = data.get("zones", {})
+	data.zones.merge({ Orfburg = [], Wulfenburg = [], Kaiserburg = [], BetweenRivers = [], OrfburgTerritory = [], WulfenburgTerritory = [] })
+	print_debug("loaded: %s borders, %s tiles, %s zones" % [
+		len(data.tiles.keys()),
+		len(data.borders.keys()),
+		len(data.zones.Orfburg) + len(data.zones.Wulfenburg) + len(data.zones.Kaiserburg) + len(data.zones.BetweenRivers)
+		])
 	data_loaded.emit(data)

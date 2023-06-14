@@ -94,13 +94,13 @@ static func derive_border_normals_in_cube(border_position: Vector3):
 		second = 3
 	return [cube_directions[first], cube_directions[second]]
 
-static func nearest_hex_in_axial(hovered: Vector2, origin: Vector2, hex_size: float):
-	var axial = pixel_coords_to_hex(hovered - origin, hex_size)
+static func nearest_hex_in_axial(nearest_pix: Vector2, origin: Vector2, hex_size: float):
+	var axial = pixel_coords_to_hex(nearest_pix - origin, hex_size)
 	var cube = Vector3(axial.x, axial.y, -axial.x-axial.y)
 	var nearest_cube = round_to_nearest_hex(cube)
 	return Vector2i(nearest_cube.x, nearest_cube.y)
 
-static func nearest_hex_in_world(hovered, origin, hex_size):
-	var nearest_axial = nearest_hex_in_axial(hovered, origin, hex_size)
+static func nearest_hex_in_world(nearest_pix: Vector2, origin, hex_size):
+	var nearest_axial = nearest_hex_in_axial(nearest_pix, origin, hex_size)
 	var is_origin = nearest_axial == Vector2i(0, 0)
 	return [hex_coords_to_pixel(nearest_axial, hex_size) + Vector2(origin), is_origin]

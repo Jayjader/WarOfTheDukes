@@ -19,7 +19,10 @@ enum TileOverlayMode {
 	EDITING_BASE,
 	PAINTING_TILES,
 	PAINTING_BORDERS,
+	PAINTING_ZONES,
 }
+
+enum TileOverlayPaletteItem { TILE, BORDER, ZONE }
 
 enum Faction { Orfburg, Wulfenburg }
 

@@ -127,3 +127,15 @@ static func draw_unit_name(control: Control, unit: Enums.Unit, faction: Enums.Fa
 		16,
 		faction_colors[faction]
 	)
+
+static func draw_zone(control: Control, zone: String, tiles_in_axial: Array, hex_size: float, origin_in_pix: Vector2):
+	for tile in tiles_in_axial:
+		for direction_index in len(Util.cube_directions):
+			var neighbour = tile + Vector2i(Util.cube_to_axial(Util.cube_directions[direction_index]))
+			if not tiles_in_axial.has(neighbour):
+				var first_corner = Util.hex_corner_trig(Util.hex_coords_to_pixel(tile, hex_size), hex_size, (direction_index+5)%6)
+				var second_corner = Util.hex_corner_trig(Util.hex_coords_to_pixel(tile, hex_size), hex_size, (direction_index)%6)
+				control.draw_line(origin_in_pix + first_corner, origin_in_pix + second_corner, Color.MEDIUM_PURPLE, 5)
+				control.draw_string(control.get_theme_default_font(), origin_in_pix + Util.hex_coords_to_pixel(tile, hex_size), "%s" % zone)
+				pass
+	pass
