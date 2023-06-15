@@ -28,6 +28,7 @@ signal data_load_requested
 func _ready():
 	in_tree = true
 	editing = false
+	data_load_requested.emit()
 
 
 func _unhandled_input(event):
