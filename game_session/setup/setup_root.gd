@@ -1,3 +1,4 @@
+@tool
 extends Control
 
 const Enums = preload("res://enums.gd")
@@ -7,6 +8,16 @@ const Drawing = preload("res://drawing.gd")
 signal unit_placed(tile: Vector2i, kind: Enums.Unit, faction: Enums.Faction)
 signal setup_finished(units: Dictionary)
 
+const INSTRUCTIONS = {
+	Enums.SetupPhase.FILL_CITIES_FORTS: """Deploy one unit on each City and Fortress tile inside your borders.
+""",
+	Enums.SetupPhase.DEPLOY_REMAINING: """Deploy your remaining units inside your borders. In this phase, control swaps between factions after each unit deployed.
+"""
+}
+@export var phase: Enums.SetupPhase = Enums.SetupPhase.FILL_CITIES_FORTS:
+	set(value):
+		phase = value
+		%PhaseInstructions.text = INSTRUCTIONS[phase]
 @export var current_player: Enums.Faction = Enums.Faction.Orfburg:
 	set(value):
 		current_player = value

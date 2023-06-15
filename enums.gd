@@ -33,7 +33,8 @@ static func get_other_faction(faction: Faction):
 
 enum SessionMode { SETUP, PLAY, GAME_OVER }
 
-enum SessionPhase { MOVEMENT, COMBAT }
+enum SetupPhase { FILL_CITIES_FORTS, DEPLOY_REMAINING}
+enum PlayPhase { MOVEMENT, COMBAT }
 enum MovementSubPhase { CHOOSE_UNIT, CHOOSE_DESTINATION }
 enum CombatSubPhase { CHOOSE_ATTACKERS, CHOOSE_DEFENDER }
 

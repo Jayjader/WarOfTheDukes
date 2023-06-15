@@ -48,6 +48,14 @@ layout_mode = 2
 text = "Setup"
 horizontal_alignment = 1
 
+[node name="PhaseInstructions" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Deploy one unit on each City and Fortress tile inside your borders.
+"
+horizontal_alignment = 1
+autowrap_mode = 3
+
 [node name="CurrentPlayer" type="HBoxContainer" parent="MarginContainer/PanelContainer/Margins/HBox/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -83,6 +91,7 @@ alignment = 1
 layout_mode = 2
 size_flags_horizontal = 3
 toggle_mode = true
+button_pressed = true
 button_group = ExtResource("3_fneyt")
 text = "Infantry"
 
@@ -151,18 +160,22 @@ text = "Orfburg"
 
 [node name="OrfburgInfantry" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
+text = "10"
 horizontal_alignment = 2
 
 [node name="OrfburgCavalry" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
+text = "10"
 horizontal_alignment = 2
 
 [node name="OrfburgArtillery" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
+text = "10"
 horizontal_alignment = 2
 
 [node name="OrfburgDuke" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
+text = "1"
 horizontal_alignment = 2
 
 [node name="Wulfenburg" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
@@ -171,16 +184,20 @@ text = "WulfenBurg"
 
 [node name="WulfenburgInfantry" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
+text = "10"
 horizontal_alignment = 2
 
 [node name="WulfenburgCavalry" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
+text = "10"
 horizontal_alignment = 2
 
 [node name="WulfenburgArtillery" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
+text = "10"
 horizontal_alignment = 2
 
 [node name="WulfenburgDuke" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/UnitRemainingCounts"]
 layout_mode = 2
+text = "1"
 horizontal_alignment = 2

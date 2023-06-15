@@ -20,7 +20,7 @@ const MAX_TURNS = 15
 		%Player.set_text("Current Player: %s" % Enums.Faction.find_key(current_player))
 
 const PHASE_INSTRUCTIONS = {
-	Enums.SessionPhase.MOVEMENT: """Each of your units can move once during this phase, and each is limited in the total distance it can move.
+	Enums.PlayPhase.MOVEMENT: """Each of your units can move once during this phase, and each is limited in the total distance it can move.
 This limit is affected by the unit type, as well as the terrain you make your units cross.
 Mounted units (Cavalry and Dukes) start each turn with 6 movement points.
 Units on foot (Infantry and Artillery) start each turn with 3 movement points.
@@ -34,12 +34,12 @@ Woods and Cliffs cost 2 points to enter.
 Lakes can not be entered.
 Rivers can not be crossed (but a Bridge over a River can be crossed - cost as specified above).
 """,
-	Enums.SessionPhase.COMBAT: """blablabla hit stuff win fights"""
+	Enums.PlayPhase.COMBAT: """blablabla hit stuff win fights"""
 }
-@export var current_phase: Enums.SessionPhase = Enums.SessionPhase.MOVEMENT:
+@export var current_phase: Enums.PlayPhase = Enums.PlayPhase.MOVEMENT:
 	set(value):
 		current_phase = value
-		%Phase.set_text("Movement Phase" if current_phase == Enums.SessionPhase.MOVEMENT else "Combat Phase")
+		%Phase.set_text("Movement Phase" if current_phase == Enums.PlayPhase.MOVEMENT else "Combat Phase")
 		%PhaseInstruction.set_text(PHASE_INSTRUCTIONS[current_phase])
 
 const INSTRUCTIONS = {
@@ -53,9 +53,9 @@ var data: Dictionary:
 
 func _ready():
 	match current_phase:
-		Enums.SessionPhase.MOVEMENT:
+		Enums.PlayPhase.MOVEMENT:
 			data = { subphase = Enums.MovementSubPhase.CHOOSE_UNIT, moved = {} }
-		Enums.SessionPhase.COMBAT:
+		Enums.PlayPhase.COMBAT:
 			data = { subphase = Enums.CombatSubPhase.CHOOSE_ATTACKERS }
 
 func detect_game_result():
@@ -76,7 +76,7 @@ func select_destination(destination_tile: Vector2i):
 	}
 
 func confirm_movement():
-	current_phase = Enums.SessionPhase.COMBAT
+	current_phase = Enums.PlayPhase.COMBAT
 	data = {
 		subphase = Enums.CombatSubPhase.CHOOSE_ATTACKERS,
 		attacked = {},
@@ -125,7 +125,7 @@ func confirm_combat():
 			return
 		turn += 1
 	current_player = Enums.get_other_faction(current_player)
-	current_phase = Enums.SessionPhase.MOVEMENT
+	current_phase = Enums.PlayPhase.MOVEMENT
 	data = {
 		subphase = Enums.MovementSubPhase.CHOOSE_UNIT,
 		moved = {},
