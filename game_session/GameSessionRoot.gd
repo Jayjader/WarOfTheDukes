@@ -6,24 +6,42 @@ const Setup = preload("res://game_session/setup/setup_root.tscn")
 const GamePlay = preload("res://game_session/game_play/game_play_root.tscn")
 
 
-@export var tiles = {}
-
-
 @export var player_1: Enums.Faction
 
 var player_2:
 	get:
 		return Enums.Faction.Wulfenburg if player_1 == Enums.Faction.Orfburg else Enums.Faction.Orfburg
 
+func _is_city_or_fort(tile, map_data):
+	var tile_kind = map_data.tiles[tile]
+	var result = (tile_kind == "City") or (tile_kind == "Fortress")
+	if result:
+		print_debug("found %s" % tile_kind)
+	return result
 @export var mode: Enums.SessionMode = Enums.SessionMode.SETUP
-
+func _ready():
+	var setup_root = $SetupRoot
+	var map_data = %BoardRoot.data.map
+	var orf_tiles = {}
+	for tile in map_data.zones.OrfburgTerritory:
+		var tile_kind = map_data.tiles[tile]
+		if tile_kind == "City" or tile_kind == "Fortress":
+			orf_tiles[tile] = true
+	setup_root.empty_cities_and_forts[Enums.Faction.Orfburg] = orf_tiles.keys()
+	
+	var wulf_tiles = {}
+	for tile in map_data.zones.WulfenburgTerritory:
+		var tile_kind = map_data.tiles[tile]
+		if tile_kind == "City" or tile_kind == "Fortress":
+			wulf_tiles[tile] = true
+	setup_root.empty_cities_and_forts[Enums.Faction.Wulfenburg] = wulf_tiles.keys()
 
 func finish_setup(pieces):
 	mode = Enums.SessionMode.PLAY
 	$SetupRoot.queue_free()
 	var game_play = GamePlay.instantiate()
-	game_play.pieces = pieces
 	add_child(game_play)
+	game_play.pieces = pieces
 	game_play.connect("game_over", game_over)
 
 

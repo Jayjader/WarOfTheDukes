@@ -7,7 +7,7 @@ signal display_mode_changed(new_mode: String)
 signal calibration_step_changed(new_step: String)
 
 signal hex_hovered(Vector2i)
-signal hex_clicked(tile: Vector2i, kind)
+signal hex_clicked(tile: Vector2i, kind, zones: Array)
 
 signal bl_set(position)
 signal br_set(position)
@@ -251,7 +251,11 @@ func _gui_input(event):
 				if report_clicked_hex:
 					print_debug("hex clicked at pix %s" % event.position)
 					var tile = Util.nearest_hex_in_axial(event.position, Vector2i(0, 0), hex_draw_size)
-					hex_clicked.emit(tile, map_data.tiles.get(tile))
+					var zones = []
+					for zone in map_data.zones:
+						if map_data.zones[zone].has(tile):
+							zones.append(zone)
+					hex_clicked.emit(tile, map_data.tiles.get(tile), zones)
 			Enums.TileOverlayMode.CALIBRATING:
 				match calibration.mode:
 					Enums.TileOverlayCalibration.CALIBRATING_BL:

@@ -39,8 +39,8 @@ Rivers can not be crossed (but a Bridge over a River can be crossed - cost as sp
 @export var current_phase: Enums.PlayPhase = Enums.PlayPhase.MOVEMENT:
 	set(value):
 		current_phase = value
-		%Phase.set_text("Movement Phase" if current_phase == Enums.PlayPhase.MOVEMENT else "Combat Phase")
-		%PhaseInstruction.set_text(PHASE_INSTRUCTIONS[current_phase])
+		%Phase.text = "Movement Phase" if current_phase == Enums.PlayPhase.MOVEMENT else "Combat Phase"
+		%PhaseInstruction.text = PHASE_INSTRUCTIONS[current_phase]
 
 const INSTRUCTIONS = {
 	Enums.MovementSubPhase.CHOOSE_UNIT: "", 
@@ -48,7 +48,7 @@ const INSTRUCTIONS = {
 var data: Dictionary:
 	set(value):
 		data = value
-		%SubPhaseInstruction.set_text()
+		%SubPhaseInstruction.set_text(INSTRUCTIONS[data.subphase])
 
 
 func _ready():

@@ -71,6 +71,6 @@ func _on_map_data_save():
 
 func _on_tile_overlay_hex_hovered(axial: Vector2i):
 	hex_hovered.emit(axial)
-func _on_tile_overlay_hex_clicked(axial: Vector2i, kind):
-	print_debug("hex clicked: %s" % axial)
-	hex_clicked.emit(axial, kind)
+func _on_tile_overlay_hex_clicked(axial: Vector2i, kind, zones=[]):
+	print_debug("hex clicked: %s, kind: %s, zones: %s" % [ axial, kind, zones ])
+	hex_clicked.emit(axial, kind, zones)

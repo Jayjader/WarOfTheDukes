@@ -1,4 +1,3 @@
-@tool
 extends Control
 
 const Enums = preload("res://enums.gd")
@@ -17,6 +16,7 @@ const INSTRUCTIONS = {
 @export var phase: Enums.SetupPhase = Enums.SetupPhase.FILL_CITIES_FORTS:
 	set(value):
 		phase = value
+		%Phase.text = Enums.SetupPhase.find_key(phase)
 		%PhaseInstructions.text = INSTRUCTIONS[phase]
 @export var current_player: Enums.Faction = Enums.Faction.Orfburg:
 	set(value):
@@ -26,6 +26,11 @@ const INSTRUCTIONS = {
 @export var pieces: Dictionary = {
 	Enums.Faction.Orfburg: { Enums.Unit.Duke: null, Enums.Unit.Infantry: [], Enums.Unit.Cavalry: [], Enums.Unit.Artillery: [] },
 	Enums.Faction.Wulfenburg: { Enums.Unit.Duke: null, Enums.Unit.Infantry: [], Enums.Unit.Cavalry: [], Enums.Unit.Artillery: [] },
+}
+
+@export var empty_cities_and_forts: Dictionary = {
+	Enums.Faction.Orfburg: [],
+	Enums.Faction.Wulfenburg: []
 }
 
 func piece_count(faction_counts: Dictionary, unit: Enums.Unit):
@@ -85,9 +90,13 @@ func units_on(tile: Vector2i):
 		units.append([Enums.Unit.Cavalry, Enums.Faction.Wulfenburg])
 	return units
 
-func choose_tile(tile: Vector2i, kind: String):
+func choose_tile(tile: Vector2i, kind: String, zones: Array):
 	print_debug("choose tile %s for unit %s for player %s" % [ tile, Enums.Unit.find_key(selection), Enums.Faction.find_key(current_player) ])
 	if selection != null:
+		if not zones.has("%sTerritory" % Enums.Faction.find_key(current_player)):
+			return
+		if phase == Enums.SetupPhase.FILL_CITIES_FORTS and not empty_cities_and_forts[current_player].has(tile):
+			return
 		var already_there = units_on(tile)
 		if len(already_there) > 0:
 			if len(already_there) > 1:
@@ -106,7 +115,14 @@ func choose_tile(tile: Vector2i, kind: String):
 		display_remaining_counts()
 		unit_placed.emit(tile, selection, current_player)
 
-		current_player = Enums.get_other_faction(current_player)
+		if phase == Enums.SetupPhase.FILL_CITIES_FORTS:
+			empty_cities_and_forts[current_player].erase(tile)
+			if len(empty_cities_and_forts[current_player]) == 0:
+				current_player = Enums.get_other_faction(current_player)
+				if len(empty_cities_and_forts[current_player]) == 0:
+					phase = Enums.SetupPhase.DEPLOY_REMAINING
+		else:
+			current_player = Enums.get_other_faction(current_player)
 		%Selection/Buttons/Infantry.disabled = pieces_remaining(current_player, Enums.Unit.Infantry) == 0
 		%Selection/Buttons/Cavalry.disabled = pieces_remaining(current_player, Enums.Unit.Cavalry) == 0
 		%Selection/Buttons/Artillery.disabled = pieces_remaining(current_player, Enums.Unit.Artillery) == 0
