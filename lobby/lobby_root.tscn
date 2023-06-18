@@ -22,33 +22,37 @@ grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
 
-[node name="PanelContainer" type="PanelContainer" parent="HBox"]
+[node name="MarginContainer" type="MarginContainer" parent="HBox"]
+layout_mode = 2
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_bottom = 40
+
+[node name="PanelContainer" type="PanelContainer" parent="HBox/MarginContainer"]
 custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
-size_flags_vertical = 4
 
-[node name="Margins" type="MarginContainer" parent="HBox/PanelContainer"]
+[node name="Margins" type="MarginContainer" parent="HBox/MarginContainer/PanelContainer"]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="VBox" type="VBoxContainer" parent="HBox/PanelContainer/Margins"]
+[node name="VBox" type="VBoxContainer" parent="HBox/MarginContainer/PanelContainer/Margins"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Title" type="Label" parent="HBox/PanelContainer/Margins/VBox"]
+[node name="Title" type="Label" parent="HBox/MarginContainer/PanelContainer/Margins/VBox"]
 layout_mode = 2
 text = "Choose your Faction:"
 horizontal_alignment = 1
 
-[node name="Choice" type="HBoxContainer" parent="HBox/PanelContainer/Margins/VBox"]
+[node name="Choice" type="HBoxContainer" parent="HBox/MarginContainer/PanelContainer/Margins/VBox"]
 layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="Orfburg" type="Button" parent="HBox/PanelContainer/Margins/VBox/Choice"]
+[node name="Orfburg" type="Button" parent="HBox/MarginContainer/PanelContainer/Margins/VBox/Choice"]
 unique_name_in_owner = true
 layout_mode = 2
 toggle_mode = true
@@ -56,20 +60,27 @@ button_pressed = true
 button_group = ExtResource("2_dphmm")
 text = "Orfburg"
 
-[node name="Wulfenburg" type="Button" parent="HBox/PanelContainer/Margins/VBox/Choice"]
+[node name="Wulfenburg" type="Button" parent="HBox/MarginContainer/PanelContainer/Margins/VBox/Choice"]
 unique_name_in_owner = true
 layout_mode = 2
 toggle_mode = true
 button_group = ExtResource("2_dphmm")
 text = "Wulfenburg"
 
-[node name="Hint" type="Label" parent="HBox/PanelContainer/Margins/VBox"]
+[node name="Hint" type="Label" parent="HBox/MarginContainer/PanelContainer/Margins/VBox"]
 layout_mode = 2
 text = "(Orfburg goes first)"
 horizontal_alignment = 1
 
-[node name="FactionDetails" type="Label" parent="HBox/PanelContainer/Margins/VBox"]
+[node name="ScrollContainer" type="ScrollContainer" parent="HBox/MarginContainer/PanelContainer/Margins/VBox"]
 layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="FactionDetails" type="Label" parent="HBox/MarginContainer/PanelContainer/Margins/VBox/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 text = "The Duchy of Orfburg wins by seizing the city of Kaiserburg, all while maintaining control of the territory between the two smaller rivers.
 
 Minor Victory: Control the city of Kaiserburg and all of your existing territory in the map corner delimited by the smaller rivers and the cities of Mursk, Urft, and Grossburg.
@@ -78,10 +89,10 @@ Total Victory: Control the city of Wulfenburg or kill the Duke of Wulfenburg."
 autowrap_mode = 3
 script = ExtResource("3_jgbwk")
 
-[node name="Confirm" type="Button" parent="HBox/PanelContainer/Margins/VBox"]
+[node name="Confirm" type="Button" parent="HBox/MarginContainer/PanelContainer/Margins/VBox"]
 layout_mode = 2
 text = "Confirm"
 
-[connection signal="player_1_faction_chosen" from="." to="HBox/PanelContainer/Margins/VBox/FactionDetails" method="faction_selected"]
-[connection signal="toggled" from="HBox/PanelContainer/Margins/VBox/Choice/Wulfenburg" to="." method="_on_wulfen_is_toggled_for_player_1"]
-[connection signal="pressed" from="HBox/PanelContainer/Margins/VBox/Confirm" to="." method="_on_confirm_pressed"]
+[connection signal="player_1_faction_chosen" from="." to="HBox/MarginContainer/PanelContainer/Margins/VBox/ScrollContainer/FactionDetails" method="faction_selected"]
+[connection signal="toggled" from="HBox/MarginContainer/PanelContainer/Margins/VBox/Choice/Wulfenburg" to="." method="_on_wulfen_is_toggled_for_player_1"]
+[connection signal="pressed" from="HBox/MarginContainer/PanelContainer/Margins/VBox/Confirm" to="." method="_on_confirm_pressed"]
