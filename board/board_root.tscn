@@ -10,7 +10,7 @@
 [ext_resource type="Script" path="res://board/Palette.gd" id="7_6tn5h"]
 [ext_resource type="ButtonGroup" uid="uid://c0b178urbj1gl" path="res://board/editing_palette_selection_button_group.tres" id="8_6v8i5"]
 
-[sub_resource type="Resource" id="Resource_t6e8l"]
+[sub_resource type="Resource" id="Resource_descv"]
 script = ExtResource("2_vnsht")
 tiles = {
 Vector2i(0, 0): "City",
@@ -976,7 +976,7 @@ hex_size_in_pixels = 60.0
 
 [node name="BoardRoot" type="Node2D"]
 script = ExtResource("1_7ngv4")
-map = SubResource("Resource_t6e8l")
+map = SubResource("Resource_descv")
 
 [node name="MapDataSaveLoad" type="Node" parent="."]
 script = ExtResource("2_4ajwh")
@@ -995,7 +995,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("4_5o13e")
-map_data = SubResource("Resource_t6e8l")
+map_data = SubResource("Resource_descv")
+read_only = true
+calibration = {
+"hex_size": 58.2038,
+"mode": 7,
+"origin_in_world_coordinates": Vector2(344, 149)
+}
 
 [node name="OverBoardCamera" type="Camera2D" parent="Background"]
 editor_draw_limits = true
@@ -1036,6 +1042,7 @@ layout_mode = 2
 
 [node name="CalibrationMode" type="Label" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls"]
 layout_mode = 2
+text = "READ_ONLY"
 horizontal_alignment = 1
 
 [node name="Direct" type="HBoxContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls"]

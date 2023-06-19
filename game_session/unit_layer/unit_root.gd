@@ -1,9 +1,5 @@
 extends Node2D
 
-const Enums = preload("res://enums.gd")
-const Drawing = preload("res://drawing.gd")
-const Util = preload("res://util.gd")
-
 @export var kind: Enums.Unit:
 	set(value):
 		$Label.set_text(Enums.Unit.find_key(value))

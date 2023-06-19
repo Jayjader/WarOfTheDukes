@@ -1,8 +1,6 @@
 @tool
 extends Control
 
-const Enums = preload("res://enums.gd")
-
 signal player_1_faction_chosen(faction: Enums.Faction)
 signal player_1_faction_confirmed(faction: Enums.Faction)
 

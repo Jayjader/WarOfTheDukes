@@ -1,11 +1,6 @@
 extends Node2D
 
-const Enums = preload("res://enums.gd")
-const Util = preload("res://util.gd")
-
 const Unit = preload("res://game_session/unit_layer/unit_root.tscn")
-
-
 
 var starting_pieces: Dictionary = { Vector2i(1, 1): [Enums.Unit.Infantry, Enums.Faction.Orfburg] }
 

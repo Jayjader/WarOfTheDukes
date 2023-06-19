@@ -1,8 +1,6 @@
 @tool
 extends Control
 
-const Enums = preload("res://enums.gd")
-
 signal game_over(result: Enums.GameResult, winner)
 
 @export var pieces: Dictionary

@@ -1,3 +1,6 @@
+extends Node
+class_name Util
+
 # Spacing
 static func horizontal_distance(size):
 	return (3 * size) / 2

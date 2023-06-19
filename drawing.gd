@@ -1,7 +1,5 @@
 extends Node
-
-const Util = preload("res://util.gd")
-const Enums = preload("res://enums.gd")
+class_name Drawing
 
 static func draw_hex(control: Control, center: Vector2i, hex_size: float, color:Color=Color.RED, angle_offset:float=0):
 	for i in range(6):

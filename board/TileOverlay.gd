@@ -1,7 +1,7 @@
-# Helps edit hex tile map data
-# place as child node of map sprite, and anchor as full
+@tool
+# Helps draw and edit hex tile map data
+# To use, place as child node of map sprite, and anchor as full rect
 extends Control
-
 
 signal display_mode_changed(new_mode: String)
 signal calibration_step_changed(new_step: String)
@@ -13,11 +13,6 @@ signal bl_set(position)
 signal br_set(position)
 signal tr_set(position)
 signal tl_set(position)
-
-
-const Util = preload("res://util.gd")
-const Enums = preload("res://enums.gd")
-const Drawing = preload("res://drawing.gd")
 
 @export var map_data: HexMapData
 @export var report_hovered_hex: bool = false

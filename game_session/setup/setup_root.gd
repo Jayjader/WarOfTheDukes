@@ -1,10 +1,6 @@
 @tool
 extends Control
 
-const Enums = preload("res://enums.gd")
-const Util = preload("res://util.gd")
-const Drawing = preload("res://drawing.gd")
-
 signal unit_placed(tile: Vector2i, kind: Enums.Unit, faction: Enums.Faction)
 signal setup_finished(units: Dictionary)
 

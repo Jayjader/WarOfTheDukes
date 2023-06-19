@@ -1,8 +1,6 @@
 @tool
 extends Label
 
-const Enums = preload("res://enums.gd")
-
 const details = {
 	Enums.Faction.Orfburg: """The Duchy of Orfburg wins by seizing the city of Kaiserburg, all while maintaining control of the territory between the two smaller rivers.
 

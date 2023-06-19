@@ -1,8 +1,6 @@
 @tool
 extends Control
 
-const Enums = preload("res://enums.gd")
-
 const Setup = preload("res://game_session/setup/setup_root.tscn")
 const GamePlay = preload("res://game_session/game_play/game_play_root.tscn")
 
