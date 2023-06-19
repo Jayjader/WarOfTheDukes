@@ -27,16 +27,14 @@ var selected = "":
 	set(value):
 		print_debug("palette selection change: %s" % value)
 		selected = value
-		var to_emit
 		if selected == "EraseTile" or selected in items:
-			to_emit = palette_tile_selected
+			palette_tile_selected.emit(selected)
 		elif selected == "EraseBorder" or selected in borders:
-			to_emit = palette_border_selected
+			palette_border_selected.emit(selected)
 		elif selected == "EraseZone" or selected in zones:
-			to_emit = palette_zone_selected
+			palette_zone_selected.emit(selected)
 		else:
-			to_emit = palette_selection_cleared
-		to_emit.emit(selected)
+			palette_selection_cleared.emit()
 		%Selected.set_text(selected if selected != "" else "(None)")
 
 func clear_selection():

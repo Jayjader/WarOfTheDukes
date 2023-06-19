@@ -16,10 +16,6 @@ extends Node2D
 		if not selectable:
 			_selected = false
 
-var hex_size:
-	get:
-		return get_parent().hex_size
-
 signal selected()
 var _selected: bool = false:
 	set(value):
@@ -29,6 +25,7 @@ var _selected: bool = false:
 func _unhandled_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
 		if selectable:
+			var hex_size = MapData.map.hex_size_in_pixels
 			var tile: Vector2 = Util.nearest_hex_in_world(event.position, Vector2i(0, 0), hex_size)[0]
 			if  tile.distance_to(self.position) < hex_size / 2:
 				get_viewport().set_input_as_handled()

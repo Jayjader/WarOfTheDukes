@@ -1,8 +1,6 @@
 @tool
 extends Node2D
 
-var in_tree = false
-
 var EditingGroup: StringName = &"map-edit-ui"
 
 signal toggled_editing(bool)
@@ -10,35 +8,25 @@ signal toggled_editing(bool)
 signal hex_hovered(tile: Vector2i)
 signal hex_clicked(tile: Vector2i, kind, zones)
 
-@export var editing: bool:
+@export var editing: bool = false:
 	set(value):
 		print_debug("toggling editing to %s" % value)
 		editing = value
 		toggled_editing.emit(value)
-		if in_tree:
+		if self.is_node_ready():
 			for ui in get_tree().get_nodes_in_group(EditingGroup):
 				ui.set_visible(editing)
 
 			$Background.set_self_modulate(Color.WHITE if editing else Color.TRANSPARENT)
 
-signal data_load_requested
 func _ready():
-	in_tree = true
-	editing = false
 	MapData.load_data()
-	data_load_requested.connect(MapData.load_data)
 
 
 func _unhandled_input(event):
 	if not Engine.is_editor_hint():
 		if event.is_action_pressed("Edit Map Data"):
 			editing = !editing
-
-signal data_saved
-func _on_map_data_save():
-	data_saved.emit()
-
-
 
 @export var report_hovered_hex: bool:
 	get:

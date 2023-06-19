@@ -11,7 +11,7 @@ func save_data():
 	ResourceSaver.save(map, "res://map_data.tres", ResourceSaver.FLAG_REPLACE_SUBRESOURCE_PATHS)
 
 func load_data():
-	map = ResourceLoader.load("res://map_data.tres", "HexMapData")
+	map = ResourceLoader.load("res://map_data.tres", "HexMapData", ResourceLoader.CACHE_MODE_IGNORE)
 	if map == null:
 		print_debug("map data not found")
 		map = HexMapData.new()
