@@ -184,10 +184,12 @@ theme_override_constants/margin_bottom = 10
 layout_mode = 2
 
 [node name="SaveMapData" type="Button" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Save Map Data"
 
 [node name="LoadMapData" type="Button" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Load Map Data"
 
@@ -299,5 +301,4 @@ columns = 2
 [connection signal="palette_selection_cleared" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette" to="Background/TileOverlay" method="clear_paint_selection" binds= [""]]
 [connection signal="palette_tile_selected" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette" to="Background/TileOverlay" method="change_paint_selection" binds= [0]]
 [connection signal="palette_zone_selected" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette" to="Background/TileOverlay" method="change_paint_selection" binds= [2]]
-[connection signal="pressed" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/SaveMapData" to="." method="_on_map_data_save"]
 [connection signal="pressed" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/ClearSelection" to="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette" method="clear_selection"]

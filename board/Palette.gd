@@ -46,6 +46,8 @@ func change_selection(new_selection: String):
 	selected = new_selection
 
 func _ready():
+	%SaveMapData.connect("pressed", MapData.save_data)
+	%LoadMapData.connect("pressed", MapData.load_data)
 	var palette_group = %Tiles/EraseTile.button_group
 	for item in items:
 		var container = %Tiles/Grid

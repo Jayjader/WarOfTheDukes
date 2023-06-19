@@ -3,29 +3,18 @@ extends Node
 class_name MapDataHandler
 
 signal data_saved
-signal data_loaded()
+signal data_loaded
 
 @export var map: HexMapData
 
 func save_data():
-	var file = FileAccess.open("./map.data", FileAccess.WRITE)
-	file.store_var(map)
-	data_saved.emit()
+	ResourceSaver.save(map, "res://map_data.tres", ResourceSaver.FLAG_REPLACE_SUBRESOURCE_PATHS)
 
 func load_data():
-	var file = FileAccess.open("./map.data", FileAccess.READ)
-	if file == null:
+	map = ResourceLoader.load("res://map_data.tres", "HexMapData")
+	if map == null:
 		print_debug("map data not found")
 		map = HexMapData.new()
-	else:
-		if map == null:
-			map = HexMapData.new()
-		var data = file.get_var()
-		if data.get("tiles") != null:
-			map.tiles = data.tiles
-		if data.get("borders") != null:
-			map.borders = data.borders
-		map.zones = data.get("zones", { Orfburg = [], Wulfenburg = [], Kaiserburg = [], BetweenRivers = [], OrfburgTerritory = [], WulfenburgTerritory = [] })
 	print_debug("loaded: %s borders, %s tiles, %s zones" % [
 		len(map.tiles.keys()),
 		len(map.borders.keys()),
