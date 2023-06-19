@@ -19,12 +19,7 @@ const Util = preload("res://util.gd")
 const Enums = preload("res://enums.gd")
 const Drawing = preload("res://drawing.gd")
 
-@export var map_data = {
-	tiles = {},
-	borders = {},
-	zones = { Orfburg = [], Wulfenburg = [], Kaiserburg = [], BetweenRivers = [], OrfburgTerritory = [], WulfenburgTerritory = [] }
-	}
-@export var hex_draw_size: float = 60
+@export var map_data: HexMapData
 @export var report_hovered_hex: bool = false
 @export var report_clicked_hex: bool = false
 @export var read_only: bool:
@@ -206,11 +201,11 @@ func _draw():
 
 	if current_mode == Enums.TileOverlayMode.READ_ONLY:
 		for tile in map_data.tiles:
-			Drawing.fill_hex(self, Util.hex_coords_to_pixel(tile, hex_draw_size), hex_draw_size, map_data.tiles[tile])
+			Drawing.fill_hex(self, Util.hex_coords_to_pixel(tile, map_data.hex_size_in_pixels), map_data.hex_size_in_pixels, map_data.tiles[tile])
 		for border_center in map_data.borders:
-				Drawing.draw_border(self, map_data.borders[border_center], border_center, hex_draw_size, Vector2(0, 0))
+				Drawing.draw_border(self, map_data.borders[border_center], border_center, map_data.hex_size_in_pixels, Vector2(0, 0))
 		if state.get("hover") != null:
-			Drawing.draw_hover(self, current_mode, state.hover, Vector2i(0, 0), hex_draw_size)
+			Drawing.draw_hover(self, current_mode, state.hover, Vector2i(0, 0), map_data.hex_size_in_pixels)
 		
 	elif current_mode == Enums.TileOverlayMode.CALIBRATING:
 		if calibration.mode <= Enums.TileOverlayCalibration.CALIBRATING_SIZE:
@@ -235,7 +230,7 @@ func _draw():
 				Drawing.fill_hex(self, Util.hex_coords_to_pixel(tile, hex_size) + origin, hex_size, map_data.tiles[tile])
 			for border_center in map_data.borders:
 				Drawing.draw_border(self, map_data.borders[border_center], border_center, hex_size, origin)
-			for zone_kind in map_data.get("zones", []):
+			for zone_kind in map_data.zones:
 				Drawing.draw_zone(self, zone_kind, map_data.zones[zone_kind], hex_size, origin)
 			if hovered != null:
 				Drawing.draw_hover(self, current_mode, hovered, origin, hex_size)
@@ -250,7 +245,7 @@ func _gui_input(event):
 			Enums.TileOverlayMode.READ_ONLY:
 				if report_clicked_hex:
 					print_debug("hex clicked at pix %s" % event.position)
-					var tile = Util.nearest_hex_in_axial(event.position, Vector2i(0, 0), hex_draw_size)
+					var tile = Util.nearest_hex_in_axial(event.position, Vector2i(0, 0), map_data.hex_size_in_pixels)
 					var zones = []
 					for zone in map_data.zones:
 						if map_data.zones[zone].has(tile):
@@ -287,5 +282,5 @@ func _gui_input(event):
 		if capture:
 			state.hover = Vector2i(event.position)
 			if report_hovered_hex:
-				hex_hovered.emit(Util.nearest_hex_in_axial(state.hover, tiles_origin, hex_draw_size))
+				hex_hovered.emit(Util.nearest_hex_in_axial(state.hover, tiles_origin, map_data.hex_size_in_pixels))
 			queue_redraw()

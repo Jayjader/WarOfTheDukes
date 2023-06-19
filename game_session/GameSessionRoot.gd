@@ -22,7 +22,7 @@ func _is_city_or_fort(tile, map_data):
 @export var mode: Enums.SessionMode = Enums.SessionMode.SETUP
 func _ready():
 	var setup_root = $SetupRoot
-	var map_data = %BoardRoot.data.map
+	var map_data = %BoardRoot.map
 	var orf_tiles = {}
 	for tile in map_data.zones.OrfburgTerritory:
 		var tile_kind = map_data.tiles[tile]

@@ -2,7 +2,7 @@
 extends Node
 
 signal data_saved
-signal data_loaded(new_data)
+signal data_loaded(map_data: HexMapData)
 
 func save_data(data):
 	var file = FileAccess.open("./map.data", FileAccess.WRITE)
@@ -14,16 +14,16 @@ func load_data():
 	if file == null:
 		print_debug("map data not found")
 		return null
+	var map = HexMapData.new()
 	var data = file.get_var()
-	if data.get("tiles") == null:
-		data.tiles = {}
-	if data.get("borders") == null:
-		data.borders = {}
-	data.zones = data.get("zones", {})
-	data.zones.merge({ Orfburg = [], Wulfenburg = [], Kaiserburg = [], BetweenRivers = [], OrfburgTerritory = [], WulfenburgTerritory = [] })
+	if data.get("tiles") != null:
+		map.tiles = data.tiles
+	if data.get("borders") != null:
+		map.borders = data.borders
+	map.zones = data.get("zones", { Orfburg = [], Wulfenburg = [], Kaiserburg = [], BetweenRivers = [], OrfburgTerritory = [], WulfenburgTerritory = [] })
 	print_debug("loaded: %s borders, %s tiles, %s zones" % [
-		len(data.tiles.keys()),
-		len(data.borders.keys()),
-		len(data.zones.Orfburg) + len(data.zones.Wulfenburg) + len(data.zones.Kaiserburg) + len(data.zones.BetweenRivers)
+		len(map.tiles.keys()),
+		len(map.borders.keys()),
+		len(map.zones.Orfburg) + len(map.zones.Wulfenburg) + len(map.zones.Kaiserburg) + len(map.zones.BetweenRivers)
 		])
-	data_loaded.emit(data)
+	data_loaded.emit(map)
