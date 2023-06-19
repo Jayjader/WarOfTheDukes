@@ -18,6 +18,8 @@ func load_data():
 		print_debug("map data not found")
 		map = HexMapData.new()
 	else:
+		if map == null:
+			map = HexMapData.new()
 		var data = file.get_var()
 		if data.get("tiles") != null:
 			map.tiles = data.tiles

@@ -21,21 +21,12 @@ signal hex_clicked(tile: Vector2i, kind, zones)
 
 			$Background.set_self_modulate(Color.WHITE if editing else Color.TRANSPARENT)
 
-@export var map: HexMapData:
-	get:
-		if self.is_node_ready():
-			return %TileOverlay.map_data
-		return null
-	set(value):
-		if self.is_node_ready():
-			%TileOverlay.map_data = value
-
 signal data_load_requested
-# Called when the node enters the scene tree for the first time.
 func _ready():
 	in_tree = true
 	editing = false
-	data_load_requested.emit()
+	MapData.load_data()
+	data_load_requested.connect(MapData.load_data)
 
 
 func _unhandled_input(event):
@@ -43,16 +34,9 @@ func _unhandled_input(event):
 		if event.is_action_pressed("Edit Map Data"):
 			editing = !editing
 
-
-func finish_editing(new_map: HexMapData):
-	map = new_map
-
-func _on_map_data_load(new_map: HexMapData):
-	map = new_map
-
-signal data_saved(data: HexMapData)
+signal data_saved
 func _on_map_data_save():
-	data_saved.emit(map)
+	data_saved.emit()
 
 
 

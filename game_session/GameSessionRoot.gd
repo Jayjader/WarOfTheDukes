@@ -20,17 +20,16 @@ func _is_city_or_fort(tile, map_data):
 @export var mode: Enums.SessionMode = Enums.SessionMode.SETUP
 func _ready():
 	var setup_root = $SetupRoot
-	var map_data = %BoardRoot.map
 	var orf_tiles = {}
-	for tile in map_data.zones.OrfburgTerritory:
-		var tile_kind = map_data.tiles[tile]
+	for tile in MapData.map.zones.OrfburgTerritory:
+		var tile_kind = MapData.map.tiles[tile]
 		if tile_kind == "City" or tile_kind == "Fortress":
 			orf_tiles[tile] = true
 	setup_root.empty_cities_and_forts[Enums.Faction.Orfburg] = orf_tiles.keys()
 	
 	var wulf_tiles = {}
-	for tile in map_data.zones.WulfenburgTerritory:
-		var tile_kind = map_data.tiles[tile]
+	for tile in MapData.map.zones.WulfenburgTerritory:
+		var tile_kind = MapData.map.tiles[tile]
 		if tile_kind == "City" or tile_kind == "Fortress":
 			wulf_tiles[tile] = true
 	setup_root.empty_cities_and_forts[Enums.Faction.Wulfenburg] = wulf_tiles.keys()
