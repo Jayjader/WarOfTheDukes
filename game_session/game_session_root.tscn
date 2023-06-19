@@ -38,6 +38,10 @@ report_clicked_hex = true
 
 [node name="SetupRoot" parent="." instance=ExtResource("3_2cv6m")]
 layout_mode = 1
+empty_cities_and_forts = {
+0: [Vector2i(30, 7), Vector2i(31, 6), Vector2i(30, 6), Vector2i(31, 5), Vector2i(30, 5), Vector2i(29, 6), Vector2i(29, 5), Vector2i(30, 4), Vector2i(31, 4), Vector2i(28, 5), Vector2i(28, 4), Vector2i(29, 3), Vector2i(29, 4), Vector2i(30, 3), Vector2i(31, 2), Vector2i(31, 3), Vector2i(21, -4), Vector2i(13, 5), Vector2i(7, 11), Vector2i(30, 1), Vector2i(22, -1), Vector2i(21, 0), Vector2i(12, 11), Vector2i(13, 10), Vector2i(13, 11)],
+1: [Vector2i(2, 13), Vector2i(3, 13), Vector2i(11, 3), Vector2i(16, -1), Vector2i(17, -1), Vector2i(18, -2), Vector2i(19, -3), Vector2i(18, -3), Vector2i(17, -2), Vector2i(19, -4), Vector2i(22, -9), Vector2i(15, -5), Vector2i(6, 3), Vector2i(0, 3), Vector2i(0, 2), Vector2i(0, 1), Vector2i(0, 0), Vector2i(1, 0), Vector2i(1, 1), Vector2i(1, 2), Vector2i(2, 1), Vector2i(2, 0), Vector2i(2, -1), Vector2i(5, -1), Vector2i(5, -2)]
+}
 
 [connection signal="hex_clicked" from="SubViewportContainer/SubViewport/BoardRoot" to="SetupRoot" method="choose_tile"]
 [connection signal="toggled_editing" from="SubViewportContainer/SubViewport/BoardRoot" to="." method="_on_board_root_toggled_editing"]

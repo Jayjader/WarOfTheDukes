@@ -1,3 +1,4 @@
+@tool
 extends Control
 
 const Enums = preload("res://enums.gd")
