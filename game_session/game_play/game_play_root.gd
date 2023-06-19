@@ -17,7 +17,14 @@ const MAX_TURNS = 15
 @export var current_player: Enums.Faction = Enums.Faction.Orfburg:
 	set(value):
 		current_player = value
-		%Player.set_text("Current Player: %s" % Enums.Faction.find_key(current_player))
+		if self.is_node_ready():
+			match current_player:
+				Enums.Faction.Orfburg:
+					%OrfburgCurrentPlayer.set_visible(true)
+					%WulfenburgCurrentPlayer.set_visible(false)
+				Enums.Faction.Wulfenburg:
+					%OrfburgCurrentPlayer.set_visible(false)
+					%WulfenburgCurrentPlayer.set_visible(true)
 
 const PHASE_INSTRUCTIONS = {
 	Enums.PlayPhase.MOVEMENT: """Each of your units can move once during this phase, and each is limited in the total distance it can move.
@@ -40,7 +47,13 @@ Rivers can not be crossed (but a Bridge over a River can be crossed - cost as sp
 	set(value):
 		current_phase = value
 		if self.is_node_ready():
-			%Phase.text = "Movement Phase" if current_phase == Enums.PlayPhase.MOVEMENT else "Combat Phase"
+			match current_phase:
+				Enums.PlayPhase.MOVEMENT:
+					%MovementPhase.set_visible(true)
+					%CombatPhase.set_visible(false)
+				Enums.PlayPhase.COMBAT:
+					%MovementPhase.set_visible(false)
+					%CombatPhase.set_visible(true)
 			%PhaseInstruction.text = PHASE_INSTRUCTIONS[current_phase]
 
 const INSTRUCTIONS = {
