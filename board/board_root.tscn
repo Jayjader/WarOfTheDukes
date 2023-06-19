@@ -1,7 +1,6 @@
-[gd_scene load_steps=11 format=3 uid="uid://bwst2xk4wn3l6"]
+[gd_scene load_steps=10 format=3 uid="uid://bwst2xk4wn3l6"]
 
 [ext_resource type="Script" path="res://board/BoardRoot.gd" id="1_7ngv4"]
-[ext_resource type="Script" path="res://board/MapDataSaveLoad.gd" id="2_4ajwh"]
 [ext_resource type="Script" path="res://board/hex_map_data.gd" id="2_vnsht"]
 [ext_resource type="Texture2D" uid="uid://dgr4iw8ue00sq" path="res://docs/La guerre des ducs - Encart.jpg" id="3_o7vri"]
 [ext_resource type="Script" path="res://board/TileOverlay.gd" id="4_5o13e"]
@@ -10,7 +9,7 @@
 [ext_resource type="Script" path="res://board/Palette.gd" id="7_6tn5h"]
 [ext_resource type="ButtonGroup" uid="uid://c0b178urbj1gl" path="res://board/editing_palette_selection_button_group.tres" id="8_6v8i5"]
 
-[sub_resource type="Resource" id="Resource_descv"]
+[sub_resource type="Resource" id="Resource_7bik2"]
 script = ExtResource("2_vnsht")
 tiles = {
 Vector2i(0, 0): "City",
@@ -976,10 +975,7 @@ hex_size_in_pixels = 60.0
 
 [node name="BoardRoot" type="Node2D"]
 script = ExtResource("1_7ngv4")
-map = SubResource("Resource_descv")
-
-[node name="MapDataSaveLoad" type="Node" parent="."]
-script = ExtResource("2_4ajwh")
+map = SubResource("Resource_7bik2")
 
 [node name="Background" type="Sprite2D" parent="."]
 self_modulate = Color(1, 1, 1, 0)
@@ -995,7 +991,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("4_5o13e")
-map_data = SubResource("Resource_descv")
+map_data = SubResource("Resource_7bik2")
 read_only = true
 calibration = {
 "hex_size": 58.2038,
@@ -1250,10 +1246,7 @@ text = "Erase Zone"
 layout_mode = 2
 columns = 2
 
-[connection signal="data_load_requested" from="." to="MapDataSaveLoad" method="load_data"]
-[connection signal="data_saved" from="." to="MapDataSaveLoad" method="save_data"]
 [connection signal="toggled_editing" from="." to="Background/TileOverlay" method="toggle_editing"]
-[connection signal="data_loaded" from="MapDataSaveLoad" to="." method="_on_map_data_load"]
 [connection signal="bl_set" from="Background/TileOverlay" to="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_bl_set"]
 [connection signal="br_set" from="Background/TileOverlay" to="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_br_set"]
 [connection signal="calibration_step_changed" from="Background/TileOverlay" to="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/CalibrationMode" method="set_text"]
@@ -1274,5 +1267,4 @@ columns = 2
 [connection signal="palette_tile_selected" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette" to="Background/TileOverlay" method="change_paint_selection" binds= [0]]
 [connection signal="palette_zone_selected" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette" to="Background/TileOverlay" method="change_paint_selection" binds= [2]]
 [connection signal="pressed" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/SaveMapData" to="." method="_on_map_data_save"]
-[connection signal="pressed" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/LoadMapData" to="MapDataSaveLoad" method="load_data"]
 [connection signal="pressed" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/ClearSelection" to="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette" method="clear_selection"]
