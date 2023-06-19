@@ -56,7 +56,8 @@ Rivers can not be crossed (but a Bridge over a River can be crossed - cost as sp
 			%PhaseInstruction.text = PHASE_INSTRUCTIONS[current_phase]
 
 const INSTRUCTIONS = {
-	Enums.MovementSubPhase.CHOOSE_UNIT: "", 
+	Enums.MovementSubPhase.CHOOSE_UNIT: "Choose a unit to move",
+	Enums.MovementSubPhase.CHOOSE_DESTINATION: "Choose the destination tile for the selected unit",
 }
 var data: Dictionary:
 	set(value):
