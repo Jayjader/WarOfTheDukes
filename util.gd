@@ -100,7 +100,7 @@ static func nearest_hex_in_axial(nearest_pix: Vector2, origin: Vector2, hex_size
 	var nearest_cube = round_to_nearest_hex(cube)
 	return Vector2i(nearest_cube.x, nearest_cube.y)
 
-static func nearest_hex_in_world(nearest_pix: Vector2, origin, hex_size):
+static func nearest_hex_in_world(nearest_pix: Vector2, origin, hex_size: float):
 	var nearest_axial = nearest_hex_in_axial(nearest_pix, origin, hex_size)
 	var is_origin = nearest_axial == Vector2i(0, 0)
 	return [hex_coords_to_pixel(nearest_axial, hex_size) + Vector2(origin), is_origin]
