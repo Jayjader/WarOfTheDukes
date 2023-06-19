@@ -7,7 +7,7 @@ signal game_over(result: Enums.GameResult, winner)
 @export var pieces: Dictionary
 
 const MAX_TURNS = 15
-@export var turn: int = 1:
+@export_range(1, MAX_TURNS) var turn: int = 1:
 	set(value):
 		if value > 0 and value <= MAX_TURNS:
 			print_debug("turn set: %s -> %s" % [ turn, value ])
