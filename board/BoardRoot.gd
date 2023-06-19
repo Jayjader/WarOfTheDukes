@@ -8,7 +8,7 @@ var EditingGroup: StringName = &"map-edit-ui"
 signal toggled_editing(bool)
 
 signal hex_hovered(tile: Vector2i)
-signal hex_clicked(tile: Vector2i, kind)
+signal hex_clicked(tile: Vector2i, kind, zones)
 
 @export var editing: bool:
 	set(value):
