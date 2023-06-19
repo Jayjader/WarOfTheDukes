@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://urgscxvof7o8"]
 
 [ext_resource type="Script" path="res://game_session/setup/setup_root.gd" id="1_autkv"]
-[ext_resource type="Script" path="res://PlayerValue.gd" id="2_ps5h7"]
+[ext_resource type="Script" path="res://board/PlayerValue.gd" id="2_mxi6t"]
 [ext_resource type="ButtonGroup" uid="uid://bfis28ta025kj" path="res://game_session/setup/unit_selection_button_group.tres" id="3_fneyt"]
 
 [node name="SetupRoot" type="Control"]
@@ -77,7 +77,7 @@ text = "Current Player:"
 [node name="Value" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/CurrentPlayer"]
 layout_mode = 2
 text = "Orfburg"
-script = ExtResource("2_ps5h7")
+script = ExtResource("2_mxi6t")
 
 [node name="VSeparator" type="VSeparator" parent="MarginContainer/PanelContainer/Margins/HBox"]
 layout_mode = 2

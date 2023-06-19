@@ -1,23 +1,23 @@
 [gd_scene load_steps=9 format=3 uid="uid://bwst2xk4wn3l6"]
 
-[ext_resource type="Script" path="res://BoardRoot.gd" id="1_r6u8w"]
-[ext_resource type="Texture2D" uid="uid://dgr4iw8ue00sq" path="res://docs/La guerre des ducs - Encart.jpg" id="2_w7llp"]
-[ext_resource type="Script" path="res://TileOverlay.gd" id="3_hyvcy"]
-[ext_resource type="Script" path="res://Direct.gd" id="4_q436x"]
-[ext_resource type="Script" path="res://game_session/OverBoardCamera.gd" id="5_8dtb8"]
-[ext_resource type="Script" path="res://Palette.gd" id="5_qxi0c"]
-[ext_resource type="Script" path="res://MapDataSaveLoad.gd" id="6_m1yso"]
-[ext_resource type="ButtonGroup" uid="uid://c0b178urbj1gl" path="res://editing_palette_selection_button_group.tres" id="8_vhv3c"]
+[ext_resource type="Script" path="res://board/BoardRoot.gd" id="1_7ngv4"]
+[ext_resource type="Script" path="res://board/MapDataSaveLoad.gd" id="2_4ajwh"]
+[ext_resource type="Texture2D" uid="uid://dgr4iw8ue00sq" path="res://docs/La guerre des ducs - Encart.jpg" id="3_o7vri"]
+[ext_resource type="Script" path="res://board/TileOverlay.gd" id="4_5o13e"]
+[ext_resource type="Script" path="res://game_session/OverBoardCamera.gd" id="5_eokpn"]
+[ext_resource type="Script" path="res://board/Direct.gd" id="6_s8gsq"]
+[ext_resource type="Script" path="res://board/Palette.gd" id="7_6tn5h"]
+[ext_resource type="ButtonGroup" uid="uid://c0b178urbj1gl" path="res://board/editing_palette_selection_button_group.tres" id="8_6v8i5"]
 
 [node name="BoardRoot" type="Node2D"]
-script = ExtResource("1_r6u8w")
+script = ExtResource("1_7ngv4")
 
 [node name="MapDataSaveLoad" type="Node" parent="."]
-script = ExtResource("6_m1yso")
+script = ExtResource("2_4ajwh")
 
 [node name="Background" type="Sprite2D" parent="."]
 self_modulate = Color(1, 1, 1, 0)
-texture = ExtResource("2_w7llp")
+texture = ExtResource("3_o7vri")
 centered = false
 
 [node name="TileOverlay" type="Control" parent="Background"]
@@ -28,7 +28,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("3_hyvcy")
+script = ExtResource("4_5o13e")
 map_data = {
 "borders": {
 Vector2(0, 17.5): "River",
@@ -981,12 +981,20 @@ Vector2i(31, 3): "City",
 Vector2i(31, 4): "City",
 Vector2i(31, 5): "City",
 Vector2i(31, 6): "City"
+},
+"zones": {
+"BetweenRivers": [Vector2i(0, 18), Vector2i(1, 17), Vector2i(2, 16), Vector2i(3, 15), Vector2i(4, 14), Vector2i(4, 13), Vector2i(5, 12), Vector2i(6, 11), Vector2i(7, 11), Vector2i(8, 10), Vector2i(8, 9), Vector2i(9, 9), Vector2i(10, 8), Vector2i(10, 9), Vector2i(11, 9), Vector2i(11, 10), Vector2i(10, 11), Vector2i(10, 12), Vector2i(11, 12), Vector2i(11, 13), Vector2i(12, 13), Vector2i(12, 14), Vector2i(12, 15), Vector2i(12, 16), Vector2i(11, 16), Vector2i(10, 17), Vector2i(9, 17), Vector2i(9, 16), Vector2i(8, 16), Vector2i(7, 16), Vector2i(6, 16), Vector2i(5, 16), Vector2i(4, 17), Vector2i(3, 17), Vector2i(2, 18), Vector2i(1, 19), Vector2i(0, 19), Vector2i(1, 18), Vector2i(2, 17), Vector2i(3, 16), Vector2i(3, 16), Vector2i(4, 16), Vector2i(4, 15), Vector2i(5, 14), Vector2i(5, 15), Vector2i(5, 13), Vector2i(6, 12), Vector2i(7, 12), Vector2i(6, 13), Vector2i(6, 14), Vector2i(7, 13), Vector2i(7, 14), Vector2i(6, 15), Vector2i(7, 15), Vector2i(8, 15), Vector2i(8, 14), Vector2i(8, 13), Vector2i(8, 12), Vector2i(8, 11), Vector2i(9, 10), Vector2i(10, 10), Vector2i(9, 11), Vector2i(9, 12), Vector2i(9, 13), Vector2i(9, 14), Vector2i(10, 13), Vector2i(9, 15), Vector2i(10, 14), Vector2i(10, 15), Vector2i(11, 14), Vector2i(10, 16), Vector2i(11, 15), Vector2i(0, 20), Vector2i(0, 21), Vector2i(0, 22), Vector2i(1, 21), Vector2i(2, 21), Vector2i(3, 20), Vector2i(4, 20), Vector2i(5, 19), Vector2i(6, 19), Vector2i(7, 18), Vector2i(8, 18), Vector2i(8, 17), Vector2i(6, 17), Vector2i(6, 17), Vector2i(5, 17), Vector2i(4, 19), Vector2i(3, 19), Vector2i(2, 19), Vector2i(1, 20), Vector2i(2, 20), Vector2i(3, 18), Vector2i(5, 18), Vector2i(6, 18), Vector2i(7, 17), Vector2i(7, 17), Vector2i(4, 18)],
+"Kaiserburg": [Vector2i(16, -1), Vector2i(17, -1), Vector2i(17, -2), Vector2i(18, -2), Vector2i(18, -3), Vector2i(19, -3), Vector2i(19, -4)],
+"Orfburg": [Vector2i(30, 7), Vector2i(31, 6), Vector2i(30, 6), Vector2i(31, 5), Vector2i(30, 5), Vector2i(29, 6), Vector2i(29, 5), Vector2i(28, 5), Vector2i(29, 4), Vector2i(28, 4), Vector2i(29, 3), Vector2i(30, 3), Vector2i(31, 2), Vector2i(31, 3), Vector2i(30, 4), Vector2i(31, 4)],
+"OrfburgTerritory": [Vector2i(30, 7), Vector2i(31, 6), Vector2i(30, 6), Vector2i(31, 5), Vector2i(30, 5), Vector2i(29, 6), Vector2i(29, 7), Vector2i(28, 7), Vector2i(27, 8), Vector2i(28, 8), Vector2i(26, 9), Vector2i(27, 7), Vector2i(28, 6), Vector2i(29, 5), Vector2i(30, 4), Vector2i(31, 4), Vector2i(28, 5), Vector2i(28, 4), Vector2i(29, 3), Vector2i(29, 4), Vector2i(30, 3), Vector2i(31, 2), Vector2i(31, 3), Vector2i(25, 9), Vector2i(26, 8), Vector2i(26, 7), Vector2i(27, 6), Vector2i(27, 5), Vector2i(27, 4), Vector2i(28, 3), Vector2i(29, 2), Vector2i(30, 2), Vector2i(31, 1), Vector2i(29, 3), Vector2i(28, 4), Vector2i(28, 5), Vector2i(29, 4), Vector2i(29, 5), Vector2i(30, 4), Vector2i(30, 5), Vector2i(31, 4), Vector2i(31, 5), Vector2i(31, 6), Vector2i(30, 6), Vector2i(31, 2), Vector2i(30, 3), Vector2i(30, 2), Vector2i(29, 2), Vector2i(29, 2), Vector2i(28, 3), Vector2i(31, 1), Vector2i(31, 0), Vector2i(31, -1), Vector2i(31, -2), Vector2i(31, -4), Vector2i(31, -3), Vector2i(31, -5), Vector2i(31, -6), Vector2i(31, -7), Vector2i(31, -8), Vector2i(30, -8), Vector2i(29, -8), Vector2i(28, -7), Vector2i(27, -7), Vector2i(26, -6), Vector2i(25, -6), Vector2i(24, -5), Vector2i(23, -5), Vector2i(22, -5), Vector2i(22, -6), Vector2i(22, -7), Vector2i(22, -8), Vector2i(21, -6), Vector2i(21, -5), Vector2i(20, -4), Vector2i(20, -4), Vector2i(21, -5), Vector2i(22, -5), Vector2i(22, -6), Vector2i(21, -6), Vector2i(22, -6), Vector2i(22, -5), Vector2i(21, -4), Vector2i(22, -4), Vector2i(20, -3), Vector2i(21, -3), Vector2i(22, -3), Vector2i(23, -4), Vector2i(24, -4), Vector2i(25, -5), Vector2i(19, -2), Vector2i(18, -1), Vector2i(17, 0), Vector2i(16, 1), Vector2i(15, 2), Vector2i(14, 3), Vector2i(13, 3), Vector2i(12, 4), Vector2i(11, 5), Vector2i(10, 6), Vector2i(11, 6), Vector2i(11, 7), Vector2i(12, 7), Vector2i(12, 6), Vector2i(12, 5), Vector2i(13, 4), Vector2i(13, 5), Vector2i(13, 6), Vector2i(13, 6), Vector2i(14, 5), Vector2i(14, 4), Vector2i(15, 4), Vector2i(15, 3), Vector2i(16, 2), Vector2i(16, 3), Vector2i(17, 2), Vector2i(17, 1), Vector2i(18, 0), Vector2i(18, 1), Vector2i(19, 0), Vector2i(19, -1), Vector2i(20, -2), Vector2i(20, -1), Vector2i(21, -2), Vector2i(23, -3), Vector2i(22, -2), Vector2i(21, -1), Vector2i(20, 0), Vector2i(19, 1), Vector2i(18, 2), Vector2i(17, 3), Vector2i(16, 4), Vector2i(15, 5), Vector2i(14, 6), Vector2i(13, 7), Vector2i(12, 8), Vector2i(11, 8), Vector2i(10, 8), Vector2i(10, 9), Vector2i(11, 9), Vector2i(10, 10), Vector2i(9, 10), Vector2i(9, 9), Vector2i(8, 10), Vector2i(8, 9), Vector2i(9, 11), Vector2i(8, 11), Vector2i(7, 11), Vector2i(6, 11), Vector2i(5, 12), Vector2i(6, 12), Vector2i(7, 12), Vector2i(8, 12), Vector2i(7, 13), Vector2i(6, 13), Vector2i(5, 13), Vector2i(4, 13), Vector2i(4, 14), Vector2i(5, 14), Vector2i(7, 13), Vector2i(6, 14), Vector2i(5, 15), Vector2i(4, 15), Vector2i(3, 15), Vector2i(4, 16), Vector2i(3, 16), Vector2i(2, 16), Vector2i(1, 17), Vector2i(2, 17), Vector2i(3, 17), Vector2i(2, 18), Vector2i(1, 18), Vector2i(0, 18), Vector2i(0, 19), Vector2i(1, 19), Vector2i(0, 20), Vector2i(0, 21), Vector2i(0, 22), Vector2i(1, 21), Vector2i(2, 21), Vector2i(3, 20), Vector2i(4, 20), Vector2i(5, 19), Vector2i(6, 19), Vector2i(7, 18), Vector2i(8, 18), Vector2i(9, 17), Vector2i(10, 17), Vector2i(11, 16), Vector2i(12, 16), Vector2i(13, 15), Vector2i(14, 15), Vector2i(15, 14), Vector2i(16, 14), Vector2i(18, 13), Vector2i(17, 13), Vector2i(18, 13), Vector2i(19, 12), Vector2i(20, 12), Vector2i(21, 11), Vector2i(22, 11), Vector2i(22, 11), Vector2i(23, 10), Vector2i(24, 10), Vector2i(24, 9), Vector2i(25, 8), Vector2i(25, 7), Vector2i(24, 8), Vector2i(23, 9), Vector2i(22, 10), Vector2i(21, 10), Vector2i(22, 9), Vector2i(20, 11), Vector2i(23, 8), Vector2i(24, 7), Vector2i(25, 6), Vector2i(26, 6), Vector2i(26, 5), Vector2i(30, 1), Vector2i(30, 0), Vector2i(30, -1), Vector2i(30, -2), Vector2i(30, -4), Vector2i(30, -3), Vector2i(30, -5), Vector2i(30, -6), Vector2i(30, -7), Vector2i(29, -7), Vector2i(28, -6), Vector2i(27, -6), Vector2i(26, -5), Vector2i(25, -4), Vector2i(24, -2), Vector2i(23, -2), Vector2i(23, -2), Vector2i(24, -3), Vector2i(25, -3), Vector2i(26, -4), Vector2i(27, -5), Vector2i(28, -5), Vector2i(29, -6), Vector2i(29, -5), Vector2i(29, -4), Vector2i(29, -3), Vector2i(28, -2), Vector2i(28, -3), Vector2i(28, -4), Vector2i(27, -4), Vector2i(26, -3), Vector2i(25, -2), Vector2i(25, -2), Vector2i(26, -2), Vector2i(26, -2), Vector2i(27, -3), Vector2i(27, -2), Vector2i(27, -1), Vector2i(26, -1), Vector2i(25, -1), Vector2i(24, -1), Vector2i(23, -1), Vector2i(29, -2), Vector2i(28, -1), Vector2i(22, -1), Vector2i(21, 0), Vector2i(20, 1), Vector2i(19, 2), Vector2i(20, 2), Vector2i(21, 1), Vector2i(22, 0), Vector2i(21, 2), Vector2i(22, 1), Vector2i(23, 0), Vector2i(24, 0), Vector2i(22, 2), Vector2i(22, 2), Vector2i(23, 1), Vector2i(24, 1), Vector2i(23, 2), Vector2i(25, 0), Vector2i(24, 2), Vector2i(26, 1), Vector2i(28, 0), Vector2i(29, -1), Vector2i(27, 0), Vector2i(26, 0), Vector2i(25, 1), Vector2i(25, 2), Vector2i(27, 1), Vector2i(29, 0), Vector2i(28, 1), Vector2i(26, 2), Vector2i(27, 2), Vector2i(28, 2), Vector2i(27, 3), Vector2i(26, 4), Vector2i(26, 3), Vector2i(26, 3), Vector2i(29, 1), Vector2i(25, 3), Vector2i(25, 4), Vector2i(25, 5), Vector2i(24, 5), Vector2i(24, 4), Vector2i(24, 3), Vector2i(23, 3), Vector2i(22, 3), Vector2i(21, 3), Vector2i(21, 4), Vector2i(22, 4), Vector2i(23, 4), Vector2i(23, 5), Vector2i(22, 5), Vector2i(21, 5), Vector2i(21, 6), Vector2i(22, 6), Vector2i(23, 6), Vector2i(23, 7), Vector2i(24, 6), Vector2i(22, 8), Vector2i(22, 7), Vector2i(21, 7), Vector2i(20, 7), Vector2i(20, 8), Vector2i(21, 8), Vector2i(21, 9), Vector2i(20, 10), Vector2i(20, 9), Vector2i(19, 11), Vector2i(19, 10), Vector2i(18, 11), Vector2i(17, 12), Vector2i(17, 12), Vector2i(18, 12), Vector2i(18, 12), Vector2i(14, 14), Vector2i(13, 14), Vector2i(13, 14), Vector2i(12, 15), Vector2i(12, 14), Vector2i(11, 15), Vector2i(10, 16), Vector2i(8, 16), Vector2i(10, 16), Vector2i(9, 16), Vector2i(8, 17), Vector2i(10, 15), Vector2i(15, 13), Vector2i(17, 12), Vector2i(16, 13), Vector2i(16, 13), Vector2i(16, 12), Vector2i(19, 9), Vector2i(18, 10), Vector2i(17, 11), Vector2i(16, 11), Vector2i(17, 10), Vector2i(18, 9), Vector2i(19, 8), Vector2i(15, 12), Vector2i(14, 13), Vector2i(14, 12), Vector2i(15, 11), Vector2i(16, 10), Vector2i(14, 11), Vector2i(13, 12), Vector2i(12, 12), Vector2i(13, 13), Vector2i(12, 13), Vector2i(12, 14), Vector2i(12, 15), Vector2i(13, 15), Vector2i(12, 16), Vector2i(11, 14), Vector2i(10, 14), Vector2i(9, 15), Vector2i(8, 15), Vector2i(7, 16), Vector2i(7, 17), Vector2i(5, 19), Vector2i(5, 18), Vector2i(6, 18), Vector2i(6, 17), Vector2i(5, 17), Vector2i(6, 16), Vector2i(4, 17), Vector2i(4, 18), Vector2i(4, 19), Vector2i(3, 19), Vector2i(3, 18), Vector2i(2, 19), Vector2i(1, 20), Vector2i(2, 20), Vector2i(5, 16), Vector2i(6, 15), Vector2i(7, 14), Vector2i(8, 13), Vector2i(8, 14), Vector2i(7, 15), Vector2i(9, 14), Vector2i(9, 13), Vector2i(9, 12), Vector2i(10, 11), Vector2i(10, 12), Vector2i(10, 13), Vector2i(11, 13), Vector2i(11, 12), Vector2i(11, 10), Vector2i(11, 11), Vector2i(12, 10), Vector2i(12, 11), Vector2i(13, 10), Vector2i(13, 11), Vector2i(13, 12), Vector2i(12, 12), Vector2i(13, 11), Vector2i(12, 9), Vector2i(13, 8), Vector2i(13, 9), Vector2i(14, 7), Vector2i(14, 8), Vector2i(14, 9), Vector2i(14, 10), Vector2i(15, 10), Vector2i(16, 9), Vector2i(15, 9), Vector2i(17, 9), Vector2i(18, 8), Vector2i(20, 6), Vector2i(19, 7), Vector2i(20, 5), Vector2i(20, 4), Vector2i(20, 3), Vector2i(19, 3), Vector2i(18, 3), Vector2i(17, 4), Vector2i(16, 5), Vector2i(15, 6), Vector2i(15, 7), Vector2i(15, 8), Vector2i(16, 8), Vector2i(16, 8), Vector2i(18, 7), Vector2i(19, 6), Vector2i(19, 5), Vector2i(19, 4), Vector2i(19, 4), Vector2i(18, 4), Vector2i(18, 4), Vector2i(17, 5), Vector2i(16, 6), Vector2i(16, 7), Vector2i(17, 7), Vector2i(17, 8), Vector2i(17, 8), Vector2i(17, 7), Vector2i(18, 6), Vector2i(18, 6), Vector2i(18, 5), Vector2i(17, 6), Vector2i(17, 6)],
+"Wulfenburg": [Vector2i(0, 3), Vector2i(0, 2), Vector2i(0, 1), Vector2i(0, 0), Vector2i(1, 0), Vector2i(1, 1), Vector2i(1, 2), Vector2i(2, 1), Vector2i(2, 0), Vector2i(2, -1)],
+"WulfenburgTerritory": [Vector2i(0, 17), Vector2i(0, 16), Vector2i(1, 16), Vector2i(2, 15), Vector2i(3, 14), Vector2i(2, 14), Vector2i(1, 15), Vector2i(0, 15), Vector2i(1, 14), Vector2i(0, 14), Vector2i(0, 13), Vector2i(1, 13), Vector2i(2, 13), Vector2i(3, 13), Vector2i(4, 12), Vector2i(5, 11), Vector2i(6, 10), Vector2i(7, 10), Vector2i(7, 9), Vector2i(8, 8), Vector2i(9, 8), Vector2i(10, 7), Vector2i(9, 7), Vector2i(9, 6), Vector2i(8, 7), Vector2i(9, 5), Vector2i(10, 5), Vector2i(10, 4), Vector2i(11, 4), Vector2i(8, 6), Vector2i(7, 8), Vector2i(6, 9), Vector2i(5, 10), Vector2i(4, 11), Vector2i(3, 12), Vector2i(2, 12), Vector2i(1, 12), Vector2i(0, 12), Vector2i(0, 11), Vector2i(0, 11), Vector2i(1, 11), Vector2i(1, 10), Vector2i(0, 10), Vector2i(1, 8), Vector2i(1, 9), Vector2i(0, 8), Vector2i(0, 9), Vector2i(1, 7), Vector2i(0, 7), Vector2i(1, 6), Vector2i(0, 6), Vector2i(11, 3), Vector2i(12, 3), Vector2i(12, 2), Vector2i(13, 2), Vector2i(14, 2), Vector2i(14, 0), Vector2i(14, 1), Vector2i(13, 1), Vector2i(15, 1), Vector2i(16, 0), Vector2i(15, 0), Vector2i(15, -1), Vector2i(16, -1), Vector2i(17, -1), Vector2i(18, -2), Vector2i(19, -3), Vector2i(18, -3), Vector2i(17, -2), Vector2i(16, -2), Vector2i(17, -3), Vector2i(18, -4), Vector2i(19, -4), Vector2i(19, -5), Vector2i(19, -6), Vector2i(18, -5), Vector2i(20, -7), Vector2i(21, -8), Vector2i(22, -9), Vector2i(22, -10), Vector2i(22, -11), Vector2i(21, -10), Vector2i(20, -10), Vector2i(19, -9), Vector2i(20, -9), Vector2i(21, -9), Vector2i(20, -8), Vector2i(19, -8), Vector2i(19, -7), Vector2i(18, -6), Vector2i(18, -7), Vector2i(17, -7), Vector2i(18, -8), Vector2i(17, -8), Vector2i(18, -9), Vector2i(16, -8), Vector2i(16, -7), Vector2i(15, -7), Vector2i(14, -7), Vector2i(13, -6), Vector2i(14, -6), Vector2i(15, -6), Vector2i(16, -6), Vector2i(17, -6), Vector2i(17, -5), Vector2i(16, -5), Vector2i(14, -5), Vector2i(15, -5), Vector2i(15, -4), Vector2i(16, -4), Vector2i(16, -3), Vector2i(17, -4), Vector2i(15, -3), Vector2i(15, -2), Vector2i(14, -1), Vector2i(14, -2), Vector2i(14, -3), Vector2i(13, -3), Vector2i(13, -4), Vector2i(13, -5), Vector2i(14, -4), Vector2i(13, -2), Vector2i(13, -1), Vector2i(13, 0), Vector2i(12, 1), Vector2i(12, 0), Vector2i(12, -1), Vector2i(12, -2), Vector2i(12, -3), Vector2i(12, -4), Vector2i(12, -5), Vector2i(12, -6), Vector2i(11, -5), Vector2i(10, -5), Vector2i(9, -3), Vector2i(10, -4), Vector2i(9, -4), Vector2i(11, -4), Vector2i(10, -3), Vector2i(9, -2), Vector2i(11, -3), Vector2i(10, -2), Vector2i(11, -2), Vector2i(10, -1), Vector2i(9, -1), Vector2i(9, 0), Vector2i(11, -1), Vector2i(10, 0), Vector2i(10, 0), Vector2i(11, 0), Vector2i(9, 2), Vector2i(9, 1), Vector2i(10, 1), Vector2i(11, 1), Vector2i(10, 2), Vector2i(11, 2), Vector2i(11, 2), Vector2i(10, 3), Vector2i(9, 3), Vector2i(9, 4), Vector2i(8, 4), Vector2i(8, 5), Vector2i(7, 5), Vector2i(7, 7), Vector2i(6, 7), Vector2i(6, 8), Vector2i(5, 9), Vector2i(4, 10), Vector2i(4, 9), Vector2i(4, 8), Vector2i(4, 10), Vector2i(4, 10), Vector2i(2, 11), Vector2i(2, 12), Vector2i(2, 11), Vector2i(3, 11), Vector2i(3, 11), Vector2i(3, 10), Vector2i(3, 9), Vector2i(2, 10), Vector2i(2, 9), Vector2i(2, 8), Vector2i(2, 7), Vector2i(2, 6), Vector2i(3, 4), Vector2i(3, 4), Vector2i(4, 4), Vector2i(4, 5), Vector2i(4, 6), Vector2i(4, 7), Vector2i(4, 8), Vector2i(4, 8), Vector2i(5, 7), Vector2i(5, 7), Vector2i(5, 8), Vector2i(5, 8), Vector2i(6, 6), Vector2i(5, 6), Vector2i(5, 5), Vector2i(6, 3), Vector2i(5, 3), Vector2i(5, 4), Vector2i(6, 3), Vector2i(6, 3), Vector2i(7, 3), Vector2i(7, 3), Vector2i(6, 4), Vector2i(6, 4), Vector2i(7, 4), Vector2i(8, 3), Vector2i(8, 3), Vector2i(6, 5), Vector2i(6, 5), Vector2i(7, 3), Vector2i(7, 3), Vector2i(7, 2), Vector2i(8, 1), Vector2i(8, 2), Vector2i(8, 2), Vector2i(7, 4), Vector2i(7, 5), Vector2i(7, 6), Vector2i(7, 7), Vector2i(5, 8), Vector2i(2, 8), Vector2i(2, 8), Vector2i(3, 7), Vector2i(3, 6), Vector2i(3, 5), Vector2i(3, 4), Vector2i(3, 7), Vector2i(3, 8), Vector2i(3, 8), Vector2i(2, 6), Vector2i(2, 4), Vector2i(1, 5), Vector2i(1, 5), Vector2i(1, 5), Vector2i(0, 5), Vector2i(1, 4), Vector2i(1, 4), Vector2i(1, 5), Vector2i(2, 5), Vector2i(2, 5), Vector2i(0, 4), Vector2i(0, 4), Vector2i(1, 3), Vector2i(1, 3), Vector2i(0, 3), Vector2i(0, 2), Vector2i(0, 2), Vector2i(0, 1), Vector2i(0, 1), Vector2i(0, 0), Vector2i(0, 0), Vector2i(1, 0), Vector2i(1, 0), Vector2i(1, 1), Vector2i(1, 2), Vector2i(1, 2), Vector2i(2, 1), Vector2i(2, 0), Vector2i(2, 0), Vector2i(2, -1), Vector2i(2, -1), Vector2i(2, 1), Vector2i(2, 2), Vector2i(2, 3), Vector2i(2, 3), Vector2i(3, 2), Vector2i(3, 1), Vector2i(3, 0), Vector2i(3, 0), Vector2i(3, -1), Vector2i(3, -1), Vector2i(3, -1), Vector2i(4, -2), Vector2i(4, -2), Vector2i(4, -1), Vector2i(4, -1), Vector2i(3, 0), Vector2i(3, 0), Vector2i(4, 0), Vector2i(4, 1), Vector2i(4, 2), Vector2i(4, 2), Vector2i(4, 3), Vector2i(3, 3), Vector2i(5, 2), Vector2i(5, 2), Vector2i(6, 2), Vector2i(6, 2), Vector2i(7, 1), Vector2i(8, 0), Vector2i(8, 0), Vector2i(8, -1), Vector2i(6, 1), Vector2i(6, 1), Vector2i(5, 1), Vector2i(6, 0), Vector2i(7, 0), Vector2i(7, -1), Vector2i(6, -1), Vector2i(6, -1), Vector2i(5, 0), Vector2i(5, -1), Vector2i(5, -1), Vector2i(5, -2), Vector2i(5, -2), Vector2i(5, -2), Vector2i(6, -2), Vector2i(6, -2), Vector2i(6, -3), Vector2i(6, -3), Vector2i(7, -3), Vector2i(7, -3), Vector2i(7, -2), Vector2i(8, -3), Vector2i(8, -3), Vector2i(8, -4), Vector2i(8, -2)]
 }
 }
 
 [node name="OverBoardCamera" type="Camera2D" parent="Background"]
 editor_draw_limits = true
-script = ExtResource("5_8dtb8")
+script = ExtResource("5_eokpn")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="Background/OverBoardCamera"]
 
@@ -1027,7 +1035,7 @@ horizontal_alignment = 1
 
 [node name="Direct" type="HBoxContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls"]
 layout_mode = 2
-script = ExtResource("4_q436x")
+script = ExtResource("6_s8gsq")
 
 [node name="RestartCalibration" type="Button" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/Direct"]
 layout_mode = 2
@@ -1109,7 +1117,7 @@ anchor_right = 1.0
 anchor_bottom = 0.5
 grow_horizontal = 0
 grow_vertical = 2
-script = ExtResource("5_qxi0c")
+script = ExtResource("7_6tn5h")
 items = Array[String](["Plains", "City", "Forest", "Cliff", "Lake", "Fortress"])
 borders = Array[String](["Road", "River", "Bridge", "Bridge (No Road)"])
 zones = Array[String](["Orfburg", "Wulfenburg", "Kaiserburg", "BetweenRivers", "OrfburgTerritory", "WulfenburgTerritory"])
@@ -1178,7 +1186,7 @@ text = "Tiles"
 [node name="EraseTile" type="Button" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/columns/Tiles"]
 layout_mode = 2
 toggle_mode = true
-button_group = ExtResource("8_vhv3c")
+button_group = ExtResource("8_6v8i5")
 text = "Erase Tile"
 
 [node name="Grid" type="GridContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/columns/Tiles"]
@@ -1202,7 +1210,7 @@ text = "Borders"
 [node name="EraseBorder" type="Button" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/columns/column2/Borders"]
 layout_mode = 2
 toggle_mode = true
-button_group = ExtResource("8_vhv3c")
+button_group = ExtResource("8_6v8i5")
 text = "Erase Border"
 
 [node name="Grid" type="GridContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/columns/column2/Borders"]
@@ -1223,7 +1231,7 @@ text = "Zones"
 [node name="EraseZone" type="Button" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/columns/column2/Zones"]
 layout_mode = 2
 toggle_mode = true
-button_group = ExtResource("8_vhv3c")
+button_group = ExtResource("8_6v8i5")
 text = "Erase Zone"
 
 [node name="Grid" type="GridContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/columns/column2/Zones"]
