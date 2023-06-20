@@ -8,23 +8,37 @@
 [ext_resource type="Script" path="res://board/Palette.gd" id="7_6tn5h"]
 [ext_resource type="ButtonGroup" uid="uid://c0b178urbj1gl" path="res://board/editing_palette_selection_button_group.tres" id="8_6v8i5"]
 
-[node name="BoardRoot" type="Node2D"]
-script = ExtResource("1_7ngv4")
-
-[node name="Background" type="Sprite2D" parent="."]
-self_modulate = Color(1, 1, 1, 0)
-texture = ExtResource("3_o7vri")
-centered = false
-
-[node name="TileOverlay" type="Control" parent="Background"]
-unique_name_in_owner = true
+[node name="BoardRoot" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_7ngv4")
+report_hovered_hex = true
+report_clicked_hex = true
+
+[node name="ViewportContainer" type="SubViewportContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="ViewportContainer"]
+disable_3d = true
+handle_input_locally = false
+size = Vector2i(1920, 1080)
+render_target_update_mode = 4
+
+[node name="TileOverlay" type="Node2D" parent="ViewportContainer/SubViewport"]
+unique_name_in_owner = true
 script = ExtResource("4_5o13e")
+report_hovered_hex = true
+report_clicked_hex = true
 read_only = true
 calibration = {
 "hex_size": 58.2038,
@@ -32,14 +46,19 @@ calibration = {
 "origin_in_world_coordinates": Vector2(344, 149)
 }
 
-[node name="OverBoardCamera" type="Camera2D" parent="Background"]
+[node name="Background" type="Sprite2D" parent="ViewportContainer/SubViewport/TileOverlay"]
+unique_name_in_owner = true
+self_modulate = Color(1, 1, 1, 0)
+show_behind_parent = true
+texture = ExtResource("3_o7vri")
+centered = false
+
+[node name="OverBoardCamera" type="Camera2D" parent="ViewportContainer/SubViewport"]
 editor_draw_limits = true
 script = ExtResource("5_eokpn")
 
-[node name="CanvasLayer" type="CanvasLayer" parent="Background/OverBoardCamera"]
-
-[node name="UIRoot" type="Control" parent="Background/OverBoardCamera/CanvasLayer"]
-layout_mode = 3
+[node name="UIRoot" type="Control" parent="."]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -47,7 +66,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="Calibration" type="Panel" parent="Background/OverBoardCamera/CanvasLayer/UIRoot" groups=["map-edit-ui"]]
+[node name="Calibration" type="Panel" parent="UIRoot" groups=["map-edit-ui"]]
 visible = false
 layout_mode = 1
 anchors_preset = 5
@@ -56,7 +75,7 @@ anchor_right = 0.5
 offset_bottom = 219.0
 grow_horizontal = 2
 
-[node name="EditControls" type="VBoxContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration"]
+[node name="EditControls" type="VBoxContainer" parent="UIRoot/Calibration"]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -66,89 +85,89 @@ offset_right = 205.5
 offset_bottom = 101.0
 grow_horizontal = 2
 
-[node name="OriginControls" type="VBoxContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls"]
+[node name="OriginControls" type="VBoxContainer" parent="UIRoot/Calibration/EditControls"]
 layout_mode = 2
 
-[node name="CalibrationMode" type="Label" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls"]
+[node name="CalibrationMode" type="Label" parent="UIRoot/Calibration/EditControls/OriginControls"]
 layout_mode = 2
 text = "READ_ONLY"
 horizontal_alignment = 1
 
-[node name="Direct" type="HBoxContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls"]
+[node name="Direct" type="HBoxContainer" parent="UIRoot/Calibration/EditControls/OriginControls"]
 layout_mode = 2
 script = ExtResource("6_s8gsq")
 
-[node name="RestartCalibration" type="Button" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/Direct"]
+[node name="RestartCalibration" type="Button" parent="UIRoot/Calibration/EditControls/OriginControls/Direct"]
 layout_mode = 2
 text = "Restart Calibration"
 
-[node name="Labels" type="HBoxContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/Direct"]
+[node name="Labels" type="HBoxContainer" parent="UIRoot/Calibration/EditControls/OriginControls/Direct"]
 layout_mode = 2
 
-[node name="Left" type="VBoxContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/Direct/Labels"]
+[node name="Left" type="VBoxContainer" parent="UIRoot/Calibration/EditControls/OriginControls/Direct/Labels"]
 layout_mode = 2
 
-[node name="TopLeftLabel" type="Label" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/Direct/Labels/Left"]
+[node name="TopLeftLabel" type="Label" parent="UIRoot/Calibration/EditControls/OriginControls/Direct/Labels/Left"]
 layout_mode = 2
 text = "T-L: null"
 
-[node name="BottomLeftLabel" type="Label" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/Direct/Labels/Left"]
+[node name="BottomLeftLabel" type="Label" parent="UIRoot/Calibration/EditControls/OriginControls/Direct/Labels/Left"]
 layout_mode = 2
 text = "B-L: null"
 
-[node name="Right" type="VBoxContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/Direct/Labels"]
+[node name="Right" type="VBoxContainer" parent="UIRoot/Calibration/EditControls/OriginControls/Direct/Labels"]
 layout_mode = 2
 
-[node name="TopRightLabel" type="Label" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/Direct/Labels/Right"]
+[node name="TopRightLabel" type="Label" parent="UIRoot/Calibration/EditControls/OriginControls/Direct/Labels/Right"]
 layout_mode = 2
 text = "T-R: null"
 
-[node name="BottomRightLabel" type="Label" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/Direct/Labels/Right"]
+[node name="BottomRightLabel" type="Label" parent="UIRoot/Calibration/EditControls/OriginControls/Direct/Labels/Right"]
 layout_mode = 2
 text = "B-R: null"
 
-[node name="ChangeCalibrationStep" type="VBoxContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/Direct"]
+[node name="ChangeCalibrationStep" type="VBoxContainer" parent="UIRoot/Calibration/EditControls/OriginControls/Direct"]
 layout_mode = 2
 
-[node name="Previous" type="Button" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/Direct/ChangeCalibrationStep"]
+[node name="Previous" type="Button" parent="UIRoot/Calibration/EditControls/OriginControls/Direct/ChangeCalibrationStep"]
 layout_mode = 2
 text = "Previous Step"
 
-[node name="Next" type="Button" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/Direct/ChangeCalibrationStep"]
+[node name="Next" type="Button" parent="UIRoot/Calibration/EditControls/OriginControls/Direct/ChangeCalibrationStep"]
 layout_mode = 2
 text = "Next Step"
 
-[node name="TilesWideControls" type="HBoxContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls"]
+[node name="TilesWideControls" type="HBoxContainer" parent="UIRoot/Calibration/EditControls"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/TilesWideControls"]
+[node name="Label" type="Label" parent="UIRoot/Calibration/EditControls/TilesWideControls"]
 layout_mode = 2
 text = "Tiles Wide:"
 horizontal_alignment = 2
 
-[node name="TilesWide" type="LineEdit" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/TilesWideControls"]
+[node name="TilesWide" type="LineEdit" parent="UIRoot/Calibration/EditControls/TilesWideControls"]
 layout_mode = 2
 
-[node name="TilesHeighControls" type="HBoxContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls"]
+[node name="TilesHeighControls" type="HBoxContainer" parent="UIRoot/Calibration/EditControls"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/TilesHeighControls"]
+[node name="Label" type="Label" parent="UIRoot/Calibration/EditControls/TilesHeighControls"]
 layout_mode = 2
 text = "Tiles Heigh:"
 horizontal_alignment = 2
 
-[node name="TilesHeigh" type="LineEdit" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/TilesHeighControls"]
+[node name="TilesHeigh" type="LineEdit" parent="UIRoot/Calibration/EditControls/TilesHeighControls"]
 layout_mode = 2
 
-[node name="SaveCalibrationData" type="Button" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls"]
+[node name="SaveCalibrationData" type="Button" parent="UIRoot/Calibration/EditControls"]
 layout_mode = 2
 text = "Save Calibration Data"
 
-[node name="LoadCalibrationData" type="Button" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls"]
+[node name="LoadCalibrationData" type="Button" parent="UIRoot/Calibration/EditControls"]
 layout_mode = 2
 text = "Load Calibration Data"
 
-[node name="Palette" type="Panel" parent="Background/OverBoardCamera/CanvasLayer/UIRoot" groups=["map-edit-ui"]]
+[node name="Palette" type="Panel" parent="UIRoot" groups=["map-edit-ui"]]
 visible = false
 layout_mode = 1
 anchors_preset = 6
@@ -159,11 +178,11 @@ anchor_bottom = 0.5
 grow_horizontal = 0
 grow_vertical = 2
 script = ExtResource("7_6tn5h")
-items = Array[String](["Plains", "City", "Forest", "Cliff", "Lake", "Fortress"])
+tiles = Array[String](["Plains", "Woods", "Hills", "City", "Fortress", "Lake"])
 borders = Array[String](["Road", "River", "Bridge", "Bridge (No Road)"])
 zones = Array[String](["Orfburg", "Wulfenburg", "Kaiserburg", "BetweenRivers", "OrfburgTerritory", "WulfenburgTerritory"])
 
-[node name="PanelContainer" type="PanelContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette"]
+[node name="PanelContainer" type="PanelContainer" parent="UIRoot/Palette"]
 layout_mode = 1
 anchors_preset = 11
 anchor_left = 1.0
@@ -173,132 +192,132 @@ offset_left = -331.0
 grow_horizontal = 0
 grow_vertical = 2
 
-[node name="Margins" type="MarginContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer"]
+[node name="Margins" type="MarginContainer" parent="UIRoot/Palette/PanelContainer"]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="Items" type="VBoxContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins"]
+[node name="Items" type="VBoxContainer" parent="UIRoot/Palette/PanelContainer/Margins"]
 layout_mode = 2
 
-[node name="SaveMapData" type="Button" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items"]
+[node name="SaveMapData" type="Button" parent="UIRoot/Palette/PanelContainer/Margins/Items"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Save Map Data"
 
-[node name="LoadMapData" type="Button" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items"]
+[node name="LoadMapData" type="Button" parent="UIRoot/Palette/PanelContainer/Margins/Items"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Load Map Data"
 
-[node name="HSeparator" type="HSeparator" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items"]
+[node name="HSeparator" type="HSeparator" parent="UIRoot/Palette/PanelContainer/Margins/Items"]
 layout_mode = 2
 
-[node name="Title" type="HBoxContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items"]
+[node name="Title" type="HBoxContainer" parent="UIRoot/Palette/PanelContainer/Margins/Items"]
 layout_mode = 2
 
-[node name="Static" type="Label" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/Title"]
+[node name="Static" type="Label" parent="UIRoot/Palette/PanelContainer/Margins/Items/Title"]
 layout_mode = 2
 text = "Selected:"
 
-[node name="Selected" type="Label" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/Title"]
+[node name="Selected" type="Label" parent="UIRoot/Palette/PanelContainer/Margins/Items/Title"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="ClearSelection" type="Button" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items"]
+[node name="ClearSelection" type="Button" parent="UIRoot/Palette/PanelContainer/Margins/Items"]
 layout_mode = 2
 text = "Clear Selection"
 
-[node name="HSeparator2" type="HSeparator" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items"]
+[node name="HSeparator2" type="HSeparator" parent="UIRoot/Palette/PanelContainer/Margins/Items"]
 layout_mode = 2
 
-[node name="columns" type="HBoxContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items"]
+[node name="columns" type="HBoxContainer" parent="UIRoot/Palette/PanelContainer/Margins/Items"]
 layout_mode = 2
 
-[node name="Tiles" type="VBoxContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/columns"]
+[node name="Tiles" type="VBoxContainer" parent="UIRoot/Palette/PanelContainer/Margins/Items/columns"]
 unique_name_in_owner = true
 layout_mode = 2
 alignment = 1
 
-[node name="Title" type="Label" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/columns/Tiles"]
+[node name="Title" type="Label" parent="UIRoot/Palette/PanelContainer/Margins/Items/columns/Tiles"]
 layout_mode = 2
 text = "Tiles"
 
-[node name="EraseTile" type="Button" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/columns/Tiles"]
+[node name="EraseTile" type="Button" parent="UIRoot/Palette/PanelContainer/Margins/Items/columns/Tiles"]
 layout_mode = 2
 toggle_mode = true
 button_group = ExtResource("8_6v8i5")
 text = "Erase Tile"
 
-[node name="Grid" type="GridContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/columns/Tiles"]
+[node name="Grid" type="GridContainer" parent="UIRoot/Palette/PanelContainer/Margins/Items/columns/Tiles"]
 layout_mode = 2
 columns = 2
 
-[node name="VSeparator" type="VSeparator" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/columns"]
+[node name="VSeparator" type="VSeparator" parent="UIRoot/Palette/PanelContainer/Margins/Items/columns"]
 layout_mode = 2
 
-[node name="column2" type="VBoxContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/columns"]
+[node name="column2" type="VBoxContainer" parent="UIRoot/Palette/PanelContainer/Margins/Items/columns"]
 layout_mode = 2
 
-[node name="Borders" type="VBoxContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/columns/column2"]
+[node name="Borders" type="VBoxContainer" parent="UIRoot/Palette/PanelContainer/Margins/Items/columns/column2"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Title" type="Label" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/columns/column2/Borders"]
+[node name="Title" type="Label" parent="UIRoot/Palette/PanelContainer/Margins/Items/columns/column2/Borders"]
 layout_mode = 2
 text = "Borders"
 
-[node name="EraseBorder" type="Button" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/columns/column2/Borders"]
+[node name="EraseBorder" type="Button" parent="UIRoot/Palette/PanelContainer/Margins/Items/columns/column2/Borders"]
 layout_mode = 2
 toggle_mode = true
 button_group = ExtResource("8_6v8i5")
 text = "Erase Border"
 
-[node name="Grid" type="GridContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/columns/column2/Borders"]
+[node name="Grid" type="GridContainer" parent="UIRoot/Palette/PanelContainer/Margins/Items/columns/column2/Borders"]
 layout_mode = 2
 columns = 4
 
-[node name="HSeparator4" type="HSeparator" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/columns/column2"]
+[node name="HSeparator4" type="HSeparator" parent="UIRoot/Palette/PanelContainer/Margins/Items/columns/column2"]
 layout_mode = 2
 
-[node name="Zones" type="VBoxContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/columns/column2"]
+[node name="Zones" type="VBoxContainer" parent="UIRoot/Palette/PanelContainer/Margins/Items/columns/column2"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Title" type="Label" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/columns/column2/Zones"]
+[node name="Title" type="Label" parent="UIRoot/Palette/PanelContainer/Margins/Items/columns/column2/Zones"]
 layout_mode = 2
 text = "Zones"
 
-[node name="EraseZone" type="Button" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/columns/column2/Zones"]
+[node name="EraseZone" type="Button" parent="UIRoot/Palette/PanelContainer/Margins/Items/columns/column2/Zones"]
 layout_mode = 2
 toggle_mode = true
 button_group = ExtResource("8_6v8i5")
 text = "Erase Zone"
 
-[node name="Grid" type="GridContainer" parent="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/columns/column2/Zones"]
+[node name="Grid" type="GridContainer" parent="UIRoot/Palette/PanelContainer/Margins/Items/columns/column2/Zones"]
 layout_mode = 2
 columns = 2
 
-[connection signal="toggled_editing" from="." to="Background/TileOverlay" method="toggle_editing"]
-[connection signal="bl_set" from="Background/TileOverlay" to="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_bl_set"]
-[connection signal="br_set" from="Background/TileOverlay" to="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_br_set"]
-[connection signal="calibration_step_changed" from="Background/TileOverlay" to="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/CalibrationMode" method="set_text"]
-[connection signal="display_mode_changed" from="Background/TileOverlay" to="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/CalibrationMode" method="set_text"]
-[connection signal="hex_clicked" from="Background/TileOverlay" to="." method="_on_tile_overlay_hex_clicked"]
-[connection signal="hex_hovered" from="Background/TileOverlay" to="." method="_on_tile_overlay_hex_hovered"]
-[connection signal="tl_set" from="Background/TileOverlay" to="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_tl_set"]
-[connection signal="tr_set" from="Background/TileOverlay" to="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_tr_set"]
-[connection signal="pressed" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/Direct/RestartCalibration" to="Background/TileOverlay" method="start_calibration"]
-[connection signal="pressed" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/Direct/ChangeCalibrationStep/Previous" to="Background/TileOverlay" method="previous_calibration_step"]
-[connection signal="pressed" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/OriginControls/Direct/ChangeCalibrationStep/Next" to="Background/TileOverlay" method="next_calibration_step"]
-[connection signal="text_changed" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/TilesWideControls/TilesWide" to="Background/TileOverlay" method="choose_tiles_wide"]
-[connection signal="text_changed" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/TilesHeighControls/TilesHeigh" to="Background/TileOverlay" method="choose_tiles_heigh"]
-[connection signal="pressed" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/SaveCalibrationData" to="Background/TileOverlay" method="save_calibration_data"]
-[connection signal="pressed" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Calibration/EditControls/LoadCalibrationData" to="Background/TileOverlay" method="load_calibration_data"]
-[connection signal="palette_border_selected" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette" to="Background/TileOverlay" method="change_paint_selection" binds= [1]]
-[connection signal="palette_selection_cleared" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette" to="Background/TileOverlay" method="clear_paint_selection" binds= [""]]
-[connection signal="palette_tile_selected" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette" to="Background/TileOverlay" method="change_paint_selection" binds= [0]]
-[connection signal="palette_zone_selected" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette" to="Background/TileOverlay" method="change_paint_selection" binds= [2]]
-[connection signal="pressed" from="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette/PanelContainer/Margins/Items/ClearSelection" to="Background/OverBoardCamera/CanvasLayer/UIRoot/Palette" method="clear_selection"]
+[connection signal="toggled_editing" from="." to="ViewportContainer/SubViewport/TileOverlay" method="toggle_editing"]
+[connection signal="bl_set" from="ViewportContainer/SubViewport/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_bl_set"]
+[connection signal="br_set" from="ViewportContainer/SubViewport/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_br_set"]
+[connection signal="calibration_step_changed" from="ViewportContainer/SubViewport/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/CalibrationMode" method="set_text"]
+[connection signal="display_mode_changed" from="ViewportContainer/SubViewport/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/CalibrationMode" method="set_text"]
+[connection signal="hex_clicked" from="ViewportContainer/SubViewport/TileOverlay" to="." method="_on_tile_overlay_hex_clicked"]
+[connection signal="hex_hovered" from="ViewportContainer/SubViewport/TileOverlay" to="." method="_on_tile_overlay_hex_hovered"]
+[connection signal="tl_set" from="ViewportContainer/SubViewport/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_tl_set"]
+[connection signal="tr_set" from="ViewportContainer/SubViewport/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_tr_set"]
+[connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/RestartCalibration" to="ViewportContainer/SubViewport/TileOverlay" method="start_calibration"]
+[connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/ChangeCalibrationStep/Previous" to="ViewportContainer/SubViewport/TileOverlay" method="previous_calibration_step"]
+[connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/ChangeCalibrationStep/Next" to="ViewportContainer/SubViewport/TileOverlay" method="next_calibration_step"]
+[connection signal="text_changed" from="UIRoot/Calibration/EditControls/TilesWideControls/TilesWide" to="ViewportContainer/SubViewport/TileOverlay" method="choose_tiles_wide"]
+[connection signal="text_changed" from="UIRoot/Calibration/EditControls/TilesHeighControls/TilesHeigh" to="ViewportContainer/SubViewport/TileOverlay" method="choose_tiles_heigh"]
+[connection signal="pressed" from="UIRoot/Calibration/EditControls/SaveCalibrationData" to="ViewportContainer/SubViewport/TileOverlay" method="save_calibration_data"]
+[connection signal="pressed" from="UIRoot/Calibration/EditControls/LoadCalibrationData" to="ViewportContainer/SubViewport/TileOverlay" method="load_calibration_data"]
+[connection signal="palette_border_selected" from="UIRoot/Palette" to="ViewportContainer/SubViewport/TileOverlay" method="change_paint_selection" binds= [1]]
+[connection signal="palette_selection_cleared" from="UIRoot/Palette" to="ViewportContainer/SubViewport/TileOverlay" method="clear_paint_selection"]
+[connection signal="palette_tile_selected" from="UIRoot/Palette" to="ViewportContainer/SubViewport/TileOverlay" method="change_paint_selection" binds= [0]]
+[connection signal="palette_zone_selected" from="UIRoot/Palette" to="ViewportContainer/SubViewport/TileOverlay" method="change_paint_selection" binds= [2]]
+[connection signal="pressed" from="UIRoot/Palette/PanelContainer/Margins/Items/ClearSelection" to="UIRoot/Palette" method="clear_selection"]

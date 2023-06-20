@@ -20,7 +20,8 @@ signal selected()
 var _selected: bool = false:
 	set(value):
 		_selected = value
-		selected.emit(_selected)
+		if _selected:
+			selected.emit()
 
 func _unhandled_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():

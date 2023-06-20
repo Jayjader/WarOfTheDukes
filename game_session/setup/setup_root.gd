@@ -20,6 +20,7 @@ const INSTRUCTIONS = {
 		current_player = value
 		%CurrentPlayer/Value.faction = value
 
+# todo: hoist unit layer as autoloaded singleton, then use as reference
 @export var pieces: Dictionary = {
 	Enums.Faction.Orfburg: { Enums.Unit.Duke: null, Enums.Unit.Infantry: [], Enums.Unit.Cavalry: [], Enums.Unit.Artillery: [] },
 	Enums.Faction.Wulfenburg: { Enums.Unit.Duke: null, Enums.Unit.Infantry: [], Enums.Unit.Cavalry: [], Enums.Unit.Artillery: [] },
@@ -139,7 +140,7 @@ func choose_tile(tile: Vector2i, kind: String, zones: Array):
 			selection_button.grab_focus()
 			selection_button.set_pressed(true)
 		else:
-			setup_finished.emit(pieces)
+			setup_finished.emit()
 
 
 func _ready():

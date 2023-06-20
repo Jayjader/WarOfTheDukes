@@ -24,6 +24,9 @@ func _unhandled_input(event):
 		_zoom_level = log(exp(_zoom_level) + zoom_factor)
 	elif event.is_action_pressed("Decrease Camera Zoom"):
 		_zoom_level = log(exp(_zoom_level) - zoom_factor)
+	else:
+		return
+	get_viewport().set_input_as_handled()
 
 func _process(_delta):
 	if Input.is_action_pressed("Move Camera Left"):

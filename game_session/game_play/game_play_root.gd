@@ -3,8 +3,6 @@ extends Control
 
 signal game_over(result: Enums.GameResult, winner)
 
-@export var pieces: Dictionary
-
 const MAX_TURNS = 15
 @export_range(1, MAX_TURNS) var turn: int = 1:
 	set(value):
@@ -13,8 +11,11 @@ const MAX_TURNS = 15
 			turn = value
 			%Turn.set_text("Turn: %s" % turn)
 
+signal current_player_changed(faction: Enums.Faction)
 @export var current_player: Enums.Faction = Enums.Faction.Orfburg:
 	set(value):
+		if current_player != value:
+			current_player_changed.emit(value)
 		current_player = value
 		if self.is_node_ready():
 			match current_player:
@@ -76,6 +77,9 @@ func _ready():
 func detect_game_result():
 	return Enums.GameResult.DRAW # todo
 
+func _on_unit_selection(kind, faction, tile):
+	print_debug("blablaabl callbcak %s" % [kind, faction, tile])
+
 func select_unit(unit_tile: Vector2i):
 	data = {
 		subphase = Enums.MovementSubPhase.CHOOSE_DESTINATION,
@@ -83,12 +87,14 @@ func select_unit(unit_tile: Vector2i):
 		moved = data.moved,
 	}
 
+signal unit_moved(from_: Vector2i, to_: Vector2i)
 func select_destination(destination_tile: Vector2i):
 	data.moved[data.selection] = destination_tile
 	data = {
 		subphase = Enums.MovementSubPhase.CHOOSE_UNIT,
 		moved = data.moved,
 	}
+	unit_moved.emit(destination_tile, data.selection, current_player)
 
 func confirm_movement():
 	current_phase = Enums.PlayPhase.COMBAT

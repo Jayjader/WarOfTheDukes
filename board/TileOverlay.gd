@@ -1,7 +1,7 @@
 @tool
 # Helps draw and edit hex tile map data
 # To use, place as child node of map sprite, and anchor as full rect
-extends Control
+extends Node2D
 
 signal display_mode_changed(new_mode: String)
 signal calibration_step_changed(new_step: String)
@@ -32,7 +32,13 @@ signal tl_set(position)
 		calibration = value
 		queue_redraw()
 
-var tiles_origin = Vector2i(0, 0)
+var tiles_origin:
+	get:
+		match state.get("mode"):
+			Enums.TileOverlayMode.READ_ONLY:
+				return Vector2i(0, 0)
+			_:
+				return calibration.get("origin_in_world_coordinates")
 
 
 var MODES = len(Enums.TileOverlayMode.keys())
@@ -163,7 +169,7 @@ func paint_border(position_in_axial: Vector2, kind: String):
 		MapData.map.borders[position_in_axial] = kind
 func paint_selected_border():
 	var hovered = state.hover
-	var origin = calibration.origin_in_world_coordinates
+	var origin = tiles_origin
 	var hex_size = calibration.hex_size
 	var nearest_in_axial = Util.nearest_hex_in_axial(hovered, origin, hex_size)
 	var relative_to_center_in_axial = Vector2(nearest_in_axial) - Util.pixel_coords_to_hex(Vector2(hovered) - origin, hex_size)
@@ -191,15 +197,16 @@ func _ready():
 func _draw():
 	var temp_size = 25
 	var current_mode = state.mode
+	var origin = tiles_origin
 
 	if current_mode == Enums.TileOverlayMode.READ_ONLY:
 		var hex_size = MapData.map.hex_size_in_pixels
 		for tile in MapData.map.tiles:
 			Drawing.fill_hex(self, Util.hex_coords_to_pixel(tile, hex_size), hex_size, MapData.map.tiles[tile])
 		for border_center in MapData.map.borders:
-				Drawing.draw_border(self, MapData.map.borders[border_center], border_center, hex_size, Vector2(0, 0))
+				Drawing.draw_border(self, MapData.map.borders[border_center], border_center, hex_size, Vector2(tiles_origin))
 		if state.get("hover") != null:
-			Drawing.draw_hover(self, current_mode, state.hover, Vector2i(0, 0), MapData.map.hex_size_in_pixels)
+			Drawing.draw_hover(self, current_mode, state.hover, Vector2(tiles_origin), MapData.map.hex_size_in_pixels)
 		
 	elif current_mode == Enums.TileOverlayMode.CALIBRATING:
 		if calibration.mode <= Enums.TileOverlayCalibration.CALIBRATING_SIZE:
@@ -210,14 +217,12 @@ func _draw():
 			var hovered = state.get("hover")
 			if hovered != null:
 				Drawing.draw_hex(self, hovered, calibration.hex_size)
-			var origin = calibration.get("origin_in_world_coordinates")
 			if origin != null:
 				Drawing.draw_grid(self, self.position, self.size, origin, calibration.hex_size)
 				Drawing.draw_hex(self, origin, calibration.hex_size, Color.REBECCA_PURPLE)
 
 	elif current_mode >= Enums.TileOverlayMode.EDITING_BASE:
 		var hovered = state.get("hover")
-		var origin = calibration.get("origin_in_world_coordinates")
 		var hex_size = calibration.get("hex_size")
 		if (origin != null) and (hex_size != null):
 			for tile in MapData.map.tiles:
@@ -230,16 +235,17 @@ func _draw():
 				Drawing.draw_hover(self, current_mode, hovered, origin, hex_size)
 
 
-func _gui_input(event):
+func _input(event):
 	var current_mode = state.mode
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
-		accept_event()
+		#get_viewport().set_input_as_handled()
 		var integer_pix = Vector2i(event.position)
+		var origin = tiles_origin
 		match current_mode:
 			Enums.TileOverlayMode.READ_ONLY:
 				if report_clicked_hex:
 					print_debug("hex clicked at pix %s" % event.position)
-					var tile = Util.nearest_hex_in_axial(event.position, Vector2i(0, 0), MapData.map.hex_size_in_pixels)
+					var tile = Util.nearest_hex_in_axial(event.position, origin, MapData.map.hex_size_in_pixels)
 					var zones = []
 					for zone in MapData.map.zones:
 						if MapData.map.zones[zone].has(tile):
@@ -258,11 +264,11 @@ func _gui_input(event):
 					Enums.TileOverlayCalibration.CHOOSING_ORIGIN:
 						choose_origin(integer_pix)
 			Enums.TileOverlayMode.PAINTING_TILES:
-				paint_tile(Util.nearest_hex_in_axial(integer_pix, calibration.origin_in_world_coordinates, calibration.hex_size), state.selection)
+				paint_tile(Util.nearest_hex_in_axial(integer_pix, origin, calibration.hex_size), state.selection)
 			Enums.TileOverlayMode.PAINTING_BORDERS:
 				paint_selected_border()
 			Enums.TileOverlayMode.PAINTING_ZONES:
-				paint_zone(Util.nearest_hex_in_axial(integer_pix, calibration.origin_in_world_coordinates, calibration.hex_size), state.selection)
+				paint_zone(Util.nearest_hex_in_axial(integer_pix, origin, calibration.hex_size), state.selection)
 		queue_redraw()
 	elif event is InputEventMouseMotion:
 		var capture = false
@@ -274,7 +280,7 @@ func _gui_input(event):
 			Enums.TileOverlayMode.CALIBRATING:
 				capture = calibration.mode != Enums.TileOverlayCalibration.CALIBRATING_SIZE
 		if capture:
-			state.hover = Vector2i(event.position)
+			state.hover = get_viewport_transform().affine_inverse() * Vector2(event.position) # + 2*get_viewport().get_camera_2d().position)
 			if report_hovered_hex:
 				hex_hovered.emit(Util.nearest_hex_in_axial(state.hover, tiles_origin, MapData.map.hex_size_in_pixels))
 			queue_redraw()

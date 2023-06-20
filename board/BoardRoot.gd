@@ -1,5 +1,5 @@
 @tool
-extends Node2D
+extends Control
 
 var EditingGroup: StringName = &"map-edit-ui"
 
@@ -17,7 +17,7 @@ signal hex_clicked(tile: Vector2i, kind, zones)
 			for ui in get_tree().get_nodes_in_group(EditingGroup):
 				ui.set_visible(editing)
 
-			$Background.set_self_modulate(Color.WHITE if editing else Color.TRANSPARENT)
+			%Background.set_self_modulate(Color.WHITE if editing else Color.TRANSPARENT)
 
 func _ready():
 	MapData.load_data()
@@ -30,15 +30,21 @@ func _unhandled_input(event):
 
 @export var report_hovered_hex: bool:
 	get:
-		return %TileOverlay.report_hovered_hex
+		if self.is_node_ready():
+			return %TileOverlay.report_hovered_hex
+		return false
 	set(value):
-		%TileOverlay.report_hovered_hex = value
+		if self.is_node_ready():
+			%TileOverlay.report_hovered_hex = value
 
 @export var report_clicked_hex: bool:
 	get:
-		return %TileOverlay.report_clicked_hex
+		if self.is_node_ready():
+			return %TileOverlay.report_clicked_hex
+		return false
 	set(value):
-		%TileOverlay.report_clicked_hex = value
+		if self.is_node_ready():
+			%TileOverlay.report_clicked_hex = value
 
 
 func _on_tile_overlay_hex_hovered(axial: Vector2i):

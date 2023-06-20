@@ -8,9 +8,9 @@ signal palette_tile_selected(tile: String)
 signal palette_border_selected(border: String)
 signal palette_zone_selected(zone: String)
 
-@export var items: Array[String]:
+@export var tiles: Array[String]:
 	set(value):
-		items = value
+		tiles = value
 		notify_property_list_changed()
 
 @export var borders: Array[String]:
@@ -27,7 +27,7 @@ var selected = "":
 	set(value):
 		print_debug("palette selection change: %s" % value)
 		selected = value
-		if selected == "EraseTile" or selected in items:
+		if selected == "EraseTile" or selected in tiles:
 			palette_tile_selected.emit(selected)
 		elif selected == "EraseBorder" or selected in borders:
 			palette_border_selected.emit(selected)
@@ -47,12 +47,12 @@ func _ready():
 	%SaveMapData.connect("pressed", MapData.save_data)
 	%LoadMapData.connect("pressed", MapData.load_data)
 	var palette_group = %Tiles/EraseTile.button_group
-	for item in items:
+	for tile in tiles:
 		var container = %Tiles/Grid
 		var button = Button.new()
-		button.name = item
+		button.name = tile
 		container.add_child(button)
-		button.text = item
+		button.text = tile
 		button.toggle_mode = true
 		button.button_group = palette_group
 	for border in borders:

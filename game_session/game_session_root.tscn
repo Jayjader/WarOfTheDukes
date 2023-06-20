@@ -14,27 +14,13 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_7lw6w")
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-stretch = true
-
-[node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
-disable_3d = true
-handle_input_locally = false
-size = Vector2i(1920, 1080)
-render_target_update_mode = 4
-
-[node name="BoardRoot" parent="SubViewportContainer/SubViewport" instance=ExtResource("2_varfx")]
+[node name="BoardRoot" parent="." instance=ExtResource("2_varfx")]
 unique_name_in_owner = true
+layout_mode = 1
 report_hovered_hex = true
 report_clicked_hex = true
 
-[node name="UnitLayerRoot" parent="SubViewportContainer/SubViewport/BoardRoot" instance=ExtResource("4_6kihs")]
+[node name="UnitLayerRoot" parent="BoardRoot" instance=ExtResource("4_6kihs")]
 
 [node name="SetupRoot" parent="." instance=ExtResource("3_2cv6m")]
 layout_mode = 1
@@ -43,7 +29,7 @@ empty_cities_and_forts = {
 1: [Vector2i(2, 13), Vector2i(3, 13), Vector2i(11, 3), Vector2i(16, -1), Vector2i(17, -1), Vector2i(18, -2), Vector2i(19, -3), Vector2i(18, -3), Vector2i(17, -2), Vector2i(19, -4), Vector2i(22, -9), Vector2i(15, -5), Vector2i(6, 3), Vector2i(0, 3), Vector2i(0, 2), Vector2i(0, 1), Vector2i(0, 0), Vector2i(1, 0), Vector2i(1, 1), Vector2i(1, 2), Vector2i(2, 1), Vector2i(2, 0), Vector2i(2, -1), Vector2i(5, -1), Vector2i(5, -2)]
 }
 
-[connection signal="hex_clicked" from="SubViewportContainer/SubViewport/BoardRoot" to="SetupRoot" method="choose_tile"]
-[connection signal="toggled_editing" from="SubViewportContainer/SubViewport/BoardRoot" to="." method="_on_board_root_toggled_editing"]
+[connection signal="hex_clicked" from="BoardRoot" to="SetupRoot" method="choose_tile"]
+[connection signal="toggled_editing" from="BoardRoot" to="." method="_on_board_root_toggled_editing"]
 [connection signal="setup_finished" from="SetupRoot" to="." method="finish_setup"]
-[connection signal="unit_placed" from="SetupRoot" to="SubViewportContainer/SubViewport/BoardRoot/UnitLayerRoot" method="_place_piece"]
+[connection signal="unit_placed" from="SetupRoot" to="BoardRoot/UnitLayerRoot" method="_place_piece"]

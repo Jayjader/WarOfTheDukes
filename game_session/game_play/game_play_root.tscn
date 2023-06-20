@@ -75,6 +75,7 @@ horizontal_alignment = 1
 [node name="SubPhaseInstruction" type="Label" parent="TopMargin/Panel/Margins/HBox/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
+text = "Choose a unit to move"
 
 [node name="LeftMargin" type="MarginContainer" parent="."]
 layout_mode = 1
