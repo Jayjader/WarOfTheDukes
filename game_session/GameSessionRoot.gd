@@ -30,7 +30,7 @@ func _ready():
 	setup_root.empty_cities_and_forts[Enums.Faction.Wulfenburg] = wulf_tiles.keys()
 
 func _on_current_player_change(faction: Enums.Faction):
-	%BoardRoot/UnitLayerRoot.make_faction_selectable(faction)
+	%BoardRoot/ViewportContainer/SubViewport/UnitLayer.make_faction_selectable(faction)
 func finish_setup():
 	mode = Enums.SessionMode.PLAY
 	$SetupRoot.queue_free()
@@ -39,7 +39,7 @@ func finish_setup():
 	#game_play.pieces = pieces
 	game_play.connect("game_over", game_over)
 	_on_current_player_change(game_play.current_player)
-	%BoardRoot/UnitLayerRoot.connect("unit_clicked", game_play._on_unit_selection)
+	%BoardRoot/ViewportContainer/SubViewport/UnitLayer.connect("unit_clicked", game_play._on_unit_selection)
 	game_play.connect("unit_moved", func(): self._on_current_player_change(game_play.current_player))
 	#%BoardRoot/Background/TileOverLay.connect("tile_hovered", game_play.choose)
 

@@ -52,3 +52,7 @@ func _on_tile_overlay_hex_hovered(axial: Vector2i):
 func _on_tile_overlay_hex_clicked(axial: Vector2i, kind, zones=[]):
 	print_debug("hex clicked: %s, kind: %s, zones: %s" % [ axial, kind, zones ])
 	hex_clicked.emit(axial, kind, zones)
+
+
+func _on_setup_root_unit_placed(tile, kind, faction):
+	%UnitLayer._place_piece(tile, kind, faction)
