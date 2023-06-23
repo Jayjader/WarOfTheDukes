@@ -79,6 +79,10 @@ layout_mode = 2
 text = "Orfburg"
 script = ExtResource("2_mxi6t")
 
+[node name="AutoSetup" type="Button" parent="MarginContainer/PanelContainer/Margins/HBox/VBox"]
+layout_mode = 2
+text = "Auto Setup Remaining"
+
 [node name="VSeparator" type="VSeparator" parent="MarginContainer/PanelContainer/Margins/HBox"]
 layout_mode = 2
 
@@ -213,3 +217,5 @@ horizontal_alignment = 2
 layout_mode = 2
 text = "1"
 horizontal_alignment = 2
+
+[connection signal="pressed" from="MarginContainer/PanelContainer/Margins/HBox/VBox/AutoSetup" to="." method="_on_auto_setup_pressed"]
