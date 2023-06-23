@@ -1,8 +1,9 @@
 extends Node2D
 
-const Unit = preload("res://game_session/unit_layer/unit_root.tscn")
+const Unit = preload("res://board/unit_layer/unit_root.tscn")
 
 func _place_piece(tile: Vector2i, kind: Enums.Unit, faction: Enums.Faction):
+	print_debug("placing piece (%s, %s, %s)" % [tile, kind, faction])
 	var unit = Unit.instantiate()
 	add_child(unit)
 	unit.kind = kind

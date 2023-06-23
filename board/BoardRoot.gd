@@ -1,4 +1,3 @@
-@tool
 extends Control
 
 var EditingGroup: StringName = &"map-edit-ui"
@@ -7,6 +6,7 @@ signal toggled_editing(bool)
 
 signal hex_hovered(tile: Vector2i)
 signal hex_clicked(tile: Vector2i, kind, zones)
+
 
 @export var editing: bool = false:
 	set(value):
@@ -20,11 +20,14 @@ signal hex_clicked(tile: Vector2i, kind, zones)
 			%Background.set_self_modulate(Color.WHITE if editing else Color.TRANSPARENT)
 
 func _ready():
+	# resolve @tool and autoload clash
+	#if Engine.is_editor_hint() and get_viewport() is Window:
+	#	get_parent().remove_child(self)
 	MapData.load_data()
 
 
 func _unhandled_input(event):
-	if not Engine.is_editor_hint():
+#	if not Engine.is_editor_hint():
 		if event.is_action_pressed("Edit Map Data"):
 			editing = !editing
 

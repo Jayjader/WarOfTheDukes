@@ -1,4 +1,3 @@
-@tool
 extends Control
 
 signal game_over(result: Enums.GameResult, winner)

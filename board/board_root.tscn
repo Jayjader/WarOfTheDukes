@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" path="res://board/BoardRoot.gd" id="1_7ngv4"]
 [ext_resource type="Texture2D" uid="uid://dgr4iw8ue00sq" path="res://docs/La guerre des ducs - Encart.jpg" id="3_o7vri"]
+[ext_resource type="Script" path="res://board/unit_layer/unit_layer_root.gd" id="4_3bm0a"]
 [ext_resource type="Script" path="res://board/TileOverlay.gd" id="4_5o13e"]
-[ext_resource type="PackedScene" uid="uid://owh1v0ln32rm" path="res://game_session/unit_layer/unit_layer_root.tscn" id="4_vhncq"]
 [ext_resource type="Script" path="res://game_session/OverBoardCamera.gd" id="5_eokpn"]
 [ext_resource type="Script" path="res://board/Direct.gd" id="6_s8gsq"]
 [ext_resource type="Script" path="res://board/Palette.gd" id="7_6tn5h"]
@@ -54,8 +54,9 @@ show_behind_parent = true
 texture = ExtResource("3_o7vri")
 centered = false
 
-[node name="UnitLayer" parent="ViewportContainer/SubViewport" instance=ExtResource("4_vhncq")]
+[node name="UnitLayer" type="Node2D" parent="ViewportContainer/SubViewport"]
 unique_name_in_owner = true
+script = ExtResource("4_3bm0a")
 
 [node name="OverBoardCamera" type="Camera2D" parent="ViewportContainer/SubViewport"]
 editor_draw_limits = true

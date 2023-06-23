@@ -2,7 +2,7 @@
 extends Control
 
 signal unit_placed(tile: Vector2i, kind: Enums.Unit, faction: Enums.Faction)
-signal setup_finished(units: Dictionary)
+signal setup_finished()
 
 const INSTRUCTIONS = {
 	Enums.SetupPhase.FILL_CITIES_FORTS: """Deploy one unit on each City and Fortress tile inside your borders.

@@ -1,8 +1,6 @@
 @tool
 extends Panel
 
-#const PaletteGroup = preload("res://editing_palette_selection_button_group.tres")
-
 signal palette_selection_cleared
 signal palette_tile_selected(tile: String)
 signal palette_border_selected(border: String)

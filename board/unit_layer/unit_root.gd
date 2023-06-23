@@ -23,9 +23,11 @@ var _selected: bool = false:
 		if _selected:
 			selected.emit()
 
-func _unhandled_input(event):
+func _input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
+		print_debug("checking if selectable")
 		if selectable:
+			print_debug("checking_if_selected")
 			var hex_size = MapData.map.hex_size_in_pixels
 			var tile: Vector2 = Util.nearest_hex_in_world(event.position, Vector2i(0, 0), hex_size)[0]
 			if  tile.distance_to(self.position) < hex_size / 2:

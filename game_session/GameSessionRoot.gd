@@ -4,18 +4,20 @@ extends Control
 const Setup = preload("res://game_session/setup/setup_root.tscn")
 const GamePlay = preload("res://game_session/game_play/game_play_root.tscn")
 
-
 @export var player_1: Enums.Faction
 
 var player_2:
 	get:
 		return Enums.Faction.Wulfenburg if player_1 == Enums.Faction.Orfburg else Enums.Faction.Orfburg
 
+@export var mode: Enums.SessionMode = Enums.SessionMode.SETUP
+
 func _is_city_or_fort(tile, map_data):
 	var tile_kind = map_data.tiles[tile]
 	return (tile_kind == "City") or (tile_kind == "Fortress")
-@export var mode: Enums.SessionMode = Enums.SessionMode.SETUP
+
 func _ready():
+	Board.toggled_editing.connect(self._on_board_root_toggled_editing)
 	var setup_root = $SetupRoot
 	var orf_tiles = {}
 	for tile in MapData.map.zones.OrfburgTerritory:
@@ -28,19 +30,22 @@ func _ready():
 		if _is_city_or_fort(tile, MapData.map):
 			wulf_tiles[tile] = true
 	setup_root.empty_cities_and_forts[Enums.Faction.Wulfenburg] = wulf_tiles.keys()
+	
+	Board.hex_clicked.connect(setup_root.choose_tile)
+	setup_root.unit_placed.connect(Board._on_setup_root_unit_placed)
 
 func _on_current_player_change(faction: Enums.Faction):
-	%BoardRoot/ViewportContainer/SubViewport/UnitLayer.make_faction_selectable(faction)
+	Board.get_node("%UnitLayer").make_faction_selectable(faction)
+
 func finish_setup():
 	mode = Enums.SessionMode.PLAY
 	$SetupRoot.queue_free()
 	var game_play = GamePlay.instantiate()
 	add_child(game_play)
-	#game_play.pieces = pieces
-	game_play.connect("game_over", game_over)
-	_on_current_player_change(game_play.current_player)
-	%BoardRoot/ViewportContainer/SubViewport/UnitLayer.connect("unit_clicked", game_play._on_unit_selection)
+	self._on_current_player_change(game_play.current_player)
+	Board.get_node("%UnitLayer").connect("unit_clicked", game_play._on_unit_selection)
 	game_play.connect("unit_moved", func(): self._on_current_player_change(game_play.current_player))
+	game_play.connect("game_over", game_over)
 	#%BoardRoot/Background/TileOverLay.connect("tile_hovered", game_play.choose)
 
 

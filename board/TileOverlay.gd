@@ -1,4 +1,3 @@
-@tool
 # Helps draw and edit hex tile map data
 # To use, place as child node of map sprite, and anchor as full rect
 extends Node2D
