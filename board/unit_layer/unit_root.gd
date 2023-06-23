@@ -16,20 +16,20 @@ extends Node2D
 		if not selectable:
 			_selected = false
 
-signal selected()
+signal selected
 var _selected: bool = false:
 	set(value):
-		_selected = value
-		if _selected:
+		if value and _selected != value:
+			_selected = value
 			selected.emit()
+			$Label.add_theme_color_override("font_color", Color.REBECCA_PURPLE)
 
-func _input(event):
+func _unhandled_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
-		print_debug("checking if selectable")
 		if selectable:
-			print_debug("checking_if_selected")
 			var hex_size = MapData.map.hex_size_in_pixels
-			var tile: Vector2 = Util.nearest_hex_in_world(event.position, Vector2i(0, 0), hex_size)[0]
-			if  tile.distance_to(self.position) < hex_size / 2:
+			var tile: Vector2 = Util.nearest_hex_in_world(get_viewport_transform().affine_inverse() * event.position, Vector2i(0, 0), hex_size)[0]
+			var distance = tile.distance_to(self.position)
+			if  distance < hex_size:
 				get_viewport().set_input_as_handled()
 				_selected = not _selected

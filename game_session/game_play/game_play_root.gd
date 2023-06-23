@@ -77,7 +77,12 @@ func detect_game_result():
 	return Enums.GameResult.DRAW # todo
 
 func _on_unit_selection(kind, faction, tile):
-	print_debug("blablaabl callbcak %s" % [kind, faction, tile])
+	print_debug("blablaabl callbcak %s %s %s" % [kind, faction, tile])
+	match data.subphase:
+		Enums.MovementSubPhase.CHOOSE_UNIT:
+			select_unit(tile)
+		Enums.MovementSubPhase.CHOOSE_DESTINATION:
+			pass
 
 func select_unit(unit_tile: Vector2i):
 	data = {

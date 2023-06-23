@@ -43,6 +43,7 @@ func finish_setup():
 	var game_play = GamePlay.instantiate()
 	add_child(game_play)
 	self._on_current_player_change(game_play.current_player)
+	Board.report_clicked_hex = false
 	Board.get_node("%UnitLayer").connect("unit_clicked", game_play._on_unit_selection)
 	game_play.connect("unit_moved", func(): self._on_current_player_change(game_play.current_player))
 	game_play.connect("game_over", game_over)

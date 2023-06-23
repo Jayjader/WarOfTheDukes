@@ -2,6 +2,8 @@ extends Node2D
 
 const Unit = preload("res://board/unit_layer/unit_root.tscn")
 
+signal unit_clicked(kind: Enums.Unit, faction: Enums.Faction, tile: Vector2i)
+
 func _place_piece(tile: Vector2i, kind: Enums.Unit, faction: Enums.Faction):
 	print_debug("placing piece (%s, %s, %s)" % [tile, kind, faction])
 	var unit = Unit.instantiate()
@@ -12,13 +14,10 @@ func _place_piece(tile: Vector2i, kind: Enums.Unit, faction: Enums.Faction):
 	unit.connect(
 		"selected",
 		func():
-			unit_clicked.emit(
-				unit.kind,
-				unit.faction,
-				Util.nearest_hex_in_axial(unit.position, Vector2i(0, 0), MapData.map.hex_size_in_pixels))
-				)
+			print_debug("selected unit %s" % unit)
+			unit_clicked.emit(unit.kind, unit.faction, tile)
+	)
 
-signal unit_clicked(kind: Enums.Unit, faction: Enums.Faction, tile: Vector2i)
 
 func make_faction_selectable(faction):
 	for unit in get_children():

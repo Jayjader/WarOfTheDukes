@@ -234,7 +234,7 @@ func _draw():
 				Drawing.draw_hover(self, current_mode, hovered, origin, hex_size)
 
 
-func _input(event):
+func _unhandled_input(event):
 	var current_mode = state.mode
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
 		var integer_pix = Vector2i(get_viewport_transform().affine_inverse() * event.position)
@@ -242,6 +242,7 @@ func _input(event):
 		match current_mode:
 			Enums.TileOverlayMode.READ_ONLY:
 				if report_clicked_hex:
+					get_viewport().set_input_as_handled()
 					print_debug("hex clicked at pix %s" % integer_pix)
 					var tile = Util.nearest_hex_in_axial(integer_pix, origin, MapData.map.hex_size_in_pixels)
 					var zones = []
@@ -261,12 +262,17 @@ func _input(event):
 						choose_tl(integer_pix)
 					Enums.TileOverlayCalibration.CHOOSING_ORIGIN:
 						choose_origin(integer_pix)
+					_:
+						return
 			Enums.TileOverlayMode.PAINTING_TILES:
 				paint_tile(Util.nearest_hex_in_axial(integer_pix, origin, calibration.hex_size), state.selection)
 			Enums.TileOverlayMode.PAINTING_BORDERS:
 				paint_selected_border()
 			Enums.TileOverlayMode.PAINTING_ZONES:
 				paint_zone(Util.nearest_hex_in_axial(integer_pix, origin, calibration.hex_size), state.selection)
+			_:
+				return
+		get_viewport().set_input_as_handled()
 		queue_redraw()
 	elif event is InputEventMouseMotion:
 		var capture = false
@@ -281,4 +287,5 @@ func _input(event):
 			state.hover = get_viewport_transform().affine_inverse() * Vector2(event.position)
 			if report_hovered_hex:
 				hex_hovered.emit(Util.nearest_hex_in_axial(state.hover, tiles_origin, MapData.map.hex_size_in_pixels))
+				get_viewport().set_input_as_handled()
 			queue_redraw()
