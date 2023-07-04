@@ -144,6 +144,10 @@ func choose_tile(tile: Vector2i, kind: String, zones: Array):
 
 
 func _ready():
+	Board.report_hovered_hex = true
+	Board.report_clicked_hex = true
+	Board.hex_clicked.connect(self.choose_tile)
+	unit_placed.connect(Board._on_setup_root_unit_placed)
 	display_remaining_counts()
 	# tech debt created: the button node names **must** be exactly the enum variant names -> this is very brittle
 	%Selection/Buttons.get_child(0).get_button_group().connect("pressed", func(button): change_selection(Enums.Unit[button.name]))
@@ -156,6 +160,9 @@ func _ready():
 			%Selection/Buttons/Artillery.set_pressed(true)
 		Enums.Unit.Duke:
 			%Selection/Buttons/Duke.set_pressed(true)
+
+func _exit_tree():
+	Board.hex_clicked.disconnect(self.choose_tile)
 
 
 func _on_auto_setup_pressed():

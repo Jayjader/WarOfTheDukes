@@ -1,4 +1,3 @@
-@tool
 extends Control
 
 const Setup = preload("res://game_session/setup/setup_root.tscn")
@@ -30,9 +29,6 @@ func _ready():
 		if _is_city_or_fort(tile, MapData.map):
 			wulf_tiles[tile] = true
 	setup_root.empty_cities_and_forts[Enums.Faction.Wulfenburg] = wulf_tiles.keys()
-	
-	Board.hex_clicked.connect(setup_root.choose_tile)
-	setup_root.unit_placed.connect(Board._on_setup_root_unit_placed)
 
 func _on_current_player_change(faction: Enums.Faction):
 	Board.get_node("%UnitLayer").make_faction_selectable(faction)
