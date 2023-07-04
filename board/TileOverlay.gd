@@ -13,7 +13,12 @@ signal br_set(position)
 signal tr_set(position)
 signal tl_set(position)
 
-@export var report_hovered_hex: bool = false
+@export var report_hovered_hex: bool = false:
+	set(value):
+		report_hovered_hex = value
+		if not report_hovered_hex:
+			state.erase("hover")
+			queue_redraw()
 @export var report_clicked_hex: bool = false
 @export var read_only: bool:
 	get:
