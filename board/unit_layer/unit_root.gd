@@ -1,5 +1,10 @@
 extends Node2D
 
+@export var tile: Vector2i:
+	get:
+		return Util.nearest_hex_in_axial(self.position, Vector2i(0, 0), MapData.map.hex_size_in_pixels)
+	set(value):
+		self.position = Util.hex_coords_to_pixel(value, MapData.map.hex_size_in_pixels)
 @export var kind: Enums.Unit:
 	set(value):
 		$Label.set_text(Enums.Unit.find_key(value))
@@ -19,17 +24,21 @@ extends Node2D
 signal selected
 var _selected: bool = false:
 	set(value):
-		if value and _selected != value:
+		if _selected != value:
 			_selected = value
-			selected.emit()
-			$Label.add_theme_color_override("font_color", Color.REBECCA_PURPLE)
+			if _selected:
+				selected.emit()
+				$Label.add_theme_color_override("font_color", Color.REBECCA_PURPLE)
+			else:
+				$Label.add_theme_color_override("font_color", Drawing.faction_colors[faction])
 
 func _unhandled_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
 		if selectable:
 			var hex_size = MapData.map.hex_size_in_pixels
-			var tile: Vector2 = Util.nearest_hex_in_world(get_viewport_transform().affine_inverse() * event.position, Vector2i(0, 0), hex_size)[0]
-			var distance = tile.distance_to(self.position)
-			if  distance < hex_size:
+			var clicked_tile = Util.nearest_hex_in_axial(get_viewport_transform().affine_inverse() * event.position, Vector2i(0, 0), hex_size)
+			if clicked_tile == self.tile:
+			#var distance = tile.distance_to(self.position)
+			#if  distance < hex_size:
 				get_viewport().set_input_as_handled()
 				_selected = not _selected

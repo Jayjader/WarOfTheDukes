@@ -97,7 +97,7 @@ static func derive_border_normals_in_cube(border_position: Vector3):
 		second = 3
 	return [cube_directions[first], cube_directions[second]]
 
-static func nearest_hex_in_axial(nearest_pix: Vector2, origin: Vector2, hex_size: float):
+static func nearest_hex_in_axial(nearest_pix: Vector2, origin: Vector2, hex_size: float) -> Vector2i:
 	var axial = pixel_coords_to_hex(nearest_pix - origin, hex_size)
 	var cube = Vector3(axial.x, axial.y, -axial.x-axial.y)
 	var nearest_cube = round_to_nearest_hex(cube)

@@ -65,40 +65,59 @@ var data: Dictionary:
 		if self.is_node_ready():
 			%SubPhaseInstruction.text = INSTRUCTIONS[data.subphase]
 
-
 func _ready():
 	match current_phase:
 		Enums.PlayPhase.MOVEMENT:
 			data = { subphase = Enums.MovementSubPhase.CHOOSE_UNIT, moved = {} }
 		Enums.PlayPhase.COMBAT:
 			data = { subphase = Enums.CombatSubPhase.CHOOSE_ATTACKERS }
+	Board.get_node("%UnitLayer").make_faction_selectable(current_player)
+	Board.get_node("%UnitLayer").connect("unit_clicked", _on_unit_selection)
+	unit_moved.connect(Board.get_node("%UnitLayer").move_unit)
 
 func detect_game_result():
 	return Enums.GameResult.DRAW # todo
 
 func _on_unit_selection(kind, faction, tile):
-	print_debug("blablaabl callbcak %s %s %s" % [kind, faction, tile])
+	print_debug("blablaabl callback %s %s %s" % [Enums.Unit.find_key(kind), faction, tile])
 	match data.subphase:
 		Enums.MovementSubPhase.CHOOSE_UNIT:
 			select_unit(tile)
 		Enums.MovementSubPhase.CHOOSE_DESTINATION:
 			pass
+		Enums.CombatSubPhase.CHOOSE_ATTACKERS:
+			choose_attacker(tile)
+		Enums.CombatSubPhase.CHOOSE_DEFENDER:
+			choose_defender(tile)
 
 func select_unit(unit_tile: Vector2i):
+	if data.moved.values().has(unit_tile):
+		return
 	data = {
 		subphase = Enums.MovementSubPhase.CHOOSE_DESTINATION,
 		selection = unit_tile,
 		moved = data.moved,
 	}
+	Board.get_node("%UnitLayer").make_faction_selectable(null)
+	Board.report_clicked_hex = true
+	Board.report_hovered_hex = true
+	Board.hex_clicked.connect(_on_board_hex_click_for_destination)
+
+func _on_board_hex_click_for_destination(tile, kind, zones):
+	select_destination(tile)
 
 signal unit_moved(from_: Vector2i, to_: Vector2i)
 func select_destination(destination_tile: Vector2i):
+	Board.hex_clicked.disconnect(_on_board_hex_click_for_destination)
+	unit_moved.emit(destination_tile, data.selection)
 	data.moved[data.selection] = destination_tile
 	data = {
 		subphase = Enums.MovementSubPhase.CHOOSE_UNIT,
 		moved = data.moved,
 	}
-	unit_moved.emit(destination_tile, data.selection, current_player)
+	Board.get_node("%UnitLayer").make_faction_selectable(current_player, data.moved)
+	Board.report_clicked_hex = false
+	Board.report_hovered_hex = false
 
 func confirm_movement():
 	current_phase = Enums.PlayPhase.COMBAT
@@ -107,6 +126,7 @@ func confirm_movement():
 		attacked = {},
 		attacking = [],
 	}
+	Board.get_node("%UnitLayer").make_faction_selectable(current_player)
 
 
 func choose_attacker(attacker_tile: Vector2i):

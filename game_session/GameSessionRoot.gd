@@ -1,4 +1,3 @@
-@tool
 extends Control
 
 const Setup = preload("res://game_session/setup/setup_root.tscn")
@@ -34,24 +33,19 @@ func _ready():
 	Board.hex_clicked.connect(setup_root.choose_tile)
 	setup_root.unit_placed.connect(Board._on_setup_root_unit_placed)
 
-func _on_current_player_change(faction: Enums.Faction):
-	Board.get_node("%UnitLayer").make_faction_selectable(faction)
-
 func finish_setup():
 	mode = Enums.SessionMode.PLAY
 	$SetupRoot.queue_free()
 	var game_play = GamePlay.instantiate()
 	add_child(game_play)
-	self._on_current_player_change(game_play.current_player)
 	Board.report_clicked_hex = false
-	Board.get_node("%UnitLayer").connect("unit_clicked", game_play._on_unit_selection)
-	game_play.connect("unit_moved", func(): self._on_current_player_change(game_play.current_player))
-	game_play.connect("game_over", game_over)
+	Board.report_hovered_hex = false
+	game_play.game_over.connect(end_game)
 	#%BoardRoot/Background/TileOverLay.connect("tile_hovered", game_play.choose)
 
 
 
-func game_over(result: Enums.GameResult, winner=null):
+func end_game(result: Enums.GameResult, winner=null):
 	mode = Enums.SessionMode.GAME_OVER
 	#$GamePlay.queue_free()
 	#var game_over = GameOver.instantiate()
