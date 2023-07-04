@@ -36,8 +36,6 @@ render_target_update_mode = 4
 [node name="TileOverlay" type="Node2D" parent="ViewportContainer/SubViewport"]
 unique_name_in_owner = true
 script = ExtResource("4_5o13e")
-report_hovered_hex = false
-report_clicked_hex = false
 read_only = true
 calibration = {
 "hex_size": 58.2038,

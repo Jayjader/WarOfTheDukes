@@ -35,10 +35,7 @@ func finish_setup():
 	$SetupRoot.queue_free()
 	var game_play = GamePlay.instantiate()
 	add_child(game_play)
-	Board.report_clicked_hex = false
-	Board.report_hovered_hex = false
-	game_play.game_over.connect(end_game)
-	#%BoardRoot/Background/TileOverLay.connect("tile_hovered", game_play.choose)
+	game_play.connect("game_over", end_game)
 
 
 
@@ -52,4 +49,4 @@ func end_game(result: Enums.GameResult, winner=null):
 
 
 func _on_board_root_toggled_editing(editing: bool):
-	get_child(1).set_visible(not editing)
+	get_child(0).set_visible(not editing)

@@ -36,6 +36,13 @@ signal tl_set(position)
 		calibration = value
 		queue_redraw()
 
+var destinations: Dictionary = {}
+
+func clear_destinations():
+	destinations.clear()
+func set_destinations(new_values):
+	destinations = new_values
+
 var tiles_origin:
 	get:
 		match state.get("mode"):
@@ -209,6 +216,20 @@ func _draw():
 			Drawing.fill_hex(self, Util.hex_coords_to_pixel(tile, hex_size), hex_size, MapData.map.tiles[tile])
 		for border_center in MapData.map.borders:
 				Drawing.draw_border(self, MapData.map.borders[border_center], border_center, hex_size, Vector2(tiles_origin))
+		Drawing.draw_zone(self, "Movement Range", destinations.keys(), hex_size, origin)
+		for destination_tile in destinations:
+			self.draw_string_outline(
+				self.get_window().get_theme_default_font(),
+				Util.hex_coords_to_pixel(destination_tile, hex_size),
+				"%s" % destinations[destination_tile][1],
+				HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK
+			)
+			self.draw_string(
+				self.get_window().get_theme_default_font(),
+				Util.hex_coords_to_pixel(destination_tile, hex_size),
+				"%s" % destinations[destination_tile][1],
+				HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE
+			)
 		if state.get("hover") != null:
 			Drawing.draw_hover(self, current_mode, state.hover, Vector2(tiles_origin), MapData.map.hex_size_in_pixels)
 		

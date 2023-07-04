@@ -1,4 +1,5 @@
 extends Node2D
+class_name GamePiece
 
 @export var tile: Vector2i:
 	get:
@@ -8,12 +9,14 @@ extends Node2D
 @export var kind: Enums.Unit:
 	set(value):
 		$Label.set_text(Enums.Unit.find_key(value))
+		movement_points = Rules.MovementPoints[value]
 		kind = value
 @export var faction: Enums.Faction:
 	set(value):
 		$Label.add_theme_color_override("font_color", Drawing.faction_colors[value])
 		faction = value
 		# todo: set theme according to faction
+@export var movement_points: int
 
 @export var selectable: bool = false:
 	set(value):

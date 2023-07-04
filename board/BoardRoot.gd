@@ -49,6 +49,11 @@ func _unhandled_input(event):
 		if self.is_node_ready():
 			%TileOverlay.report_clicked_hex = value
 
+func paths_from(tile: Vector2i, max_cost: int):
+	return MapData.map.paths_from(tile, max_cost)
+func movement_cost(from_: Vector2i, to_: Vector2i) -> int:
+	var max_cost = 60
+	return paths_from(from_, max_cost)[to_][1]
 
 func _on_tile_overlay_hex_hovered(axial: Vector2i):
 	hex_hovered.emit(axial)
