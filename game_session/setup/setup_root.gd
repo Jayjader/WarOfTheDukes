@@ -20,7 +20,6 @@ const INSTRUCTIONS = {
 		current_player = value
 		%CurrentPlayer/Value.faction = value
 
-# todo: hoist unit layer as autoloaded singleton, then use as reference
 @export var pieces: Dictionary = {
 	Enums.Faction.Orfburg: { Enums.Unit.Duke: null, Enums.Unit.Infantry: [], Enums.Unit.Cavalry: [], Enums.Unit.Artillery: [] },
 	Enums.Faction.Wulfenburg: { Enums.Unit.Duke: null, Enums.Unit.Infantry: [], Enums.Unit.Cavalry: [], Enums.Unit.Artillery: [] },
@@ -166,7 +165,6 @@ func _exit_tree():
 
 
 func _on_auto_setup_pressed():
-	
 	while get_first_with_remaining(current_player) != null:
 		var player_territory = "%sTerritory" % Enums.Faction.find_key(current_player)
 		var unit_kind = get_first_with_remaining(current_player)
