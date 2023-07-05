@@ -125,7 +125,7 @@ func choose_mover(unit: GamePiece):
 		subphase = Enums.MovementSubPhase.CHOOSE_DESTINATION,
 		selection = unit,
 		moved = data.moved,
-		destinations = Board.paths_from(unit.tile, unit.movement_points)
+		destinations = Board.paths_for(unit)
 	}
 	Board.get_node("%TileOverlay").set_destinations(data.destinations)
 	Board.get_node("%UnitLayer").make_faction_selectable(null)

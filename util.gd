@@ -32,6 +32,14 @@ static func axial_to_cube(axial: Vector2):
 static func cube_to_axial(cube: Vector3):
 	return Vector2(cube.x, cube.y)
 
+static func neighbours_to_tile(axial: Vector2i) -> Array[Vector2i]:
+	var cube = axial_to_cube(Vector2(axial))
+	var neighbours: Array[Vector2i] = []
+	neighbours.resize(6)
+	for dir_index in range(6):
+		neighbours[dir_index] = Vector2i(cube_to_axial(Vector3(cube_directions[dir_index]) + cube))
+	return neighbours
+
 static func hex_coords_to_pixel(axial: Vector2, hex_size: float):
 	return hex_size * Vector2(
 		3 * axial.x,

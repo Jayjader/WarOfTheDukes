@@ -83,12 +83,16 @@ static func draw_border(node: Node2D, kind, border_center, hex_size, origin):
 			basis_index += 1
 		var first_rem = Util.cube_directions[(basis_index+6)%6]
 		var second_rem = Util.cube_directions[(basis_index+7)%6]
-
 		var bridge_offset_basis = Util.cube_to_axial(bridge_width * (first_rem - second_rem))
-		node.draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[0]) / 3, hex_size) + bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) + bridge_offset_basis, tile_colors[kind], 10)
-		node.draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[0]) / 3, hex_size) - bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) - bridge_offset_basis, tile_colors[kind], 10)
-		node.draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[1]) / 3, hex_size) + bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) + bridge_offset_basis, tile_colors[kind], 10)
-		node.draw_line(origin + Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[1]) / 3, hex_size) - bridge_offset_basis, origin + Util.hex_coords_to_pixel(border_center, hex_size) - bridge_offset_basis, tile_colors[kind], 10)
+		
+		var first_normal_in_pix = Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[0]) / 3, hex_size)
+		var second_normal_in_pix = Util.hex_coords_to_pixel(border_center + Util.cube_to_axial(normals[1]) / 3, hex_size)
+		var border_center_in_pix = Util.hex_coords_to_pixel(border_center, hex_size)
+		
+		node.draw_line(origin + first_normal_in_pix + bridge_offset_basis, origin + border_center_in_pix + bridge_offset_basis, tile_colors[kind], 10)
+		node.draw_line(origin + first_normal_in_pix - bridge_offset_basis, origin + border_center_in_pix - bridge_offset_basis, tile_colors[kind], 10)
+		node.draw_line(origin + second_normal_in_pix + bridge_offset_basis, origin + border_center_in_pix + bridge_offset_basis, tile_colors[kind], 10)
+		node.draw_line(origin + second_normal_in_pix - bridge_offset_basis, origin + border_center_in_pix - bridge_offset_basis, tile_colors[kind], 10)
 
 static func draw_hover(node: Node2D, mode, hovered, origin, hex_size):
 	var nearest_in_axial = Util.nearest_hex_in_axial(hovered, origin, hex_size)

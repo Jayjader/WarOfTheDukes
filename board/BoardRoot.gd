@@ -51,9 +51,22 @@ func _unhandled_input(event):
 
 func paths_from(tile: Vector2i, max_cost: int):
 	return MapData.map.paths_from(tile, max_cost)
-func movement_cost(from_: Vector2i, to_: Vector2i) -> int:
-	var max_cost = 60
-	return paths_from(from_, max_cost)[to_][1]
+func paths_for(unit: GamePiece):
+	var units = %UnitLayer.get_children(true).filter(func(node): return node.name != unit.name) as Array[GamePiece]
+	#var units = %UnitLayer.get_children(true) as Array[GamePiece]
+	return MapData.map.paths_for(unit, units as Array[GamePiece])
+	
+	var terrain_allowed = paths_from(unit.tile, unit.movement_points)
+	var zones_of_control = %UnitLayer.get_children().reduce(func(accum, node):
+		if node == unit or node.faction == unit.faction:
+			return accum
+		for neighbour in Util.neighbours_to_tile(node.tile):
+			accum[neighbour] = true
+		return accum
+		, {})
+	for tile in zones_of_control:
+		terrain_allowed.erase(tile)
+	return terrain_allowed
 
 func _on_tile_overlay_hex_hovered(axial: Vector2i):
 	hex_hovered.emit(axial)
