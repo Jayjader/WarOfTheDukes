@@ -79,13 +79,12 @@ text = "Choose a unit to move"
 
 [node name="LeftMargin" type="MarginContainer" parent="."]
 layout_mode = 1
-anchors_preset = 4
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_top = -44.5
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -869.0
 offset_right = 546.0
-offset_bottom = 44.5
-grow_vertical = 2
+grow_vertical = 0
 theme_override_constants/margin_left = 10
 
 [node name="HBoxContainer" type="HBoxContainer" parent="LeftMargin"]
@@ -94,12 +93,6 @@ layout_mode = 2
 [node name="VBox" type="VBoxContainer" parent="LeftMargin/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-
-[node name="ToggleInstructions" type="Button" parent="LeftMargin/HBoxContainer/VBox"]
-layout_mode = 2
-toggle_mode = true
-button_pressed = true
-text = "View Instructions"
 
 [node name="Panel" type="PanelContainer" parent="LeftMargin/HBoxContainer/VBox"]
 custom_minimum_size = Vector2(0, 800)
@@ -141,5 +134,11 @@ Lakes can not be entered.
 Rivers can not be crossed (but a Bridge over a River can be crossed - cost as specified above).
 "
 autowrap_mode = 3
+
+[node name="ToggleInstructions" type="Button" parent="LeftMargin/HBoxContainer/VBox"]
+layout_mode = 2
+toggle_mode = true
+button_pressed = true
+text = "View Instructions"
 
 [connection signal="toggled" from="LeftMargin/HBoxContainer/VBox/ToggleInstructions" to="LeftMargin/HBoxContainer/VBox/Panel" method="set_visible"]
