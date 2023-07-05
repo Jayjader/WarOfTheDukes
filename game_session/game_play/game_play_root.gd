@@ -99,8 +99,8 @@ func _on_unit_selection(selected_unit: GamePiece):
 		Enums.CombatSubPhase.CHOOSE_DEFENDER:
 			choose_defender(selected_unit)
 
-func _on_hex_selection(tile, kind, faction):
-	print_debug("_on_hex_selection %s %s %s" % [kind, faction, tile])
+func _on_hex_selection(tile, kind, zones):
+	print_debug("_on_hex_selection %s %s %s" % [kind, zones, tile])
 	match data.subphase:
 		Enums.MovementSubPhase.CHOOSE_UNIT:
 			pass
@@ -114,8 +114,20 @@ func _on_hex_selection(tile, kind, faction):
 				}
 				Board.get_node("%TileOverlay").clear_destinations()
 			else:
-				if tile in data.destinations:
-					choose_destination(tile)
+				if tile not in data.destinations:
+					return
+				# no need to filter for faction, as tile would not be in data.destinations if it contained an enemy unit
+				var current_occupents = Board.get_units_on(tile)
+				match len(current_occupents):
+					0: pass
+					1:
+						if kind != "City" and kind != "Fortress":
+							return
+						var unit = current_occupents.front()
+						if (unit.kind == Enums.Unit.Duke) == (mover.kind == Enums.Unit.Duke):
+							return
+					_: return
+				choose_destination(tile)
 
 func choose_mover(unit: GamePiece):
 	Board.report_clicked_hex = true

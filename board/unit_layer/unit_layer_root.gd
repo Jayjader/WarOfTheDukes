@@ -23,6 +23,8 @@ func make_faction_selectable(faction, omit=[]):
 	for unit in get_children():
 		unit.selectable = (unit.faction == faction and not omit.has(unit))
 
+func get_units(faction: Enums.Faction):
+	return get_children().filter(func(unit): return unit.faction == faction)
 
 func _unselect_all_units():
 	for unit in get_children():

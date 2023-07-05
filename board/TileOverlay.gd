@@ -231,7 +231,18 @@ func _draw():
 				HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE
 			)
 		if state.get("hover") != null:
-			Drawing.draw_hover(self, current_mode, state.hover, Vector2(tiles_origin), MapData.map.hex_size_in_pixels)
+			# todo: cache nearest hovered tile to only re-draw when it changes (ie when cursor hovers over a *different* tile)
+			# maybe split tile overlay into separate layers [in the node/scene tree]?
+			Drawing.draw_hover(self, current_mode, state.hover, Vector2(tiles_origin), hex_size)
+			var nearest_tile = Util.nearest_hex_in_axial(state.hover, Vector2(tiles_origin), hex_size)
+			if nearest_tile in destinations:
+				while nearest_tile != null:
+					var from_ = destinations[nearest_tile]
+					self.draw_line(
+						Util.hex_coords_to_pixel(nearest_tile, hex_size),
+						Util.hex_coords_to_pixel(destinations[nearest_tile][0], hex_size),
+						Color.RED, 8, true)
+					nearest_tile = from_[0] if from_[1] > 0 else null
 		
 	elif current_mode == Enums.TileOverlayMode.CALIBRATING:
 		if calibration.mode <= Enums.TileOverlayCalibration.CALIBRATING_SIZE:
