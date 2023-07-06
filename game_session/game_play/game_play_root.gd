@@ -50,24 +50,32 @@ Rivers can not be crossed (but a Bridge over a River can be crossed - cost as sp
 				Enums.PlayPhase.MOVEMENT:
 					%MovementPhase.set_visible(true)
 					%CombatPhase.set_visible(false)
+					%EndMovementPhase.set_visible(true)
+					%EndCombatPhase.set_visible(false)
 				Enums.PlayPhase.COMBAT:
 					%MovementPhase.set_visible(false)
 					%CombatPhase.set_visible(true)
+					%EndMovementPhase.set_visible(false)
+					%EndCombatPhase.set_visible(true)
 			%PhaseInstruction.text = PHASE_INSTRUCTIONS[current_phase]
 
 const INSTRUCTIONS = {
+	Enums.PlayPhase.MOVEMENT: {
 	Enums.MovementSubPhase.CHOOSE_UNIT: "Choose a unit to move",
 	Enums.MovementSubPhase.CHOOSE_DESTINATION: "Choose the destination tile for the selected unit",
+	},
+	Enums.PlayPhase.COMBAT: {
+	Enums.CombatSubPhase.CHOOSE_ATTACKERS: "Choose the next attacker(s) to participate in combat",
+	Enums.CombatSubPhase.CHOOSE_DEFENDER: "Choose defender for combat with the chosen attackers",
+	},
 }
 var data: Dictionary:
 	set(value):
 		data = value
 		if self.is_node_ready():
-			%SubPhaseInstruction.text = INSTRUCTIONS[data.subphase]
+			%SubPhaseInstruction.text = INSTRUCTIONS[current_phase][data.subphase]
 
 
-func _on_current_player_change():
-	_unit_layer_root.make_faction_selectable(current_player)
 
 var _random = RandomNumberGenerator.new()
 
@@ -77,9 +85,9 @@ var _tile_layer_root
 func _ready():
 	_unit_layer_root = Board.get_node("%UnitLayer")
 	_tile_layer_root = Board.get_node("%TileOverlay")
-	_on_current_player_change()
 	Board.report_clicked_hex = false
 	Board.report_hovered_hex = false
+	_unit_layer_root.make_faction_selectable(current_player)
 	_unit_layer_root.connect("unit_clicked", self._on_unit_selection)
 	unit_moved.connect(_unit_layer_root.move_unit)
 	match current_phase:
@@ -93,20 +101,24 @@ func detect_game_result():
 
 func _on_unit_selection(selected_unit: GamePiece, now_selected: bool):
 	print_debug("_on_unit_selection %s %s %s, now selected: %s" % [Enums.Unit.find_key(selected_unit.kind), Enums.Faction.find_key(selected_unit.faction), selected_unit.tile, now_selected])
-	match data.subphase:
-		Enums.MovementSubPhase.CHOOSE_UNIT:
-			if selected_unit in data.moved or not now_selected:
-				return
-			choose_mover(selected_unit)
-		Enums.MovementSubPhase.CHOOSE_DESTINATION:
-			if not now_selected:
-				cancel_mover_choice()
-			else:
-				print_debug("moving to ")
-		Enums.CombatSubPhase.CHOOSE_ATTACKERS:
-			choose_attacker(selected_unit)
-		Enums.CombatSubPhase.CHOOSE_DEFENDER:
-			choose_defender(selected_unit)
+	match current_phase:
+		Enums.PlayPhase.MOVEMENT:
+			match data.subphase:
+				Enums.MovementSubPhase.CHOOSE_UNIT:
+					if selected_unit in data.moved or not now_selected:
+						return
+					choose_mover(selected_unit)
+				Enums.MovementSubPhase.CHOOSE_DESTINATION:
+					if not now_selected:
+						cancel_mover_choice()
+					else:
+						print_debug("moving to ")
+		Enums.PlayPhase.COMBAT:
+			match data.subphase:
+				Enums.CombatSubPhase.CHOOSE_ATTACKERS:
+					choose_attacker(selected_unit)
+				Enums.CombatSubPhase.CHOOSE_DEFENDER:
+					choose_defender(selected_unit)
 
 func _on_hex_selection(tile, kind, zones):
 	print_debug("_on_hex_selection %s %s %s" % [kind, zones, tile])

@@ -156,9 +156,17 @@ grow_vertical = 0
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="EndPhase" type="Button" parent="BottomRightMargin"]
+[node name="EndMovementPhase" type="Button" parent="BottomRightMargin"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "End Phase"
+text = "End Movement Phase"
+
+[node name="EndCombatPhase" type="Button" parent="BottomRightMargin"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "End Combat Phase"
 
 [connection signal="toggled" from="BottomLeftMargin/HBoxContainer/VBox/ToggleInstructions" to="BottomLeftMargin/HBoxContainer/VBox/Panel" method="set_visible"]
+[connection signal="pressed" from="BottomRightMargin/EndMovementPhase" to="." method="confirm_movement"]
+[connection signal="pressed" from="BottomRightMargin/EndCombatPhase" to="." method="confirm_combat"]
