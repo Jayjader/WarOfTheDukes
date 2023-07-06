@@ -77,7 +77,7 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Choose a unit to move"
 
-[node name="LeftMargin" type="MarginContainer" parent="."]
+[node name="BottomLeftMargin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
@@ -86,35 +86,36 @@ offset_top = -869.0
 offset_right = 546.0
 grow_vertical = 0
 theme_override_constants/margin_left = 10
+theme_override_constants/margin_bottom = 10
 
-[node name="HBoxContainer" type="HBoxContainer" parent="LeftMargin"]
+[node name="HBoxContainer" type="HBoxContainer" parent="BottomLeftMargin"]
 layout_mode = 2
 
-[node name="VBox" type="VBoxContainer" parent="LeftMargin/HBoxContainer"]
+[node name="VBox" type="VBoxContainer" parent="BottomLeftMargin/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Panel" type="PanelContainer" parent="LeftMargin/HBoxContainer/VBox"]
+[node name="Panel" type="PanelContainer" parent="BottomLeftMargin/HBoxContainer/VBox"]
 custom_minimum_size = Vector2(0, 800)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Margin" type="MarginContainer" parent="LeftMargin/HBoxContainer/VBox/Panel"]
+[node name="Margin" type="MarginContainer" parent="BottomLeftMargin/HBoxContainer/VBox/Panel"]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="VBox" type="VBoxContainer" parent="LeftMargin/HBoxContainer/VBox/Panel/Margin"]
+[node name="VBox" type="VBoxContainer" parent="BottomLeftMargin/HBoxContainer/VBox/Panel/Margin"]
 layout_mode = 2
 
-[node name="ScrollContainer" type="ScrollContainer" parent="LeftMargin/HBoxContainer/VBox/Panel/Margin/VBox"]
+[node name="ScrollContainer" type="ScrollContainer" parent="BottomLeftMargin/HBoxContainer/VBox/Panel/Margin/VBox"]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="PhaseInstruction" type="Label" parent="LeftMargin/HBoxContainer/VBox/Panel/Margin/VBox/ScrollContainer"]
+[node name="PhaseInstruction" type="Label" parent="BottomLeftMargin/HBoxContainer/VBox/Panel/Margin/VBox/ScrollContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -135,10 +136,29 @@ Rivers can not be crossed (but a Bridge over a River can be crossed - cost as sp
 "
 autowrap_mode = 3
 
-[node name="ToggleInstructions" type="Button" parent="LeftMargin/HBoxContainer/VBox"]
+[node name="ToggleInstructions" type="Button" parent="BottomLeftMargin/HBoxContainer/VBox"]
 layout_mode = 2
 toggle_mode = true
 button_pressed = true
 text = "View Instructions"
 
-[connection signal="toggled" from="LeftMargin/HBoxContainer/VBox/ToggleInstructions" to="LeftMargin/HBoxContainer/VBox/Panel" method="set_visible"]
+[node name="BottomRightMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -175.0
+offset_top = -61.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="EndPhase" type="Button" parent="BottomRightMargin"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "End Phase"
+
+[connection signal="toggled" from="BottomLeftMargin/HBoxContainer/VBox/ToggleInstructions" to="BottomLeftMargin/HBoxContainer/VBox/Panel" method="set_visible"]

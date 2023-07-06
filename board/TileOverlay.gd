@@ -282,11 +282,15 @@ func _unhandled_input(event):
 					get_viewport().set_input_as_handled()
 					print_debug("hex clicked at pix %s" % integer_pix)
 					var tile = Util.nearest_hex_in_axial(integer_pix, origin, MapData.map.hex_size_in_pixels)
+					if MapData.map.tiles.get(tile) == null:
+						return
+					get_viewport().set_input_as_handled()
 					var zones = []
 					for zone in MapData.map.zones:
 						if MapData.map.zones[zone].has(tile):
 							zones.append(zone)
 					hex_clicked.emit(tile, MapData.map.tiles.get(tile), zones)
+					return
 			Enums.TileOverlayMode.CALIBRATING:
 				match calibration.mode:
 					Enums.TileOverlayCalibration.CALIBRATING_BL:
@@ -309,7 +313,6 @@ func _unhandled_input(event):
 				paint_zone(Util.nearest_hex_in_axial(integer_pix, origin, calibration.hex_size), state.selection)
 			_:
 				return
-		get_viewport().set_input_as_handled()
 		queue_redraw()
 	elif event is InputEventMouseMotion:
 		var capture = false
@@ -324,5 +327,6 @@ func _unhandled_input(event):
 			state.hover = get_viewport_transform().affine_inverse() * Vector2(event.position)
 			if report_hovered_hex:
 				hex_hovered.emit(Util.nearest_hex_in_axial(state.hover, tiles_origin, MapData.map.hex_size_in_pixels))
-				get_viewport().set_input_as_handled()
+				#get_viewport().set_input_as_handled()
+			# todo: split hover drawing into child node, to split draw caching for the tiles and borders, and the decorations that lie on top (hover, destinations)
 			queue_redraw()

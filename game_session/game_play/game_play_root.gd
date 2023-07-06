@@ -67,33 +67,42 @@ var data: Dictionary:
 
 
 func _on_current_player_change():
-	Board.get_node("%UnitLayer").make_faction_selectable(current_player)
+	_unit_layer_root.make_faction_selectable(current_player)
+
+var _random = RandomNumberGenerator.new()
+
+var _unit_layer_root
+var _tile_layer_root
 
 func _ready():
+	_unit_layer_root = Board.get_node("%UnitLayer")
+	_tile_layer_root = Board.get_node("%TileOverlay")
 	_on_current_player_change()
 	Board.report_clicked_hex = false
 	Board.report_hovered_hex = false
-	Board.get_node("%UnitLayer").connect("unit_clicked", self._on_unit_selection)
+	_unit_layer_root.connect("unit_clicked", self._on_unit_selection)
+	unit_moved.connect(_unit_layer_root.move_unit)
 	match current_phase:
 		Enums.PlayPhase.MOVEMENT:
 			data = { subphase = Enums.MovementSubPhase.CHOOSE_UNIT, moved = {} }
 		Enums.PlayPhase.COMBAT:
 			data = { subphase = Enums.CombatSubPhase.CHOOSE_ATTACKERS }
-	Board.get_node("%UnitLayer").make_faction_selectable(current_player)
-	unit_moved.connect(Board.get_node("%UnitLayer").move_unit)
 
 func detect_game_result():
 	return Enums.GameResult.DRAW # todo
 
-func _on_unit_selection(selected_unit: GamePiece):
-	print_debug("_on_unit_selection %s %s %s" % [selected_unit.kind, selected_unit.faction, selected_unit.tile])
+func _on_unit_selection(selected_unit: GamePiece, now_selected: bool):
+	print_debug("_on_unit_selection %s %s %s, now selected: %s" % [Enums.Unit.find_key(selected_unit.kind), Enums.Faction.find_key(selected_unit.faction), selected_unit.tile, now_selected])
 	match data.subphase:
 		Enums.MovementSubPhase.CHOOSE_UNIT:
-			if data.moved.values().has(selected_unit.tile):
+			if selected_unit in data.moved or not now_selected:
 				return
 			choose_mover(selected_unit)
 		Enums.MovementSubPhase.CHOOSE_DESTINATION:
-			pass
+			if not now_selected:
+				cancel_mover_choice()
+			else:
+				print_debug("moving to ")
 		Enums.CombatSubPhase.CHOOSE_ATTACKERS:
 			choose_attacker(selected_unit)
 		Enums.CombatSubPhase.CHOOSE_DEFENDER:
@@ -107,56 +116,65 @@ func _on_hex_selection(tile, kind, zones):
 		Enums.MovementSubPhase.CHOOSE_DESTINATION:
 			var mover = data.selection
 			if mover.tile == tile:
-				data = {
-					subphase = Enums.MovementSubPhase.CHOOSE_UNIT,
-					moved = data.moved,
-					destinations = {}
-				}
-				Board.get_node("%TileOverlay").clear_destinations()
-			else:
-				if tile not in data.destinations:
-					return
-				# no need to filter for faction, as tile would not be in data.destinations if it contained an enemy unit
-				var current_occupents = Board.get_units_on(tile)
-				match len(current_occupents):
-					0: pass
-					1:
-						if kind != "City" and kind != "Fortress":
-							return
-						var unit = current_occupents.front()
-						if (unit.kind == Enums.Unit.Duke) == (mover.kind == Enums.Unit.Duke):
-							return
-					_: return
-				choose_destination(tile)
+				print_debug("choice should have been cancelled by unit")
+				return
+			if tile not in data.destinations:
+				return
+			# assumption: no need to filter for faction, as tile would not be in data.destinations if it contained an enemy unit
+			var current_occupents = Board.get_units_on(tile)
+			match len(current_occupents):
+				0: pass
+				1:
+					if kind != "City" and kind != "Fortress":
+						return
+					var unit = current_occupents.front()
+					if (unit.kind == Enums.Unit.Duke) == (mover.kind == Enums.Unit.Duke):
+						return
+				_: return
+			choose_destination(tile)
 
 func choose_mover(unit: GamePiece):
 	Board.report_clicked_hex = true
 	Board.report_hovered_hex = true
 	Board.hex_clicked.connect(self._on_hex_selection)
+	
 	data = {
 		subphase = Enums.MovementSubPhase.CHOOSE_DESTINATION,
 		selection = unit,
 		moved = data.moved,
 		destinations = Board.paths_for(unit)
 	}
-	Board.get_node("%TileOverlay").set_destinations(data.destinations)
-	Board.get_node("%UnitLayer").make_faction_selectable(null)
+	_tile_layer_root.set_destinations(data.destinations)
+	_unit_layer_root.make_faction_selectable(null, [unit])
 
+func cancel_mover_choice():
+	Board.report_clicked_hex = false
+	Board.report_hovered_hex = false
+	Board.hex_clicked.disconnect(self._on_hex_selection)
+	var choice: GamePiece = data.selection
+	data = {
+		subphase = Enums.MovementSubPhase.CHOOSE_UNIT,
+		moved = data.moved,
+		destinations = {}
+	}
+	_tile_layer_root.clear_destinations()
+	_unit_layer_root.make_faction_selectable(choice.faction, data.moved.keys())
 
 signal unit_moved(mover: GamePiece, from_:Vector2i, to_: Vector2i)
 func choose_destination(destination_tile: Vector2i):
 	Board.hex_clicked.disconnect(self._on_hex_selection)
-	var mover = data.selection
+	Board.report_clicked_hex = false
+	Board.report_hovered_hex = false
+	var mover: GamePiece = data.selection
 	data.moved[mover] = [mover.tile, destination_tile]
 	data = {
 		subphase = Enums.MovementSubPhase.CHOOSE_UNIT,
 		moved = data.moved,
 	}
-	Board.report_clicked_hex = false
-	Board.report_hovered_hex = false
-	Board.get_node("%TileOverlay").clear_destinations()
-	Board.get_node("%UnitLayer").make_faction_selectable(current_player, data.moved.keys())
+	_tile_layer_root.clear_destinations()
 	unit_moved.emit(mover, mover.tile, destination_tile)
+	mover.selectable = false
+	_unit_layer_root.make_faction_selectable(current_player, data.moved.keys())
 
 func confirm_movement():
 	current_phase = Enums.PlayPhase.COMBAT
@@ -165,7 +183,7 @@ func confirm_movement():
 		attacked = {},
 		attacking = [],
 	}
-	Board.get_node("%UnitLayer").make_faction_selectable(current_player)
+	_unit_layer_root.make_faction_selectable(current_player)
 
 
 func choose_attacker(attacker: GamePiece):

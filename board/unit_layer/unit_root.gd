@@ -18,22 +18,32 @@ class_name GamePiece
 		# todo: set theme according to faction
 @export var movement_points: int
 
+@onready var _original_outline: Color = $Label.get_theme_color("font_outline_color")
+
+func _set_label_text_outline():
+	if _selected:
+		$Label.add_theme_color_override("font_outline_color", Color.ORANGE)
+	elif selectable:
+		$Label.add_theme_color_override("font_outline_color", Color.LIGHT_GRAY)
+	else:
+		$Label.add_theme_color_override("font_outline_color", _original_outline)
+	
 @export var selectable: bool = false:
 	set(value):
 		selectable = value
-		if not selectable:
-			_selected = false
+		self._set_label_text_outline()
 
-signal selected
+signal selected(value: bool)
 var _selected: bool = false:
 	set(value):
 		if _selected != value:
 			_selected = value
-			if _selected:
-				selected.emit()
-				$Label.add_theme_color_override("font_color", Color.REBECCA_PURPLE)
-			else:
-				$Label.add_theme_color_override("font_color", Drawing.faction_colors[faction])
+			self._set_label_text_outline()
+			selected.emit(_selected)
+
+
+func unselect():
+	_selected = false
 
 func _unhandled_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
@@ -41,7 +51,5 @@ func _unhandled_input(event):
 			var hex_size = MapData.map.hex_size_in_pixels
 			var clicked_tile = Util.nearest_hex_in_axial(get_viewport_transform().affine_inverse() * event.position, Vector2i(0, 0), hex_size)
 			if clicked_tile == self.tile:
-			#var distance = tile.distance_to(self.position)
-			#if  distance < hex_size:
 				get_viewport().set_input_as_handled()
 				_selected = not _selected
