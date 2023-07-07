@@ -41,7 +41,11 @@ The document is unclear on whether moving "backwards" means in the context of a 
 1. remaining in the existing attacker/defender axis, effectively moving "straight" backwards,
 2. moving to any tile that increases the attacker/defender distance by 1, effectively moving either "straight" backwards or "diagonally".
 
-More concretely, consider an adjacent attacker/defender pair (respectively `A` and `C` in [!](./docs/example_0.png)). To retreat, the attacker could either choose from any of the top three pink tiles or be forced to choose the tile above it.
+More concretely, consider an adjacent attacker/defender pair (respectively `A` and `C` in the following figure:
+
+![A small portion of a hexagonal grid. On it are 2 units, named "A" and "C", which are adjacent to each other. A is directly "above" C. Each of the 6 tiles directly adjacent to A are tinted pink.](./docs/example_0.png)
+
+To retreat, the attacker could either choose from any of the top three pink tiles, or be forced to choose the tile above it.
 ##### Choice made: Backwards is Straight
 Units can only retreat following the axis determined by their tile and the "center of mass" of attacker's tiles, **away** from that center. If this falls upon the border between 2 tiles, a **random** choice is made between the 2.
 
