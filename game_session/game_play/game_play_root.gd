@@ -110,7 +110,26 @@ func _ready():
 			data = { subphase = Enums.CombatSubPhase.CHOOSE_ATTACKERS }
 
 func detect_game_result():
-	return Enums.GameResult.MINOR_VICTORY # todo
+	for capital_faction in [Enums.Faction.Orfburg, Enums.Faction.Wulfenburg]:
+		var capital_tiles = MapData.map.zones[Enums.Faction.find_key(capital_faction)]
+		var occupants_by_faction =  capital_tiles.reduce(func(accum, tile):
+			var units = Board.get_units_on(tile)
+			for unit in units:
+				accum[unit.faction] += 1
+			return accum
+		, { Enums.Faction.Orfburg: 0, Enums.Faction.Wulfenburg: 0 })
+		if (occupants_by_faction[capital_faction] == 0) and (occupants_by_faction[Enums.get_other_faction(capital_faction)] > 0):
+			return [Enums.GameResult.TOTAL_VICTORY, Enums.get_other_faction(capital_faction)]
+	
+	var occupants_by_faction = { Enums.Faction.Orfburg: 0, Enums.Faction.Wulfenburg: 0 }
+	for zone in ["BetweenRivers", "Kaiserburg"]:
+		var tiles = MapData.map.zones[zone]
+		for tile in tiles:
+			for unit in Board.get_units_on(tile):
+				occupants_by_faction[unit.faction] += 1
+	if occupants_by_faction[Enums.Faction.Orfburg] > 0 and occupants_by_faction[Enums.Faction.Wulfenburg] == 0:
+		return [Enums.GameResult.MINOR_VICTORY, Enums.Faction.Orfburg]
+	return [Enums.GameResult.MINOR_VICTORY, Enums.Faction.Wulfenburg]
 
 func _in_attack_range(attacker: GamePiece, defender: GamePiece):
 	return Util.cube_distance(
@@ -354,7 +373,8 @@ func choose_defender(defender: GamePiece):
 func confirm_combat():
 	if current_player == Enums.Faction.Wulfenburg:
 		if turn == MAX_TURNS:
-			game_over.emit(detect_game_result())
+			var results = detect_game_result()
+			game_over.emit(results[0], results[1])
 			return
 		turn += 1
 	current_player = Enums.get_other_faction(current_player)
