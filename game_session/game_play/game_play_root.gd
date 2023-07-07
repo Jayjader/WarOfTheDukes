@@ -279,7 +279,7 @@ func confirm_attackers():
 		attacking = data.attacking,
 		attacked = data.attacked,
 	}
-	_unit_layer_root.make_faction_selectable(Enums.get_other_faction(current_player))
+	_unit_layer_root.make_faction_selectable(Enums.get_other_faction(current_player), data.attacked.values())
 
 func cancel_attack():
 	var attackers = data.attacking
