@@ -94,6 +94,7 @@ layout_mode = 2
 [node name="VBox" type="VBoxContainer" parent="BottomLeftMargin/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+alignment = 2
 
 [node name="Panel" type="PanelContainer" parent="BottomLeftMargin/HBoxContainer/VBox"]
 custom_minimum_size = Vector2(0, 800)
