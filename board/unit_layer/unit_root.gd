@@ -42,9 +42,66 @@ var _selected: bool = false:
 			selected.emit(_selected)
 
 func retreat_from(defenders: Array):
-	print_debug("unit pretending to retreat...")
-	#todo: detect if retreat impossible
-	#todo: detect if unit could push another allied unit "out of the way" to retreat
+	## TODO: test this (at least manually)
+	var center_of_mass = Vector2(defenders.reduce(func(accum, defender): return accum + defender.tile, Vector2i(0, 0))) / len(defenders)
+	var self_to_center = (center_of_mass - self.tile)
+	# normalize
+	self_to_center /= Util.cube_distance(Util.axial_to_cube(self_to_center), Vector3(0, 0, 0))
+	var candidates = []
+	for direction in Util.cube_directions:
+		var distance_to_direction = Util.cube_distance(Util.axial_to_cube(self.tile) + direction, Util.axial_to_cube(center_of_mass))
+		if distance_to_direction < 0.2:
+			candidates.append(-direction)
+			break
+		elif distance_to_direction < 0.7:
+			# if this is true, none of the directions should fulfill the previous if condition
+			candidates.append(-direction)
+
+	candidates.shuffle()
+	var candidate_tiles = []
+	for direction in candidates:
+		var retreat_direction_in_axial = Util.cube_to_axial(direction)
+		if MapData.map.borders.get(Vector2(self.tile) + Vector2(retreat_direction_in_axial) / 2) == "River":
+			continue
+		
+		var candidate_tile = self.tile + retreat_direction_in_axial
+		var kind = MapData.map.tiles.get(candidate_tile)
+		if kind == null or kind == "Lake":
+			continue
+		
+		var current_tile_occupants = Board.get_units_on(candidate_tile)
+		if current_tile_occupants.any(func(unit): return unit.faction == Enums.get_other_faction(self.faction)):
+			continue
+		
+		elif len(current_tile_occupants) > 0:
+			var cascade_retreat_tiles = Util.neighbours_to_tile(candidate_tile).filter(func(tile): return len(Board.get_units_on(tile) == 0))
+			if len(cascade_retreat_tiles) == 0:
+				continue
+		
+		var enemy_zoc = false
+		for neighbour_tile in Util.neighbours_to_tile(candidate_tile):
+			if Board.get_units_on(neighbour_tile).any(func(unit): return unit.faction == Enums.get_other_faction(self.faction)):
+				enemy_zoc = true
+				break
+		
+		if enemy_zoc:
+			continue
+		
+		candidate_tiles.append(candidate_tile)
+	
+	if len(candidate_tiles) == 0:
+		self.die()
+	else:
+		candidate_tiles.shuffle()
+		var retreat_tile = candidate_tiles.pop_front()
+		var units_to_push = Board.get_units_on(retreat_tile)
+		if len(units_to_push) > 0:
+			var cascade_retreat_tiles = Util.neighbours_to_tile(retreat_tile).filter(func(tile): return len(Board.get_units_on(tile) == 0))
+			cascade_retreat_tiles.shuffle()
+			var cascade_push_destination_tile = cascade_retreat_tiles.pop_front()
+			for unit in units_to_push:
+				Board.get_node("%UnitLayer").move_unit(unit, unit.tile, cascade_push_destination_tile)
+		Board.get_node("%UnitLayer").move_unit(self, self.tile, retreat_tile)
 
 func die():
 	queue_free()
