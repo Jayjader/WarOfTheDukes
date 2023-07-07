@@ -312,20 +312,33 @@ func _calculate_effective_defense_strength(unit: GamePiece, duke_tile_in_cube):
 	if Util.cube_distance(Util.axial_to_cube(tile), duke_tile_in_cube) <= Rules.DukeAura.range:
 		base_strength *= Rules.DukeAura.multiplier
 	return base_strength
+func _allocate_exchange_losses(defense_strength: int, defender_in_cube, attackers, attacker_duke_in_cube):
+	attackers.shuffle()
+	var allocated = []
+	for attacker in attackers:
+	#while defense_strength > 0 and len(attackers) > 0:
+		#var attacker = attackers.pop_front()
+		if attacker.kind != Enums.Unit.Artillery or \
+			Util.cube_distance(Util.axial_to_cube(attacker.tile), defender_in_cube) < 2:
+			defense_strength -= _calculate_effective_attack_strength(attacker, attacker_duke_in_cube)
+			attacker.die()
+			if defense_strength <= 0:
+				break
 func _resolve_combat(attackers, defender):
 	print_debug("### Combat ###")
-	var duke_in_cube
+	var attacker_duke_in_cube
 	for faction_unit in Board.get_node("%UnitLayer").get_units(attackers.front().faction):
 		if faction_unit.kind == Enums.Unit.Duke:
-			duke_in_cube = Util.axial_to_cube(faction_unit.tile)
+			attacker_duke_in_cube = Util.axial_to_cube(faction_unit.tile)
 			break
-	var total_attack_strength = attackers.reduce(func(accum, a): return accum + _calculate_effective_attack_strength(a, duke_in_cube), 0)
+	var total_attack_strength = attackers.reduce(func(accum, a): return accum + _calculate_effective_attack_strength(a, attacker_duke_in_cube), 0)
 	print_debug("Effective Total Attack Strength: %s" % total_attack_strength)
+	var defender_duke_in_cube
 	for faction_unit in Board.get_node("%UnitLayer").get_units(defender.faction):
 		if faction_unit.kind == Enums.Unit.Duke:
-			duke_in_cube = Util.axial_to_cube(faction_unit.tile)
+			defender_duke_in_cube = Util.axial_to_cube(faction_unit.tile)
 			break
-	var defense_strength = _calculate_effective_defense_strength(defender, duke_in_cube)
+	var defense_strength = _calculate_effective_defense_strength(defender, defender_duke_in_cube)
 	print_debug("Effective Defense Strength: %s" % defense_strength)
 	
 	var numerator
@@ -345,18 +358,26 @@ func _resolve_combat(attackers, defender):
 	match result:
 		CR.AttackerEliminated:
 			for attacker in attackers:
-				attacker.die()
+				if attacker.kind != Enums.Unit.Artillery or Util.cube_distance(
+					Util.axial_to_cube(attacker.tile),
+					Util.axial_to_cube(defender.tile)
+					) < 2:
+					attacker.die()
 		CR.AttackerRetreats:
 			for attacker in attackers:
-				attacker.retreat()
+				if attacker.kind != Enums.Unit.Artillery or Util.cube_distance(
+					Util.axial_to_cube(attacker.tile),
+					Util.axial_to_cube(defender.tile)
+					) < 2:
+					attacker.retreat_from([defender])
 		CR.Exchange:
+			var defender_tile = Util.axial_to_cube(defender.tile)
 			defender.die()
-			#todo: attackers totaling in strength the same as the defender
-			#todo: make & record game design choice on whether to allow player to allocate losses amongst attackers
+			_allocate_exchange_losses(defense_strength, defender_tile, attackers, attacker_duke_in_cube)
+			if defender.kind == Enums.Unit.Duke:
+				game_over.emit(Enums.GameResult.TOTAL_VICTORY, Enums.get_other_faction(defender.faction))
 		CR.DefenderRetreats:
-			#var tile_retreated_from = defender.tile
-			defender.retreat()
-			#todo: offer attacking player to advance one of their attackers to occupy the tile the defender has just retreated from
+			defender.retreat_from(attackers)
 		CR.DefenderEliminated:
 			defender.die()
 			if defender.kind == Enums.Unit.Duke:

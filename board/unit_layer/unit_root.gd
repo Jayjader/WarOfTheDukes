@@ -41,7 +41,7 @@ var _selected: bool = false:
 			self._set_label_text_outline()
 			selected.emit(_selected)
 
-func retreat():
+func retreat_from(defenders: Array):
 	print_debug("unit pretending to retreat...")
 	#todo: detect if retreat impossible
 	#todo: detect if unit could push another allied unit "out of the way" to retreat
