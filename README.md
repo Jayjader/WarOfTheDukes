@@ -14,7 +14,7 @@ More concretely: after the Orfburg player has finished their movement phase, doe
 ### Choice made: Move/Fight/Move/Fight
 The Orfburg player, once declaring their Movement Phase finished, directly proceeds to their Combat Phase. After they similarly declare that Combat Phase to be finished, play proceeds to the Wulfenberg player's Movement Phase.
 
-## Victory Condition Detection / Game Resolution
+## Victory Condition Detection / Game Resolution (Early Win?)
 ### Problem statement
 The document is unclear on *when* to inspect the game state to declare the overall game result:
 1. as soon as it "could be" determined,
@@ -27,7 +27,56 @@ More concretely: the Orfburg player currently has units on every tile of the "ci
 Play continues until the end of turn 15, upon which the victory conditions are evaluated and minor/major victory attributed to a faction. The only exception is the death of a Duke, which immediately ends the game in a major victory for the opposing faction.
 
 This presents several benefits:
-1. simplified game logic, as we only need to introspect the entire game state for victory conditions once.
-2. prevents "cheese" strategies that could cheapen the feeling of victory or defeat; for example, a concerted push on an early turn could immediately give a minor victory to one faction, while their opponent could successfully contest the objective(s) in play in the following turns.
-3. increases value of longer-turn strategy over all 15 turns?
-4. increases chances of interesting turn-by-turn decisions for players emerging from gameplay?
+- simplified game logic, as we only need to introspect the entire game state for victory conditions once.
+- prevents "cheese" strategies that could cheapen the feeling of victory or defeat; for example, a concerted push on an early turn could immediately give a minor victory to one faction, while their opponent could successfully contest the objective(s) in play in the following turns.
+- increases value of longer-turn strategy over all 15 turns?
+- increases chances of interesting turn-by-turn decisions for players emerging from gameplay?
+
+
+## Combat Specifics
+### Retreat
+#### Directions Allowed (What Is Backwards?)
+##### Problem statement
+The document is unclear on whether moving "backwards" means in the context of a retreat:
+1. remaining in the existing attacker/defender axis, effectively moving "straight" backwards,
+2. moving to any tile that increases the attacker/defender distance by 1, effectively moving either "straight" backwards or "diagonally".
+
+More concretely, consider an adjacent attacker/defender pair (respectively `A` and `C` in [!](./docs/example_0.png)). To retreat, the attacker could either choose from any of the top three pink tiles or be forced to choose the tile above it.
+##### Choice made: Backwards is Straight
+Units can only retreat following the axis determined by their tile and the "center of mass" of attacker's tiles, **away** from that center. If this falls upon the border between 2 tiles, a **random** choice is made between the 2.
+
+This gives us:
+- simplicity in implementation (no need to hand control over to opposite player, no need to discriminate between attacker retreating and defender retreating in logic)
+- simplicity in gameplay (less granular decisions for the player to make, player retains control throughout their turn)
+
+#### Pushing Allies (Chain vs Single)
+##### Problem statement
+The document is unclear on how many allied units can be "pushed" out of the way for a retreating unit. Two obvious choices:
+1. only 1 unit can move out of the way,
+2. an unlimited amount of units can move out of the way (if the last in the "retreat chain" has at least 1 empty tile to move into beforehand).
+
+More concretely: a unit is adjacent to an enemy unit, and is surrounded on the other neighbouring tiles by allied units. Some of these allied units are *also* effectively surrounded by allied units (effectively in the sense that at least one neighbouring, otherwise accessible tile is currently occupied by an allied unit). The first unit in question attacks the enemy unit, on its own, which resolves to an `AttackerRetreats` result. Can another allied unit move out of the way of one of the allied units adjacent to the first, or does a *different* adjacent unit [that *can* move to a different tile] need to move out of the way?
+
+The logic for the 2 could be combined to further generalize to an arbitrary limit - finite or not. However, it does not appear obvious to this project's author that such a design decision would intrinsicly make the game more fun than choosing either of the previous choices.
+##### Choice made: Single
+Only 1 "additional" unit can "participate" in a retreat for a given combat.
+
+Rationale: simplicity in game logic and gameplay. This also makes "lines" of units "deeper" than 2 more risky, rewards flanking more, and makes massed combat more deadly in general, as melee combattants are much more likely to be unable to to retreat from a lost combat.
+
+### Exchange
+#### Loss Allocation (Random vs Player Choice)
+##### Problem statement
+The document is unclear on whether loss allocation amongst the attackers of an exchange is up to any player's choice. The choices are:
+- the attacking player allocates them
+- the defending player allocates them
+- the losses amongst the attackers are allocated at random (amongst melee attackers, of course)
+##### Choice made: Attacking Player Allocates
+The attacker selects attacking units until their combined offensive strength equals that of the [killed] defender's defensive strength.
+
+#### Which Strength (Effective vs Base)
+##### Problem statement
+The document is unclear on whether loss allocation during an exchange is based off of the base attack strength of each attacker, or their effective strength given the current position of all units on the board.
+
+More concretely: are terrain- and duke-aura-based strength multipliers applied when referencing "how much" attacker strength needs to be allocated as a loss for an Exchange combat result?
+##### Choice made: Effective
+Total attack strength includes duke aura effects, and defender's defensive strength is affected by terrain and duke aura multipliers. This increases the risk towards attackers when attacking "garisonned" units (and reduces risk for those defenders), and increases the impact of duke's auras.
