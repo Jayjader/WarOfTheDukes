@@ -179,7 +179,7 @@ anchor_bottom = 0.5
 grow_horizontal = 0
 grow_vertical = 2
 script = ExtResource("7_6tn5h")
-tiles = Array[String](["Plains", "Woods", "Hills", "City", "Fortress", "Lake"])
+tiles = Array[String](["Plains", "Woods", "Cliff", "City", "Fortress", "Lake"])
 borders = Array[String](["Road", "River", "Bridge", "Bridge (No Road)"])
 zones = Array[String](["Orfburg", "Wulfenburg", "Kaiserburg", "BetweenRivers", "OrfburgTerritory", "WulfenburgTerritory"])
 
