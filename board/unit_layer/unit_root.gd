@@ -22,7 +22,7 @@ class_name GamePiece
 
 func _set_label_text_outline():
 	if _selected:
-		$Label.add_theme_color_override("font_outline_color", Color.ORANGE)
+		$Label.add_theme_color_override("font_outline_color", Color.GOLD)
 	elif selectable:
 		$Label.add_theme_color_override("font_outline_color", Color.LIGHT_GRAY)
 	else:
@@ -41,6 +41,13 @@ var _selected: bool = false:
 			self._set_label_text_outline()
 			selected.emit(_selected)
 
+func retreat():
+	print_debug("unit pretending to retreat...")
+	#todo: detect if retreat impossible
+	#todo: detect if unit could push another allied unit "out of the way" to retreat
+
+func die():
+	queue_free()
 
 func unselect():
 	_selected = false

@@ -32,6 +32,10 @@ static func axial_to_cube(axial: Vector2):
 static func cube_to_axial(cube: Vector3):
 	return Vector2(cube.x, cube.y)
 
+static func cube_distance(a, b):
+	return (abs(a.x - b.x) + abs(a.y - b.y) + abs(a.z - b.z)) / 2
+
+
 static func neighbours_to_tile(axial: Vector2i) -> Array[Vector2i]:
 	var cube = axial_to_cube(Vector2(axial))
 	var neighbours: Array[Vector2i] = []

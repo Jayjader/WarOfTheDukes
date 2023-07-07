@@ -52,11 +52,13 @@ Rivers can not be crossed (but a Bridge over a River can be crossed - cost as sp
 					%CombatPhase.set_visible(false)
 					%EndMovementPhase.set_visible(true)
 					%EndCombatPhase.set_visible(false)
+					%ConfirmAttackers.set_visible(false)
 				Enums.PlayPhase.COMBAT:
 					%MovementPhase.set_visible(false)
 					%CombatPhase.set_visible(true)
 					%EndMovementPhase.set_visible(false)
-					%EndCombatPhase.set_visible(true)
+					%EndCombatPhase.set_visible(false)
+					%ConfirmAttackers.set_visible(false)
 			%PhaseInstruction.text = PHASE_INSTRUCTIONS[current_phase]
 
 const INSTRUCTIONS = {
@@ -74,6 +76,17 @@ var data: Dictionary:
 		data = value
 		if self.is_node_ready():
 			%SubPhaseInstruction.text = INSTRUCTIONS[current_phase][data.subphase]
+			if current_phase == Enums.PlayPhase.COMBAT:
+				match data.subphase:
+					Enums.CombatSubPhase.CHOOSE_ATTACKERS:
+						var at_least_one_attacking = len(data.attacking) > 0
+						%ConfirmAttackers.set_visible(at_least_one_attacking)
+						%EndCombatPhase.set_visible(not at_least_one_attacking)
+						%CancelAttack.set_visible(false)
+					Enums.CombatSubPhase.CHOOSE_DEFENDER:
+						%ConfirmAttackers.set_visible(false)
+						%EndCombatPhase.set_visible(false)
+						%CancelAttack.set_visible(true)
 
 
 
@@ -99,6 +112,12 @@ func _ready():
 func detect_game_result():
 	return Enums.GameResult.DRAW # todo
 
+func _in_attack_range(attacker: GamePiece, defender: GamePiece):
+	return Util.cube_distance(
+		Util.axial_to_cube(attacker.tile),
+		Util.axial_to_cube(defender.tile)
+		) <= (Rules.ArtilleryRange if attacker.kind == Enums.Unit.Artillery else 1)
+	
 func _on_unit_selection(selected_unit: GamePiece, now_selected: bool):
 	print_debug("_on_unit_selection %s %s %s, now selected: %s" % [Enums.Unit.find_key(selected_unit.kind), Enums.Faction.find_key(selected_unit.faction), selected_unit.tile, now_selected])
 	match current_phase:
@@ -116,9 +135,15 @@ func _on_unit_selection(selected_unit: GamePiece, now_selected: bool):
 		Enums.PlayPhase.COMBAT:
 			match data.subphase:
 				Enums.CombatSubPhase.CHOOSE_ATTACKERS:
-					choose_attacker(selected_unit)
+					if selected_unit in data.attacking:
+						remove_attacker(selected_unit)
+					elif selected_unit not in data.attacked:
+						add_attacker(selected_unit)
 				Enums.CombatSubPhase.CHOOSE_DEFENDER:
-					choose_defender(selected_unit)
+					if now_selected:
+						selected_unit.unselect()
+						if data.attacking.all(func(attacker): return _in_attack_range(attacker, selected_unit)):
+							choose_defender(selected_unit)
 
 func _on_hex_selection(tile, kind, zones):
 	print_debug("_on_hex_selection %s %s %s" % [kind, zones, tile])
@@ -198,8 +223,15 @@ func confirm_movement():
 	_unit_layer_root.make_faction_selectable(current_player)
 
 
-func choose_attacker(attacker: GamePiece):
+func add_attacker(attacker: GamePiece):
 	data.attacking.append(attacker)
+	data = {
+		subphase = Enums.CombatSubPhase.CHOOSE_ATTACKERS,
+		attacking = data.attacking,
+		attacked = data.attacked,
+	}
+func remove_attacker(attacker: GamePiece):
+	data.attacking.erase(attacker)
 	data = {
 		subphase = Enums.CombatSubPhase.CHOOSE_ATTACKERS,
 		attacking = data.attacking,
@@ -217,19 +249,106 @@ const COMBAT_RESULTs = {
 	Vector2i(3, 1): [CR.DefenderRetreats, CR.DefenderRetreats, CR.DefenderRetreats, CR.DefenderRetreats, CR.DefenderRetreats, CR.AttackerRetreats],
 	Vector2i(4, 1): [CR.DefenderEliminated, CR.DefenderRetreats, CR.DefenderRetreats, CR.DefenderRetreats, CR.DefenderRetreats, CR.Exchange],
 	Vector2i(5, 1): [CR.DefenderEliminated, CR.DefenderEliminated, CR.DefenderEliminated, CR.DefenderRetreats, CR.DefenderRetreats, CR.Exchange],
-	Vector2i(1, 6): [CR.DefenderEliminated, CR.DefenderEliminated, CR.DefenderEliminated, CR.DefenderEliminated, CR.Exchange, CR.Exchange],
+	Vector2i(6, 1): [CR.DefenderEliminated, CR.DefenderEliminated, CR.DefenderEliminated, CR.DefenderEliminated, CR.Exchange, CR.Exchange],
 }
 
 
-func choose_defender(defender: GamePiece):
-	for attacker in data.attacking:
-		data.attacked[attacker] = defender
+func confirm_attackers():
+	data = {
+		subphase = Enums.CombatSubPhase.CHOOSE_DEFENDER,
+		attacking = data.attacking,
+		attacked = data.attacked,
+	}
+	_unit_layer_root.make_faction_selectable(Enums.get_other_faction(current_player))
+
+func cancel_attack():
+	var attackers = data.attacking
+	for unit in attackers:
+		unit.unselect()
 	data = {
 		subphase = Enums.CombatSubPhase.CHOOSE_ATTACKERS,
 		attacking = [],
 		attacked = data.attacked,
 	}
-	#todo: resolve combat - don't forget about handling Duke auras!
+	_unit_layer_root.make_faction_selectable(current_player, data.attacked.keys())
+
+func _calculate_effective_attack_strength(unit: GamePiece, duke_tile_in_cube):
+	var tile = unit.tile
+	var base_strength = Rules.AttackStrength[unit.kind]
+	if Util.cube_distance(Util.axial_to_cube(tile), duke_tile_in_cube) <= Rules.DukeAura.range:
+		base_strength *= Rules.DukeAura.multiplier
+	return base_strength
+func _calculate_effective_defense_strength(unit: GamePiece, duke_tile_in_cube):
+	var tile = unit.tile
+	var base_strength = Rules.DefenseStrength[unit.kind]
+	var terrain_multiplier = Rules.DefenseMultiplier.get(MapData.map.tiles[tile])
+	if terrain_multiplier != null:
+		base_strength *= terrain_multiplier
+	if Util.cube_distance(Util.axial_to_cube(tile), duke_tile_in_cube) <= Rules.DukeAura.range:
+		base_strength *= Rules.DukeAura.multiplier
+	return base_strength
+func _resolve_combat(attackers, defender):
+	print_debug("### Combat ###")
+	var duke_in_cube
+	for faction_unit in Board.get_node("%UnitLayer").get_units(attackers.front().faction):
+		if faction_unit.kind == Enums.Unit.Duke:
+			duke_in_cube = Util.axial_to_cube(faction_unit.tile)
+			break
+	var total_attack_strength = attackers.reduce(func(accum, a): return accum + _calculate_effective_attack_strength(a, duke_in_cube), 0)
+	print_debug("Effective Total Attack Strength: %s" % total_attack_strength)
+	for faction_unit in Board.get_node("%UnitLayer").get_units(defender.faction):
+		if faction_unit.kind == Enums.Unit.Duke:
+			duke_in_cube = Util.axial_to_cube(faction_unit.tile)
+			break
+	var defense_strength = _calculate_effective_defense_strength(defender, duke_in_cube)
+	print_debug("Effective Defense Strength: %s" % defense_strength)
+	
+	var numerator
+	var denominator
+	var ratio = float(total_attack_strength) / float(defense_strength)
+	if ratio > 1:
+		numerator = min(6, floori(ratio))
+		denominator = 1
+	else:
+		numerator = 1
+		denominator = min(5, floori(1 / ratio))
+	print_debug("Effective Ratio: %s to %s" % [numerator, denominator])
+	var result_spread = COMBAT_RESULTs[Vector2i(numerator, denominator)]
+	var result = result_spread[_random.randi_range(0, 5)]
+	print_debug("Result: %s" % CR.find_key(result))
+	
+	match result:
+		CR.AttackerEliminated:
+			for attacker in attackers:
+				attacker.die()
+		CR.AttackerRetreats:
+			for attacker in attackers:
+				attacker.retreat()
+		CR.Exchange:
+			#todo: remove defender, and attackers totaling in strength the same as the defender
+			#todo: make & record game design choice on allowing player to allocate losses amongst attackers
+			pass
+		CR.DefenderRetreats:
+			#var tile_retreated_from = defender.tile
+			defender.retreat()
+			#todo: offer attacking player to advance one of their attackers to occupy the tile the defender has just retreated from
+		CR.DefenderEliminated:
+			defender.die()
+
+func choose_defender(defender: GamePiece):
+	var attackers = data.attacking
+	var result = _resolve_combat(attackers, defender)
+	for attacker in attackers:
+		data.attacked[attacker] = defender
+	# todo: check victory conditions (duke death)
+	data = {
+		subphase = Enums.CombatSubPhase.CHOOSE_ATTACKERS,
+		attacking = [],
+		attacked = data.attacked,
+	}
+	for unit in attackers:
+		unit.unselect()
+	_unit_layer_root.make_faction_selectable(current_player, data.attacked.keys())
 
 func confirm_combat():
 	if current_player == Enums.Faction.Wulfenburg:
@@ -243,3 +362,4 @@ func confirm_combat():
 		subphase = Enums.MovementSubPhase.CHOOSE_UNIT,
 		moved = {},
 	}
+	_unit_layer_root.make_faction_selectable(current_player)

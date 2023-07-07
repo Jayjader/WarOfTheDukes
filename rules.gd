@@ -18,3 +18,29 @@ const MovementCost = {
 	"Forest": 2,
 	"Cliff": 2,
 }
+
+const AttackStrength = {
+	Enums.Unit.Duke: 0,
+	Enums.Unit.Infantry: 5,
+	Enums.Unit.Cavalry: 2,
+	Enums.Unit.Artillery: 3,
+}
+
+const DefenseStrength = {
+	Enums.Unit.Duke: 1,
+	Enums.Unit.Infantry: 5,
+	Enums.Unit.Cavalry: 2,
+	Enums.Unit.Artillery: 3,
+}
+
+const DefenseMultiplier = {
+	"City": 2,
+	"Fortress": 3,
+}
+
+const DukeAura = {
+	range = 2,
+	multiplier = 2,
+}
+
+const ArtilleryRange = 2

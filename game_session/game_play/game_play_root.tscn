@@ -167,6 +167,20 @@ visible = false
 layout_mode = 2
 text = "End Combat Phase"
 
+[node name="ConfirmAttackers" type="Button" parent="BottomRightMargin"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Choose Defender"
+
+[node name="CancelAttack" type="Button" parent="BottomRightMargin"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Cancel Attack"
+
 [connection signal="toggled" from="BottomLeftMargin/HBoxContainer/VBox/ToggleInstructions" to="BottomLeftMargin/HBoxContainer/VBox/Panel" method="set_visible"]
 [connection signal="pressed" from="BottomRightMargin/EndMovementPhase" to="." method="confirm_movement"]
 [connection signal="pressed" from="BottomRightMargin/EndCombatPhase" to="." method="confirm_combat"]
+[connection signal="pressed" from="BottomRightMargin/ConfirmAttackers" to="." method="confirm_attackers"]
+[connection signal="pressed" from="BottomRightMargin/CancelAttack" to="." method="cancel_attack"]
