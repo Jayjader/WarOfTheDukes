@@ -1,6 +1,6 @@
 extends Control
 
-signal game_over(result: Enums.GameResult, winner)
+signal game_over(result: Enums.GameResult, winner: Enums.Faction)
 
 const MAX_TURNS = 15
 @export_range(1, MAX_TURNS) var turn: int = 1:
@@ -110,7 +110,7 @@ func _ready():
 			data = { subphase = Enums.CombatSubPhase.CHOOSE_ATTACKERS }
 
 func detect_game_result():
-	return Enums.GameResult.DRAW # todo
+	return Enums.GameResult.MINOR_VICTORY # todo
 
 func _in_attack_range(attacker: GamePiece, defender: GamePiece):
 	return Util.cube_distance(
@@ -325,22 +325,23 @@ func _resolve_combat(attackers, defender):
 			for attacker in attackers:
 				attacker.retreat()
 		CR.Exchange:
-			#todo: remove defender, and attackers totaling in strength the same as the defender
-			#todo: make & record game design choice on allowing player to allocate losses amongst attackers
-			pass
+			defender.die()
+			#todo: attackers totaling in strength the same as the defender
+			#todo: make & record game design choice on whether to allow player to allocate losses amongst attackers
 		CR.DefenderRetreats:
 			#var tile_retreated_from = defender.tile
 			defender.retreat()
 			#todo: offer attacking player to advance one of their attackers to occupy the tile the defender has just retreated from
 		CR.DefenderEliminated:
 			defender.die()
+			if defender.kind == Enums.Unit.Duke:
+				game_over.emit(Enums.GameResult.TOTAL_VICTORY, Enums.get_other_faction(defender.faction))
 
 func choose_defender(defender: GamePiece):
 	var attackers = data.attacking
 	var result = _resolve_combat(attackers, defender)
 	for attacker in attackers:
 		data.attacked[attacker] = defender
-	# todo: check victory conditions (duke death)
 	data = {
 		subphase = Enums.CombatSubPhase.CHOOSE_ATTACKERS,
 		attacking = [],

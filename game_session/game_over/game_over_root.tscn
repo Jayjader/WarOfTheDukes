@@ -1,0 +1,59 @@
+[gd_scene load_steps=2 format=3 uid="uid://p16825x8r5wb"]
+
+[ext_resource type="Script" path="res://game_session/game_over/game_over_root.gd" id="1_5c2kw"]
+
+[node name="GameOverRoot" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_5c2kw")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -198.0
+offset_top = -121.0
+offset_right = 198.0
+offset_bottom = 121.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margins" type="MarginContainer" parent="PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="PanelContainer/Margins"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="VBox" type="VBoxContainer" parent="PanelContainer/Margins/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="VictoryType" type="Label" parent="PanelContainer/Margins/VBox/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="WinningFaction" type="Label" parent="PanelContainer/Margins/VBox/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="NewGameLobby" type="Button" parent="PanelContainer/Margins/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Create New Game Lobby"
+
+[node name="CloseSession" type="Button" parent="PanelContainer/Margins/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Return To Main Menu"

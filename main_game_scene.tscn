@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://b67vykg1enpfk"]
+[gd_scene load_steps=2 format=3 uid="uid://b67vykg1enpfk"]
 
 [ext_resource type="Script" path="res://main_game_scene.gd" id="1_10cqv"]
-[ext_resource type="PackedScene" uid="uid://bq2ere0f57kax" path="res://main_menu_root.tscn" id="2_ybf8k"]
 
 [node name="MainGameScene" type="Control"]
 layout_mode = 3
@@ -12,8 +11,3 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_10cqv")
-
-[node name="MainMenuRoot" parent="." instance=ExtResource("2_ybf8k")]
-layout_mode = 1
-
-[connection signal="new_game_started" from="MainMenuRoot" to="." method="_on_main_menu_root_new_game_started"]

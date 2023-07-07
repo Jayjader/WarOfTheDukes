@@ -2,6 +2,7 @@ extends Control
 
 const Setup = preload("res://game_session/setup/setup_root.tscn")
 const GamePlay = preload("res://game_session/game_play/game_play_root.tscn")
+const GameOver = preload("res://game_session/game_over/game_over_root.tscn")
 
 @export var player_1: Enums.Faction
 
@@ -35,17 +36,20 @@ func finish_setup():
 	$SetupRoot.queue_free()
 	var game_play = GamePlay.instantiate()
 	add_child(game_play)
-	game_play.connect("game_over", end_game)
+	game_play.game_over.connect(end_game)
 
 
-
+signal new_lobby_started
+signal session_closed
 func end_game(result: Enums.GameResult, winner=null):
 	mode = Enums.SessionMode.GAME_OVER
-	#$GamePlay.queue_free()
-	#var game_over = GameOver.instantiate()
-	#game_over.result = result
-	#game_over.winner = winner
-	#add_child(game_over)
+	$GamePlayRoot.queue_free()
+	var game_over = GameOver.instantiate()
+	game_over.result = result
+	game_over.winner = winner
+	add_child(game_over)
+	game_over.new_lobby_created.connect(func(): new_lobby_started.emit())
+	game_over.session_closed.connect(func(): session_closed.emit())
 
 
 func _on_board_root_toggled_editing(editing: bool):

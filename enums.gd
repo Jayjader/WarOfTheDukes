@@ -55,6 +55,6 @@ enum CombatResult {
 	DefenderEliminated,
 }
 
-enum MainMode { MainMenu, NewGameLobby, InGame, GameOver  }
+enum MainMode { MainMenu, NewGameLobby, InGame }
 
-enum GameResult { DRAW, MINOR_VICTORY, TOTAL_VICTORY }
+enum GameResult { MINOR_VICTORY, TOTAL_VICTORY }

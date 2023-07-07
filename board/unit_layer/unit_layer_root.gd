@@ -34,3 +34,7 @@ func _unselect_all_units():
 func move_unit(mover: GamePiece, from_: Vector2i, to_: Vector2i):
 	mover.tile = to_
 	mover.unselect()
+
+func _remove_all_pieces():
+	for unit in get_children():
+		unit.queue_free()

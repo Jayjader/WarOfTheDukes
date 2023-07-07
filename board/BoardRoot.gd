@@ -67,3 +67,6 @@ func _on_tile_overlay_hex_clicked(axial: Vector2i, kind, zones=[]):
 
 func _on_setup_root_unit_placed(tile, kind, faction):
 	%UnitLayer._place_piece(tile, kind, faction)
+
+func wipe_units_off():
+	%UnitLayer._remove_all_pieces()
