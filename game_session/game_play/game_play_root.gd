@@ -112,14 +112,15 @@ func _ready():
 func detect_game_result():
 	for capital_faction in [Enums.Faction.Orfburg, Enums.Faction.Wulfenburg]:
 		var capital_tiles = MapData.map.zones[Enums.Faction.find_key(capital_faction)]
+		var hostile_faction = Enums.get_other_faction(capital_faction)
 		var occupants_by_faction =  capital_tiles.reduce(func(accum, tile):
 			var units = Board.get_units_on(tile)
 			for unit in units:
 				accum[unit.faction] += 1
 			return accum
 		, { Enums.Faction.Orfburg: 0, Enums.Faction.Wulfenburg: 0 })
-		if (occupants_by_faction[capital_faction] == 0) and (occupants_by_faction[Enums.get_other_faction(capital_faction)] > 0):
-			return [Enums.GameResult.TOTAL_VICTORY, Enums.get_other_faction(capital_faction)]
+		if (occupants_by_faction[capital_faction] == 0) and (occupants_by_faction[hostile_faction] > 0):
+			return [Enums.GameResult.TOTAL_VICTORY, hostile_faction]
 	
 	var occupants_by_faction = { Enums.Faction.Orfburg: 0, Enums.Faction.Wulfenburg: 0 }
 	for zone in ["BetweenRivers", "Kaiserburg"]:
