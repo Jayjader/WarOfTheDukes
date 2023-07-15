@@ -41,26 +41,26 @@ var _selected: bool = false:
 			self._set_label_text_outline()
 			selected.emit(_selected)
 
-func retreat_from(defenders: Array):
+## Attempts to move the unit 1 tile away from the average position of the group/list of opponents passed as arguments. Returns whether the retreat attempt was successful
+func attempt_retreat_from(defenders: Array) -> bool:
 	## TODO: test this (at least manually)
 	var center_of_mass = Vector2(defenders.reduce(func(accum, defender): return accum + defender.tile, Vector2i(0, 0))) / len(defenders)
-	var self_to_center = (center_of_mass - self.tile)
+	var self_to_center = (center_of_mass - Vector2(self.tile))
 	# normalize
 	self_to_center /= Util.cube_distance(Util.axial_to_cube(self_to_center), Vector3(0, 0, 0))
 	var candidates = []
 	for direction in Util.cube_directions:
-		var distance_to_direction = Util.cube_distance(Util.axial_to_cube(self.tile) + direction, Util.axial_to_cube(center_of_mass))
-		if distance_to_direction < 0.2:
-			candidates.append(-direction)
-			break
-		elif distance_to_direction < 0.7:
-			# if this is true, none of the directions should fulfill the previous if condition
+		var distance_to_direction = Util.cube_distance(Util.axial_to_cube(self.tile) + Vector3(direction), Util.axial_to_cube(center_of_mass))
+		#if distance_to_direction < 0.2:
+		#	candidates.append(-direction)
+		#	break
+		if distance_to_direction < 0.7:
 			candidates.append(-direction)
 
 	candidates.shuffle()
 	var candidate_tiles = []
 	for direction in candidates:
-		var retreat_direction_in_axial = Util.cube_to_axial(direction)
+		var retreat_direction_in_axial = Vector2i(Util.cube_to_axial(direction))
 		if MapData.map.borders.get(Vector2(self.tile) + Vector2(retreat_direction_in_axial) / 2) == "River":
 			continue
 		
@@ -74,7 +74,7 @@ func retreat_from(defenders: Array):
 			continue
 		
 		elif len(current_tile_occupants) > 0:
-			var cascade_retreat_tiles = Util.neighbours_to_tile(candidate_tile).filter(func(tile): return len(Board.get_units_on(tile) == 0))
+			var cascade_retreat_tiles = Util.neighbours_to_tile(candidate_tile).filter(func(tile): return len(Board.get_units_on(tile)) == 0)
 			if len(cascade_retreat_tiles) == 0:
 				continue
 		
@@ -90,18 +90,32 @@ func retreat_from(defenders: Array):
 		candidate_tiles.append(candidate_tile)
 	
 	if len(candidate_tiles) == 0:
+		print_debug("Nowhere to retreat to for unit %s" % self)
 		self.die()
+		return false
 	else:
 		candidate_tiles.shuffle()
 		var retreat_tile = candidate_tiles.pop_front()
 		var units_to_push = Board.get_units_on(retreat_tile)
 		if len(units_to_push) > 0:
-			var cascade_retreat_tiles = Util.neighbours_to_tile(retreat_tile).filter(func(tile): return len(Board.get_units_on(tile) == 0))
+			var cascade_retreat_tiles = Util.neighbours_to_tile(retreat_tile).filter(
+				func(tile):
+					return (
+							len(Board.get_units_on(tile)) == 0
+						) and (
+							MapData.map.borders.get(Vector2(self.tile) + Vector2(tile - retreat_tile) / 2) == "River"
+						)
+			)
+			if len(cascade_retreat_tiles) == 0:
+				print_debug("Nowhere to push allies to make room for retreat of %s" % units_to_push)
+				self.die()
+				return false
 			cascade_retreat_tiles.shuffle()
 			var cascade_push_destination_tile = cascade_retreat_tiles.pop_front()
 			for unit in units_to_push:
 				Board.get_node("%UnitLayer").move_unit(unit, unit.tile, cascade_push_destination_tile)
 		Board.get_node("%UnitLayer").move_unit(self, self.tile, retreat_tile)
+		return true
 
 func die():
 	queue_free()

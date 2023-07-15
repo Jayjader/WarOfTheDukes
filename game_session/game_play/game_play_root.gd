@@ -351,8 +351,9 @@ func _resolve_combat(attackers, defender):
 		numerator = 1
 		denominator = min(5, floori(1 / ratio))
 	print_debug("Effective Ratio: %s to %s" % [numerator, denominator])
-	var result_spread = COMBAT_RESULTs[Vector2i(numerator, denominator)]
-	var result = result_spread[_random.randi_range(0, 5)]
+	#var result_spread = COMBAT_RESULTs[Vector2i(numerator, denominator)]
+	#var result = result_spread[_random.randi_range(0, 5)]
+	var result = Enums.CombatResult.DefenderRetreats
 	print_debug("Result: %s" % CR.find_key(result))
 	
 	match result:
@@ -369,7 +370,11 @@ func _resolve_combat(attackers, defender):
 					Util.axial_to_cube(attacker.tile),
 					Util.axial_to_cube(defender.tile)
 					) < 2:
-					attacker.retreat_from([defender])
+					if not attacker.attempt_retreat_from([defender]):
+						for unit in  Board.get_units_on(attacker.tile):
+							if unit.kind == Enums.Unit.Duke:
+								game_over.emit(Enums.GameResult.TOTAL_VICTORY, Enums.get_other_faction(unit.faction))
+					
 		CR.Exchange:
 			var defender_tile = Util.axial_to_cube(defender.tile)
 			defender.die()
@@ -377,7 +382,8 @@ func _resolve_combat(attackers, defender):
 			if defender.kind == Enums.Unit.Duke:
 				game_over.emit(Enums.GameResult.TOTAL_VICTORY, Enums.get_other_faction(defender.faction))
 		CR.DefenderRetreats:
-			defender.retreat_from(attackers)
+			if not defender.attempt_retreat_from(attackers) and defender.kind == Enums.Unit.Duke:
+				game_over.emit(Enums.GameResult.TOTAL_VICTORY, Enums.get_other_faction(defender.faction))
 		CR.DefenderEliminated:
 			defender.die()
 			if defender.kind == Enums.Unit.Duke:
