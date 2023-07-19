@@ -216,18 +216,19 @@ func _draw():
 			Drawing.fill_hex(self, Util.hex_coords_to_pixel(tile, hex_size), hex_size, MapData.map.tiles[tile])
 		for border_center in MapData.map.borders:
 				Drawing.draw_border(self, MapData.map.borders[border_center], border_center, hex_size, Vector2(tiles_origin))
-		Drawing.draw_zone(self, "Movement Range", destinations.keys(), hex_size, origin)
+		Drawing.draw_zone(self, "Movement Range", destinations.keys().filter(func(d): return destinations[d].can_stop_here), hex_size, origin)
 		for destination_tile in destinations:
+			var cost_to_reach = "%s" % destinations[destination_tile].cost_to_reach
 			self.draw_string_outline(
 				self.get_window().get_theme_default_font(),
 				Util.hex_coords_to_pixel(destination_tile, hex_size),
-				"%s" % destinations[destination_tile][1],
+				cost_to_reach,
 				HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK
 			)
 			self.draw_string(
 				self.get_window().get_theme_default_font(),
 				Util.hex_coords_to_pixel(destination_tile, hex_size),
-				"%s" % destinations[destination_tile][1],
+				cost_to_reach,
 				HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE
 			)
 		if state.get("hover") != null:
@@ -240,15 +241,15 @@ func _draw():
 					var from_ = destinations[nearest_tile]
 					self.draw_line(
 						Util.hex_coords_to_pixel(nearest_tile, hex_size),
-						Util.hex_coords_to_pixel(destinations[nearest_tile][0], hex_size),
+						Util.hex_coords_to_pixel(destinations[nearest_tile].from, hex_size),
 						Color.RED, 8, true)
-					nearest_tile = from_[0] if from_[1] > 0 else null
-		
+					nearest_tile = from_.from if from_.cost_to_reach > 0 else null
+
 	elif current_mode == Enums.TileOverlayMode.CALIBRATING:
 		if calibration.mode <= Enums.TileOverlayCalibration.CALIBRATING_SIZE:
 			Drawing.draw_calibration(self, calibration, temp_size, state.get("hover"))
 			return
-	
+
 		if calibration.mode == Enums.TileOverlayCalibration.CHOOSING_ORIGIN:
 			var hovered = state.get("hover")
 			if hovered != null:

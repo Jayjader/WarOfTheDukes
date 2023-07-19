@@ -177,24 +177,14 @@ func _on_hex_selection(tile, kind, zones):
 				return
 			if tile not in data.destinations:
 				return
-			# assumption: no need to filter for faction, as tile would not be in data.destinations if it contained an enemy unit
-			var current_occupents = Board.get_units_on(tile)
-			match len(current_occupents):
-				0: pass
-				1:
-					if kind != "City" and kind != "Fortress":
-						return
-					var unit = current_occupents.front()
-					if (unit.kind == Enums.Unit.Duke) == (mover.kind == Enums.Unit.Duke):
-						return
-				_: return
-			choose_destination(tile)
+			if data.destinations[tile].can_stop_here:
+				choose_destination(tile)
 
 func choose_mover(unit: GamePiece):
 	Board.report_clicked_hex = true
 	Board.report_hovered_hex = true
 	Board.hex_clicked.connect(self._on_hex_selection)
-	
+
 	data = {
 		subphase = Enums.MovementSubPhase.CHOOSE_DESTINATION,
 		selection = unit,
