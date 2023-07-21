@@ -4,7 +4,7 @@ extends Camera2D
 
 @export var max_zoom = 2
 
-@export var zoom_factor = 0.1
+@export var zoom_factor = 0.05
 
 @export var zoom_duration = 0.2
 
@@ -16,19 +16,14 @@ var _zoom_level = 1:
 			"zoom",
 			Vector2.ONE * clamped,
 			zoom_duration
-		).set_ease(Tween.EASE_IN)
+		).set_ease(Tween.EASE_OUT)
 		_zoom_level = clamped
 
-func _unhandled_input(event):
-	if event.is_action_pressed("Increase Camera Zoom"):
-		_zoom_level = log(exp(_zoom_level) + zoom_factor)
-	elif event.is_action_pressed("Decrease Camera Zoom"):
-		_zoom_level = log(exp(_zoom_level) - zoom_factor)
-	else:
-		return
-	get_viewport().set_input_as_handled()
-
 func _process(_delta):
+	if Input.is_action_pressed("Increase Camera Zoom"):
+		_zoom_level = log(exp(_zoom_level) * (1+zoom_factor))
+	if Input.is_action_pressed("Decrease Camera Zoom"):
+		_zoom_level = log(exp(_zoom_level) * (1-zoom_factor))
 	if Input.is_action_pressed("Move Camera Left"):
 		position.x -= 20 / _zoom_level
 	if Input.is_action_pressed("Move Camera Up"):
