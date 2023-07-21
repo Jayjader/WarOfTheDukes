@@ -63,32 +63,32 @@ func attempt_retreat_from(defenders: Array) -> bool:
 		var retreat_direction_in_axial = Vector2i(Util.cube_to_axial(direction))
 		if MapData.map.borders.get(Vector2(self.tile) + Vector2(retreat_direction_in_axial) / 2) == "River":
 			continue
-		
+
 		var candidate_tile = self.tile + retreat_direction_in_axial
-		var kind = MapData.map.tiles.get(candidate_tile)
-		if kind == null or kind == "Lake":
+		var tile_kind = MapData.map.tiles.get(candidate_tile)
+		if tile_kind == null or tile_kind == "Lake":
 			continue
-		
+
 		var current_tile_occupants = Board.get_units_on(candidate_tile)
 		if current_tile_occupants.any(func(unit): return unit.faction == Enums.get_other_faction(self.faction)):
 			continue
-		
+
 		elif len(current_tile_occupants) > 0:
 			var cascade_retreat_tiles = Util.neighbours_to_tile(candidate_tile).filter(func(tile): return len(Board.get_units_on(tile)) == 0)
 			if len(cascade_retreat_tiles) == 0:
 				continue
-		
+
 		var enemy_zoc = false
 		for neighbour_tile in Util.neighbours_to_tile(candidate_tile):
 			if Board.get_units_on(neighbour_tile).any(func(unit): return unit.faction == Enums.get_other_faction(self.faction)):
 				enemy_zoc = true
 				break
-		
+
 		if enemy_zoc:
 			continue
-		
+
 		candidate_tiles.append(candidate_tile)
-	
+
 	if len(candidate_tiles) == 0:
 		print_debug("Nowhere to retreat to for unit %s" % self)
 		self.die()
