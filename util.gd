@@ -61,7 +61,7 @@ static func round_to_nearest_hex(cube: Vector3):
 	var q_diff = abs(rounded.x - cube.x)
 	var r_diff = abs(rounded.y - cube.y)
 	var s_diff = abs(rounded.z - cube.z)
-	
+
 	if q_diff > r_diff and q_diff > s_diff:
 		rounded.x = -rounded.y-rounded.z
 	elif r_diff > s_diff:
@@ -91,7 +91,7 @@ static func direction_to_center_in_cube(nearest_in_cube: Vector3):
 			direction_in_cube = 0
 		else: # bottom-left
 			direction_in_cube = 3
-	
+
 	if direction_in_cube != null:
 		return cube_directions[direction_in_cube]
 

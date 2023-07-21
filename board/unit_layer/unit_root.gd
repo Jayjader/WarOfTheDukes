@@ -27,7 +27,7 @@ func _set_label_text_outline():
 		$Label.add_theme_color_override("font_outline_color", Color.LIGHT_GRAY)
 	else:
 		$Label.add_theme_color_override("font_outline_color", _original_outline)
-	
+
 @export var selectable: bool = false:
 	set(value):
 		selectable = value

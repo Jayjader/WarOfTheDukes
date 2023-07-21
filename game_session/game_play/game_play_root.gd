@@ -121,7 +121,7 @@ func detect_game_result():
 		, { Enums.Faction.Orfburg: 0, Enums.Faction.Wulfenburg: 0 })
 		if (occupants_by_faction[capital_faction] == 0) and (occupants_by_faction[hostile_faction] > 0):
 			return [Enums.GameResult.TOTAL_VICTORY, hostile_faction]
-	
+
 	var occupants_by_faction = { Enums.Faction.Orfburg: 0, Enums.Faction.Wulfenburg: 0 }
 	for zone in ["BetweenRivers", "Kaiserburg"]:
 		var tiles = MapData.map.zones[zone]
@@ -137,7 +137,7 @@ func _in_attack_range(attacker: GamePiece, defender: GamePiece):
 		Util.axial_to_cube(attacker.tile),
 		Util.axial_to_cube(defender.tile)
 		) <= (Rules.ArtilleryRange if attacker.kind == Enums.Unit.Artillery else 1)
-	
+
 func _on_unit_selection(selected_unit: GamePiece, now_selected: bool):
 	print_debug("_on_unit_selection %s %s %s, now selected: %s" % [Enums.Unit.find_key(selected_unit.kind), Enums.Faction.find_key(selected_unit.faction), selected_unit.tile, now_selected])
 	match current_phase:
@@ -183,6 +183,7 @@ func _on_hex_selection(tile, kind, zones):
 func choose_mover(unit: GamePiece):
 	Board.report_clicked_hex = true
 	Board.report_hovered_hex = true
+	Board.get_node("%HoverClick").draw_hover = true
 	Board.hex_clicked.connect(self._on_hex_selection)
 
 	data = {
@@ -197,6 +198,7 @@ func choose_mover(unit: GamePiece):
 func cancel_mover_choice():
 	Board.report_clicked_hex = false
 	Board.report_hovered_hex = false
+	Board.get_node("%HoverClick").draw_hover = false
 	Board.hex_clicked.disconnect(self._on_hex_selection)
 	var choice: GamePiece = data.selection
 	data = {
@@ -212,6 +214,7 @@ func choose_destination(destination_tile: Vector2i):
 	Board.hex_clicked.disconnect(self._on_hex_selection)
 	Board.report_clicked_hex = false
 	Board.report_hovered_hex = false
+	Board.get_node("%HoverClick").draw_hover = false
 	var mover: GamePiece = data.selection
 	data.moved[mover] = [mover.tile, destination_tile]
 	data = {
@@ -330,7 +333,7 @@ func _resolve_combat(attackers, defender):
 			break
 	var defense_strength = _calculate_effective_defense_strength(defender, defender_duke_in_cube)
 	print_debug("Effective Defense Strength: %s" % defense_strength)
-	
+
 	var numerator
 	var denominator
 	var ratio = float(total_attack_strength) / float(defense_strength)
@@ -345,7 +348,7 @@ func _resolve_combat(attackers, defender):
 	#var result = result_spread[_random.randi_range(0, 5)]
 	var result = Enums.CombatResult.DefenderRetreats
 	print_debug("Result: %s" % CR.find_key(result))
-	
+
 	match result:
 		CR.AttackerEliminated:
 			for attacker in attackers:
@@ -364,7 +367,7 @@ func _resolve_combat(attackers, defender):
 						for unit in  Board.get_units_on(attacker.tile):
 							if unit.kind == Enums.Unit.Duke:
 								game_over.emit(Enums.GameResult.TOTAL_VICTORY, Enums.get_other_faction(unit.faction))
-					
+
 		CR.Exchange:
 			var defender_tile = Util.axial_to_cube(defender.tile)
 			defender.die()

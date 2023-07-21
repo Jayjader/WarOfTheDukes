@@ -24,7 +24,7 @@ func _ready():
 		if _is_city_or_fort(tile, MapData.map):
 			orf_tiles[tile] = true
 	setup_root.empty_cities_and_forts[Enums.Faction.Orfburg] = orf_tiles.keys()
-	
+
 	var wulf_tiles = {}
 	for tile in MapData.map.zones.WulfenburgTerritory:
 		if _is_city_or_fort(tile, MapData.map):

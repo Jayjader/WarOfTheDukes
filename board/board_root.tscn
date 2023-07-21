@@ -1,9 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://bwst2xk4wn3l6"]
+[gd_scene load_steps=11 format=3 uid="uid://bwst2xk4wn3l6"]
 
 [ext_resource type="Script" path="res://board/BoardRoot.gd" id="1_7ngv4"]
+[ext_resource type="Script" path="res://board/tile_layer/TileOverlay.gd" id="2_g1bmc"]
 [ext_resource type="Texture2D" uid="uid://dgr4iw8ue00sq" path="res://docs/La guerre des ducs - Encart.jpg" id="3_o7vri"]
 [ext_resource type="Script" path="res://board/unit_layer/unit_layer_root.gd" id="4_3bm0a"]
-[ext_resource type="Script" path="res://board/TileOverlay.gd" id="4_5o13e"]
+[ext_resource type="Script" path="res://board/tile_layer/movement_range.gd" id="4_6mrs1"]
+[ext_resource type="Script" path="res://board/tile_layer/hover_click.gd" id="4_7yuta"]
 [ext_resource type="Script" path="res://game_session/OverBoardCamera.gd" id="5_eokpn"]
 [ext_resource type="Script" path="res://board/Direct.gd" id="6_s8gsq"]
 [ext_resource type="Script" path="res://board/Palette.gd" id="7_6tn5h"]
@@ -35,7 +37,7 @@ render_target_update_mode = 4
 
 [node name="TileOverlay" type="Node2D" parent="ViewportContainer/SubViewport"]
 unique_name_in_owner = true
-script = ExtResource("4_5o13e")
+script = ExtResource("2_g1bmc")
 read_only = true
 calibration = {
 "hex_size": 58.2038,
@@ -49,6 +51,14 @@ self_modulate = Color(1, 1, 1, 0)
 show_behind_parent = true
 texture = ExtResource("3_o7vri")
 centered = false
+
+[node name="MovementRange" type="Node2D" parent="ViewportContainer/SubViewport/TileOverlay"]
+unique_name_in_owner = true
+script = ExtResource("4_6mrs1")
+
+[node name="HoverClick" type="Node2D" parent="ViewportContainer/SubViewport/TileOverlay"]
+unique_name_in_owner = true
+script = ExtResource("4_7yuta")
 
 [node name="UnitLayer" type="Node2D" parent="ViewportContainer/SubViewport"]
 unique_name_in_owner = true
@@ -310,6 +320,8 @@ columns = 2
 [connection signal="hex_hovered" from="ViewportContainer/SubViewport/TileOverlay" to="." method="_on_tile_overlay_hex_hovered"]
 [connection signal="tl_set" from="ViewportContainer/SubViewport/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_tl_set"]
 [connection signal="tr_set" from="ViewportContainer/SubViewport/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_tr_set"]
+[connection signal="tile_hovered" from="ViewportContainer/SubViewport/TileOverlay/HoverClick" to="ViewportContainer/SubViewport/TileOverlay" method="_on_hex_hovered"]
+[connection signal="tile_hovered" from="ViewportContainer/SubViewport/TileOverlay/HoverClick" to="ViewportContainer/SubViewport/TileOverlay/MovementRange" method="_on_tile_hovered"]
 [connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/RestartCalibration" to="ViewportContainer/SubViewport/TileOverlay" method="start_calibration"]
 [connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/ChangeCalibrationStep/Previous" to="ViewportContainer/SubViewport/TileOverlay" method="previous_calibration_step"]
 [connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/ChangeCalibrationStep/Next" to="ViewportContainer/SubViewport/TileOverlay" method="next_calibration_step"]

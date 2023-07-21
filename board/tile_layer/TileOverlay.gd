@@ -14,11 +14,16 @@ signal tr_set(position)
 signal tl_set(position)
 
 @export var report_hovered_hex: bool = false:
+	get:
+		if self.is_node_ready():
+			return %HoverClick.capture_hover
+		return false
 	set(value):
-		report_hovered_hex = value
-		if not report_hovered_hex:
-			state.erase("hover")
-			queue_redraw()
+		if self.is_node_ready():
+			%HoverClick.capture_hover = value
+			if not value:
+				state.erase("hover")
+				queue_redraw()
 @export var report_clicked_hex: bool = false
 @export var read_only: bool:
 	get:
@@ -39,9 +44,11 @@ signal tl_set(position)
 var destinations: Dictionary = {}
 
 func clear_destinations():
-	destinations.clear()
+	%MovementRange.destinations.clear()
+	%MovementRange.queue_redraw()
 func set_destinations(new_values):
-	destinations = new_values
+	%MovementRange.destinations = new_values
+	%MovementRange.queue_redraw()
 
 var tiles_origin:
 	get:
@@ -205,6 +212,9 @@ func _ready():
 		calibration = calib_data
 
 
+func _on_hex_hovered(tile: Vector2i):
+	hex_hovered.emit(tile)
+
 func _draw():
 	var temp_size = 25
 	var current_mode = state.mode
@@ -215,35 +225,7 @@ func _draw():
 		for tile in MapData.map.tiles:
 			Drawing.fill_hex(self, Util.hex_coords_to_pixel(tile, hex_size), hex_size, MapData.map.tiles[tile])
 		for border_center in MapData.map.borders:
-				Drawing.draw_border(self, MapData.map.borders[border_center], border_center, hex_size, Vector2(tiles_origin))
-		Drawing.draw_zone(self, "Movement Range", destinations.keys().filter(func(d): return destinations[d].can_stop_here), hex_size, origin)
-		for destination_tile in destinations:
-			var cost_to_reach = "%s" % destinations[destination_tile].cost_to_reach
-			self.draw_string_outline(
-				self.get_window().get_theme_default_font(),
-				Util.hex_coords_to_pixel(destination_tile, hex_size),
-				cost_to_reach,
-				HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK
-			)
-			self.draw_string(
-				self.get_window().get_theme_default_font(),
-				Util.hex_coords_to_pixel(destination_tile, hex_size),
-				cost_to_reach,
-				HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE
-			)
-		if state.get("hover") != null:
-			# todo: cache nearest hovered tile to only re-draw when it changes (ie when cursor hovers over a *different* tile)
-			# maybe split tile overlay into separate layers [in the node/scene tree]?
-			Drawing.draw_hover(self, current_mode, state.hover, Vector2(tiles_origin), hex_size)
-			var nearest_tile = Util.nearest_hex_in_axial(state.hover, Vector2(tiles_origin), hex_size)
-			if nearest_tile in destinations:
-				while nearest_tile != null:
-					var from_ = destinations[nearest_tile]
-					self.draw_line(
-						Util.hex_coords_to_pixel(nearest_tile, hex_size),
-						Util.hex_coords_to_pixel(destinations[nearest_tile].from, hex_size),
-						Color.RED, 8, true)
-					nearest_tile = from_.from if from_.cost_to_reach > 0 else null
+			Drawing.draw_border(self, MapData.map.borders[border_center], border_center, hex_size, Vector2(tiles_origin))
 
 	elif current_mode == Enums.TileOverlayMode.CALIBRATING:
 		if calibration.mode <= Enums.TileOverlayCalibration.CALIBRATING_SIZE:
@@ -318,8 +300,6 @@ func _unhandled_input(event):
 	elif event is InputEventMouseMotion:
 		var capture = false
 		match current_mode:
-			Enums.TileOverlayMode.READ_ONLY:
-				capture = report_hovered_hex
 			Enums.TileOverlayMode.PAINTING_BORDERS, Enums.TileOverlayMode.PAINTING_TILES:
 				capture = true
 			Enums.TileOverlayMode.CALIBRATING:
@@ -327,7 +307,7 @@ func _unhandled_input(event):
 		if capture:
 			state.hover = get_viewport_transform().affine_inverse() * Vector2(event.position)
 			if report_hovered_hex:
+				# TODO: split this off into map painter and/or calibration sub-nodes
 				hex_hovered.emit(Util.nearest_hex_in_axial(state.hover, tiles_origin, MapData.map.hex_size_in_pixels))
-				get_viewport().set_input_as_handled()
-			# todo: split hover drawing into child node, to split draw caching for the tiles and borders, and the decorations that lie on top (hover, destinations)
+				#get_viewport().set_input_as_handled()
 			queue_redraw()

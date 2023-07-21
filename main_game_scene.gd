@@ -31,7 +31,7 @@ var data
 				add_child(game_session)
 				game_session.new_lobby_started.connect(_on_new_game_started)
 				game_session.session_closed.connect(_on_game_session_closed)
-		
+
 		mode = value
 
 func _ready():
