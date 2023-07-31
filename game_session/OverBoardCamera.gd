@@ -4,7 +4,7 @@ extends Camera2D
 
 @export var max_zoom: float = 1.25
 
-@export var zoom_factor: float = 0.05
+@export var zoom_factor: float = 0.5
 
 @export var zoom_duration: float = 0.2
 
@@ -28,27 +28,18 @@ func _input(event):
 	if event is InputEventPanGesture:
 		get_viewport().set_input_as_handled()
 		var y_abs = abs(event.delta.y)
-		# The underlying acceleration driving the OS events we end up receiving seems to run afoul
-		# of the "reactive" tweening we use, locking us into a camera zoom "drift"
-		#var steps = min(3, y_abs / scroll_panning_threshold)
-		#var action_name = "Increase Camera Zoom" if sign(event.delta.y) > 0 else "Decrease Camera Zoom"
-		#for i in range(steps):
-		#	var action = InputEventAction.new()
-		#	action.action = action_name
-		#	action.pressed = true
-		#	Input.parse_input_event(action)
 		if y_abs > scroll_panning_threshold:
-			_zoom_level = log(
-				exp(_zoom_level) * (
-					1 + (int(invert_y_axis)) * (zoom_factor * y_abs * sign(event.delta.y))
-				)
-			)
+			var action = InputEventAction.new()
+			action.action = "Increase Camera Zoom" if sign(event.delta.y) > 0 else "Decrease Camera Zoom"
+			action.pressed = true
+			action.strength = y_abs
+			Input.parse_input_event(action)
 
-func _process(_delta):
+func _process(delta):
 	if Input.is_action_pressed("Increase Camera Zoom"):
-		_zoom_level = log(exp(_zoom_level) * (1+zoom_factor))
+		_zoom_level = log(exp(_zoom_level) * (1 + zoom_factor * delta * Input.get_action_strength("Increase Camera Zoom")))
 	if Input.is_action_pressed("Decrease Camera Zoom"):
-		_zoom_level = log(exp(_zoom_level) * (1-zoom_factor))
+		_zoom_level = log(exp(_zoom_level) * (1 - zoom_factor * delta * Input.get_action_strength("Decrease Camera Zoom")))
 	if Input.is_action_pressed("Move Camera Left"):
 		position.x -= 20 / _zoom_level
 	if Input.is_action_pressed("Move Camera Up"):
