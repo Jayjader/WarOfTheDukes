@@ -11,7 +11,7 @@ extends Camera2D
 var _zoom_tween: Tween
 
 
-@export var scroll_panning_threshold: float = 0.1
+@export var scroll_panning_threshold: float = 0.025
 
 @export var invert_y_axis: bool = true
 
@@ -40,7 +40,7 @@ func _unhandled_input(event):
 			action.pressed = true
 			action.strength = y_abs
 			Input.parse_input_event(action)
-	
+
 	elif event.is_action_pressed("Increase Camera Zoom"):
 		tween_zoom(log(exp(self.zoom.x * (1 + zoom_factor * Input.get_action_strength("Increase Camera Zoom")))))
 	elif event.is_action_pressed("Decrease Camera Zoom"):
