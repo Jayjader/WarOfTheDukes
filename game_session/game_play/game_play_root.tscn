@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://dn24y8eq6bsf"]
+[gd_scene load_steps=4 format=3 uid="uid://dn24y8eq6bsf"]
 
 [ext_resource type="Script" path="res://game_session/game_play/game_play_root.gd" id="1_kicvc"]
+[ext_resource type="Script" path="res://game_session/game_play/proceed_button.gd" id="2_hmm0i"]
+[ext_resource type="Script" path="res://game_session/game_play/cancel_button.gd" id="3_2xix2"]
 
 [node name="GamePlayRoot" type="Control"]
 layout_mode = 3
@@ -159,6 +161,7 @@ theme_override_constants/margin_bottom = 10
 
 [node name="EndMovementPhase" type="Button" parent="BottomRightMargin"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 text = "End Movement Phase"
 
@@ -179,6 +182,19 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 text = "Cancel Attack"
+
+[node name="Proceed" type="Button" parent="BottomRightMargin"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "proceed"
+script = ExtResource("2_hmm0i")
+
+[node name="Cancel" type="Button" parent="BottomRightMargin"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "cancel"
+script = ExtResource("3_2xix2")
 
 [connection signal="toggled" from="BottomLeftMargin/HBoxContainer/VBox/ToggleInstructions" to="BottomLeftMargin/HBoxContainer/VBox/Panel" method="set_visible"]
 [connection signal="pressed" from="BottomRightMargin/EndMovementPhase" to="." method="confirm_movement"]
