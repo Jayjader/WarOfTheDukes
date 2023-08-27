@@ -2,7 +2,14 @@ class_name PlayPhaseStateMachine
 extends Node
 
 @export var current_player: Enums.Faction
-@export var turns: int = 0
+@export var turns: int = 0:
+	set(value):
+		turns = value
+		if label.is_node_ready():
+			label.text = "Turn: %s" % turns
+		
+
+@onready var label = get_parent().get_node("%Turn")
 
 @export var current_phase: PlayPhase
 

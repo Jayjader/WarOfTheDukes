@@ -19,7 +19,8 @@ func cancel_attack():
 	phase_state_machine.change_subphase(main_subphase)
 
 func choose_defender(choice: GamePiece):
-	defender = choice
+	if choose_attackers.attacking.all(func(attacker): return _in_attack_range(attacker, choice)):
+		defender = choice
 
 func confirm_attack():
 	phase_state_machine.change_subphase(resolve_combat)
@@ -31,3 +32,8 @@ func _enter_subphase():
 		Enums.get_other_faction(parent_phase.play_state_machine.current_player),
 		parent_phase.attacked
 	)
+func _in_attack_range(attacker: GamePiece, defender: GamePiece):
+	return Util.cube_distance(
+		Util.axial_to_cube(attacker.tile),
+		Util.axial_to_cube(defender.tile)
+		) <= (Rules.ArtilleryRange if attacker.kind == Enums.Unit.Artillery else 1)

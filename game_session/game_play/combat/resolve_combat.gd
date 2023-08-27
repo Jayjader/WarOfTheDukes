@@ -18,6 +18,7 @@ extends CombatSubphase
 @export var retreat_defender: RetreatDefender
 
 @onready var unit_layer = Board.get_node("%UnitLayer")
+var _random = RandomNumberGenerator.new()
 
 func _enter_subphase():
 	var attackers = choose_attackers.attacking
@@ -30,8 +31,8 @@ func _enter_subphase():
 		parent_phase.attacked[attacker] = defender
 	defender.unselect()
 	parent_phase.defended.append(defender)
-	# result = _resolve_combat(choose_attackers.attacking, choose_defender.defender)
-	result = Enums.CombatResult.Exchange
+	result = _resolve_combat(choose_attackers.attacking, choose_defender.defender)
+	# result = Enums.CombatResult.Exchange
 	
 	match result:
 		Enums.CombatResult.AttackerEliminated:
@@ -48,6 +49,10 @@ func _enter_subphase():
 			phase_state_machine.change_subphase(choose_attacker_to_retreat)
 		Enums.CombatResult.Exchange:
 			parent_phase.died.append(defender)
+			if defender.kind == Enums.Unit.Duke:
+				parent_phase.play_phase_state_machine.get_parent().game_over.emit(
+					Enums.GameResult.TOTAL_VICTORY, Enums.get_other_faction(defender.faction)
+				)
 			phase_state_machine.change_subphase(allocate_exchange_losses)
 		Enums.CombatResult.DefenderRetreats:
 			# var has_room = len(allowed_retreat_destinations) > 0
@@ -63,6 +68,8 @@ func _enter_subphase():
 				phase_state_machine.change_subphase(main_combat)
 		Enums.CombatResult.DefenderEliminated:
 			parent_phase.died.append(defender)
+			if defender.kind == Enums.Unit.Duke:
+				parent_phase.play_phase_state_machine.get_parent().game_over.emit(Enums.GameResult.TOTAL_VICTORY, Enums.get_other_faction(defender.faction))
 			phase_state_machine.change_subphase(main_combat)
 			unit_layer.make_faction_selectable(parent_phase.play_state_machine.current_player, attackers)
 
