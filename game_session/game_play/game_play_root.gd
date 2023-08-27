@@ -61,7 +61,7 @@ const INSTRUCTIONS = {
 	Enums.CombatSubPhase.MAIN: "Choose a unit to begin attacking",
 	Enums.CombatSubPhase.CHOOSE_ATTACKERS: "Choose the next attacker(s) to participate in combat",
 	Enums.CombatSubPhase.CHOOSE_DEFENDER: "Choose defender for combat with the chosen attacker(s)",
-	Enums.CombatSubPhase.LOSS_ALLOCATION_FROM_EXCHANGE: "Choose a unit among the attackers to be killed by the exchange (this will continue until the total attacking combat strength killed equals or surpasses the defender's combat strength, or all attackers have been killed)",
+	Enums.CombatSubPhase.LOSS_ALLOCATION_FROM_EXCHANGE: "Choose an attacker to allocate as loss",
 	Enums.CombatSubPhase.RETREAT_DEFENDER: "Choose a tile for the defender to retreat to",
 	Enums.CombatSubPhase.MAKE_WAY_FOR_RETREAT: "Choose a unit to be pushed by the retreating unit",
 	Enums.CombatSubPhase.CHOOSE_ATTACKER_TO_RETREAT: "Choose a unit among the attackers to retreat",
