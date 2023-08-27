@@ -1,8 +1,25 @@
-[gd_scene load_steps=4 format=3 uid="uid://dn24y8eq6bsf"]
+[gd_scene load_steps=21 format=3 uid="uid://dn24y8eq6bsf"]
 
 [ext_resource type="Script" path="res://game_session/game_play/game_play_root.gd" id="1_kicvc"]
 [ext_resource type="Script" path="res://game_session/game_play/proceed_button.gd" id="2_hmm0i"]
+[ext_resource type="Script" path="res://game_session/game_play/play_state_machine.gd" id="2_i3q2l"]
 [ext_resource type="Script" path="res://game_session/game_play/cancel_button.gd" id="3_2xix2"]
+[ext_resource type="Script" path="res://game_session/game_play/movement/movement_phase.gd" id="5_qyd0w"]
+[ext_resource type="Script" path="res://game_session/game_play/movement/movement_phase_machine.gd" id="6_rh5ps"]
+[ext_resource type="Script" path="res://game_session/game_play/movement/choose_unit_for_move.gd" id="7_77m47"]
+[ext_resource type="Script" path="res://game_session/game_play/movement/choose_unit_destination.gd" id="8_gsitl"]
+[ext_resource type="Script" path="res://game_session/game_play/combat/combat_phase.gd" id="9_l5y64"]
+[ext_resource type="Script" path="res://game_session/game_play/combat/combat_phase_machine.gd" id="10_cw3gt"]
+[ext_resource type="Script" path="res://game_session/game_play/combat/main_combat_subphase.gd" id="11_72puf"]
+[ext_resource type="Script" path="res://game_session/game_play/combat/choose_units_for_attack.gd" id="12_bclrs"]
+[ext_resource type="Script" path="res://game_session/game_play/combat/choose_defender_for_attack.gd" id="13_73w2u"]
+[ext_resource type="Script" path="res://game_session/game_play/combat/resolve_combat.gd" id="14_kp63i"]
+[ext_resource type="Script" path="res://game_session/game_play/combat/allocate_exchange_losses.gd" id="15_nensy"]
+[ext_resource type="Script" path="res://game_session/game_play/combat/choose_attacker_to_retreat.gd" id="16_vqded"]
+[ext_resource type="Script" path="res://game_session/game_play/combat/retreat_attacker.gd" id="17_buyt2"]
+[ext_resource type="Script" path="res://game_session/game_play/combat/make_way_for_retreat.gd" id="17_rmqba"]
+[ext_resource type="Script" path="res://game_session/game_play/combat/retreat_defender.gd" id="18_1m6pe"]
+[ext_resource type="Script" path="res://game_session/game_play/combat/choose_ally_to_make_way.gd" id="18_ohqr4"]
 
 [node name="GamePlayRoot" type="Control"]
 layout_mode = 3
@@ -195,6 +212,107 @@ visible = false
 layout_mode = 2
 text = "cancel"
 script = ExtResource("3_2xix2")
+
+[node name="PlayStateMachine" type="Node" parent="." node_paths=PackedStringArray("state", "move_phase")]
+script = ExtResource("2_i3q2l")
+state = NodePath("MovementPhase")
+move_phase = NodePath("MovementPhase")
+
+[node name="MovementPhase" type="Node" parent="PlayStateMachine" node_paths=PackedStringArray("move_phase_machine", "combat_phase", "choose_unit")]
+script = ExtResource("5_qyd0w")
+move_phase_machine = NodePath("MovementPhaseStateMachine")
+combat_phase = NodePath("../CombatPhase")
+choose_unit = NodePath("MovementPhaseStateMachine/ChooseUnitForMove")
+
+[node name="MovementPhaseStateMachine" type="Node" parent="PlayStateMachine/MovementPhase" node_paths=PackedStringArray("subphase")]
+script = ExtResource("6_rh5ps")
+subphase = NodePath("ChooseUnitForMove")
+
+[node name="ChooseUnitForMove" type="Node" parent="PlayStateMachine/MovementPhase/MovementPhaseStateMachine" node_paths=PackedStringArray("choose_destination")]
+script = ExtResource("7_77m47")
+choose_destination = NodePath("../ChooseUnitDestination")
+
+[node name="ChooseUnitDestination" type="Node" parent="PlayStateMachine/MovementPhase/MovementPhaseStateMachine" node_paths=PackedStringArray("choose_unit", "parent_phase")]
+script = ExtResource("8_gsitl")
+choose_unit = NodePath("../ChooseUnitForMove")
+parent_phase = NodePath("../..")
+
+[node name="CombatPhase" type="Node" parent="PlayStateMachine" node_paths=PackedStringArray("combat_phase_machine", "move_phase", "choose_attackers")]
+script = ExtResource("9_l5y64")
+combat_phase_machine = NodePath("CombatPhaseStateMachine")
+move_phase = NodePath("../MovementPhase")
+choose_attackers = NodePath("CombatPhaseStateMachine/ChooseUnitsForAttack")
+
+[node name="CombatPhaseStateMachine" type="Node" parent="PlayStateMachine/CombatPhase" node_paths=PackedStringArray("subphase")]
+script = ExtResource("10_cw3gt")
+subphase = NodePath("ChooseUnitsForAttack")
+
+[node name="MainCombatSubphase" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "choose_attackers")]
+script = ExtResource("11_72puf")
+parent_phase = NodePath("../..")
+choose_attackers = NodePath("../ChooseUnitsForAttack")
+
+[node name="ChooseUnitsForAttack" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("main_subphase", "choose_defender")]
+script = ExtResource("12_bclrs")
+main_subphase = NodePath("../MainCombatSubphase")
+choose_defender = NodePath("../ChooseDefenderForAttack")
+
+[node name="ChooseDefenderForAttack" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("main_subphase", "choose_attackers", "resolve_combat")]
+script = ExtResource("13_73w2u")
+main_subphase = NodePath("../MainCombatSubphase")
+choose_attackers = NodePath("../ChooseUnitsForAttack")
+resolve_combat = NodePath("../ResolveCombat")
+
+[node name="ResolveCombat" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "phase_state_machine", "main_combat", "choose_attackers", "choose_defender", "allocate_exchange_losses", "choose_attacker_to_retreat", "choose_ally_to_make_way", "retreat_defender")]
+script = ExtResource("14_kp63i")
+parent_phase = NodePath("../..")
+phase_state_machine = NodePath("..")
+main_combat = NodePath("../MainCombatSubphase")
+choose_attackers = NodePath("../ChooseUnitsForAttack")
+choose_defender = NodePath("../ChooseDefenderForAttack")
+allocate_exchange_losses = NodePath("../AllocateExchangeLosses")
+choose_attacker_to_retreat = NodePath("../ChooseAttackerToRetreat")
+choose_ally_to_make_way = NodePath("../ChooseAllyToMakeWay")
+retreat_defender = NodePath("../RetreatDefender")
+
+[node name="AllocateExchangeLosses" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "main_combat", "choose_attackers", "choose_defender")]
+script = ExtResource("15_nensy")
+parent_phase = NodePath("../..")
+main_combat = NodePath("../MainCombatSubphase")
+choose_attackers = NodePath("../ChooseUnitsForAttack")
+choose_defender = NodePath("../ChooseDefenderForAttack")
+
+[node name="ChooseAttackerToRetreat" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "main_combat", "choose_attackers", "retreat_attacker", "choose_ally_to_make_way")]
+script = ExtResource("16_vqded")
+parent_phase = NodePath("../..")
+main_combat = NodePath("../MainCombatSubphase")
+choose_attackers = NodePath("../ChooseUnitsForAttack")
+retreat_attacker = NodePath("../RetreatAttacker")
+choose_ally_to_make_way = NodePath("../ChooseAllyToMakeWay")
+
+[node name="RetreatAttacker" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "main_combat", "choose_retreater", "choose_ally_to_make_way")]
+script = ExtResource("17_buyt2")
+parent_phase = NodePath("../..")
+main_combat = NodePath("../MainCombatSubphase")
+choose_retreater = NodePath("../ChooseAttackerToRetreat")
+choose_ally_to_make_way = NodePath("../ChooseAllyToMakeWay")
+
+[node name="ChooseAllyToMakeWay" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "make_way")]
+script = ExtResource("18_ohqr4")
+parent_phase = NodePath("../..")
+make_way = NodePath("../MakeWayForRetreat")
+
+[node name="MakeWayForRetreat" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "choose_ally_to_make_way")]
+script = ExtResource("17_rmqba")
+parent_phase = NodePath("../..")
+choose_ally_to_make_way = NodePath("../ChooseAllyToMakeWay")
+
+[node name="RetreatDefender" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "main_combat", "choose_attackers", "choose_defender")]
+script = ExtResource("18_1m6pe")
+parent_phase = NodePath("../..")
+main_combat = NodePath("../MainCombatSubphase")
+choose_attackers = NodePath("../ChooseUnitsForAttack")
+choose_defender = NodePath("../ChooseDefenderForAttack")
 
 [connection signal="toggled" from="BottomLeftMargin/HBoxContainer/VBox/ToggleInstructions" to="BottomLeftMargin/HBoxContainer/VBox/Panel" method="set_visible"]
 [connection signal="pressed" from="BottomRightMargin/EndMovementPhase" to="." method="confirm_movement"]
