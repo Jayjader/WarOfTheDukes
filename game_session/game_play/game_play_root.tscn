@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" path="res://game_session/game_play/game_play_root.gd" id="1_kicvc"]
 [ext_resource type="Script" path="res://game_session/game_play/proceed_button.gd" id="2_hmm0i"]
-[ext_resource type="Script" path="res://game_session/game_play/play_state_machine.gd" id="2_i3q2l"]
 [ext_resource type="Script" path="res://game_session/game_play/cancel_button.gd" id="3_2xix2"]
+[ext_resource type="Script" path="res://game_session/game_play/play_phase_state_machine.gd" id="4_rxnh7"]
 [ext_resource type="Script" path="res://game_session/game_play/movement/movement_phase.gd" id="5_qyd0w"]
 [ext_resource type="Script" path="res://game_session/game_play/movement/movement_phase_machine.gd" id="6_rh5ps"]
 [ext_resource type="Script" path="res://game_session/game_play/movement/choose_unit_for_move.gd" id="7_77m47"]
@@ -21,7 +21,7 @@
 [ext_resource type="Script" path="res://game_session/game_play/combat/retreat_defender.gd" id="18_1m6pe"]
 [ext_resource type="Script" path="res://game_session/game_play/combat/choose_ally_to_make_way.gd" id="18_ohqr4"]
 
-[node name="GamePlayRoot" type="Control"]
+[node name="GamePlayRoot" type="Control" node_paths=PackedStringArray("play_phase_state_machine")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -30,6 +30,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_kicvc")
+play_phase_state_machine = NodePath("PlayStateMachine")
 
 [node name="TopMargin" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -213,9 +214,8 @@ layout_mode = 2
 text = "cancel"
 script = ExtResource("3_2xix2")
 
-[node name="PlayStateMachine" type="Node" parent="." node_paths=PackedStringArray("state", "move_phase")]
-script = ExtResource("2_i3q2l")
-state = NodePath("MovementPhase")
+[node name="PlayStateMachine" type="Node" parent="." node_paths=PackedStringArray("move_phase")]
+script = ExtResource("4_rxnh7")
 move_phase = NodePath("MovementPhase")
 
 [node name="MovementPhase" type="Node" parent="PlayStateMachine" node_paths=PackedStringArray("move_phase_machine", "combat_phase", "choose_unit")]
@@ -237,10 +237,11 @@ script = ExtResource("8_gsitl")
 choose_unit = NodePath("../ChooseUnitForMove")
 parent_phase = NodePath("../..")
 
-[node name="CombatPhase" type="Node" parent="PlayStateMachine" node_paths=PackedStringArray("combat_phase_machine", "move_phase", "choose_attackers")]
+[node name="CombatPhase" type="Node" parent="PlayStateMachine" node_paths=PackedStringArray("combat_phase_machine", "move_phase", "main_combat", "choose_attackers")]
 script = ExtResource("9_l5y64")
 combat_phase_machine = NodePath("CombatPhaseStateMachine")
 move_phase = NodePath("../MovementPhase")
+main_combat = NodePath("CombatPhaseStateMachine/MainCombatSubphase")
 choose_attackers = NodePath("CombatPhaseStateMachine/ChooseUnitsForAttack")
 
 [node name="CombatPhaseStateMachine" type="Node" parent="PlayStateMachine/CombatPhase" node_paths=PackedStringArray("subphase")]
@@ -257,8 +258,9 @@ script = ExtResource("12_bclrs")
 main_subphase = NodePath("../MainCombatSubphase")
 choose_defender = NodePath("../ChooseDefenderForAttack")
 
-[node name="ChooseDefenderForAttack" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("main_subphase", "choose_attackers", "resolve_combat")]
+[node name="ChooseDefenderForAttack" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "main_subphase", "choose_attackers", "resolve_combat")]
 script = ExtResource("13_73w2u")
+parent_phase = NodePath("../..")
 main_subphase = NodePath("../MainCombatSubphase")
 choose_attackers = NodePath("../ChooseUnitsForAttack")
 resolve_combat = NodePath("../ResolveCombat")

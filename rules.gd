@@ -44,3 +44,5 @@ const DukeAura = {
 }
 
 const ArtilleryRange = 2
+
+const MaxTurns = 15

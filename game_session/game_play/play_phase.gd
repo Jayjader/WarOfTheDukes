@@ -1,4 +1,4 @@
-class_name PlayState
+class_name PlayPhase
 extends Node
 
 signal state_finished

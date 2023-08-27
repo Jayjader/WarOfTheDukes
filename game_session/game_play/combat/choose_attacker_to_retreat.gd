@@ -14,6 +14,8 @@ extends CombatSubphase
 @export var retreat_attacker: RetreatAttacker
 @export var choose_ally_to_make_way: ChooseAllyToMakeWay
 
+@onready var unit_layer = Board.get_node("%UnitLayer")
+
 func choose_attacker(attacker: GamePiece):
 	var att_idx = to_retreat.find(attacker)
 	assert(att_idx > -1)
@@ -34,3 +36,8 @@ func choose_attacker(attacker: GamePiece):
 
 func _enter_subphase():
 	assert(len(to_retreat) > 0)
+	for attacker in to_retreat:
+		attacker.unselect()
+	unit_layer.make_faction_selectable(null)
+	for attacker in to_retreat:
+		attacker.selectable = true

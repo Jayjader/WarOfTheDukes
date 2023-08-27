@@ -1,5 +1,5 @@
 class_name MovementPhase
-extends PlayState
+extends PlayPhase
 
 @export var moved: Array[GamePiece] = []
 
@@ -9,7 +9,8 @@ extends PlayState
 @export_category("Subphases")
 @export var choose_unit: ChooseUnitForMove
 
-@onready var play_state_machine: PlayStateMachine = get_parent()
+@onready var play_state_machine: PlayPhaseStateMachine = get_parent()
+@onready var unit_layer = Board.get_node("%UnitLayer")
 
 func clear():
 	moved = []
@@ -20,6 +21,7 @@ func confirm_movement():
 
 func _enter_state():
 	move_phase_machine.change_subphase(choose_unit)
+	unit_layer.make_faction_selectable(play_state_machine.current_player)
 
 func _exit_state():
 	state_finished.emit()

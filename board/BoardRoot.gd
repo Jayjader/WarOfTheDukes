@@ -7,6 +7,9 @@ signal toggled_editing(bool)
 signal hex_hovered(tile: Vector2i)
 signal hex_clicked(tile: Vector2i, kind, zones)
 
+var report_hover_tiles: Array[Vector2i] = []
+var report_click_tiles: Array[Vector2i] = []
+
 
 @export var editing: bool = false:
 	set(value):
@@ -30,6 +33,14 @@ func _unhandled_input(event):
 #	if not Engine.is_editor_hint():
 		if event.is_action_pressed("Edit Map Data"):
 			editing = !editing
+
+func report_click_for_tiles(tiles: Array[Vector2i]):
+	report_click_tiles = tiles
+	report_clicked_hex = len(tiles) > 0
+
+func report_hover_for_tiles(tiles: Array[Vector2i]):
+	report_hover_tiles = tiles
+	report_hovered_hex = len(tiles) > 0
 
 @export var report_hovered_hex: bool:
 	get:
@@ -59,10 +70,12 @@ func get_units_on(tile: Vector2i):
 	return %UnitLayer.get_children().filter(func(unit): return unit.tile == tile)
 
 func _on_tile_overlay_hex_hovered(axial: Vector2i):
-	hex_hovered.emit(axial)
+	if axial in report_hover_tiles:
+		hex_hovered.emit(axial)
 func _on_tile_overlay_hex_clicked(axial: Vector2i, kind, zones=[]):
 	print_debug("hex clicked: %s, kind: %s, zones: %s" % [ axial, kind, zones ])
-	hex_clicked.emit(axial, kind, zones)
+	if axial in report_click_tiles:
+		hex_clicked.emit(axial, kind, zones)
 
 
 func _on_setup_root_unit_placed(tile, kind, faction):

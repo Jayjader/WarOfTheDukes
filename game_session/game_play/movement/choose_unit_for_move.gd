@@ -8,6 +8,7 @@ class_name ChooseUnitForMove
 
 func choose_unit(unit: GamePiece):
 	choose_destination.moving = unit
+	choose_destination.destinations = Board.paths_for(unit)
 	phase_state_machine.change_subphase(choose_destination)
 
 
