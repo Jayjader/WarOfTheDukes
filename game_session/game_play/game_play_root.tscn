@@ -228,8 +228,9 @@ choose_unit = NodePath("MovementPhaseStateMachine/ChooseUnitForMove")
 script = ExtResource("6_rh5ps")
 subphase = NodePath("ChooseUnitForMove")
 
-[node name="ChooseUnitForMove" type="Node" parent="PlayStateMachine/MovementPhase/MovementPhaseStateMachine" node_paths=PackedStringArray("choose_destination")]
+[node name="ChooseUnitForMove" type="Node" parent="PlayStateMachine/MovementPhase/MovementPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "choose_destination")]
 script = ExtResource("7_77m47")
+parent_phase = NodePath("../..")
 choose_destination = NodePath("../ChooseUnitDestination")
 
 [node name="ChooseUnitDestination" type="Node" parent="PlayStateMachine/MovementPhase/MovementPhaseStateMachine" node_paths=PackedStringArray("choose_unit", "parent_phase")]
@@ -320,4 +321,3 @@ choose_defender = NodePath("../ChooseDefenderForAttack")
 [connection signal="pressed" from="BottomRightMargin/EndMovementPhase" to="." method="confirm_movement"]
 [connection signal="pressed" from="BottomRightMargin/EndCombatPhase" to="." method="confirm_combat"]
 [connection signal="pressed" from="BottomRightMargin/ConfirmAttackers" to="." method="confirm_attackers"]
-[connection signal="pressed" from="BottomRightMargin/CancelAttack" to="." method="cancel_attack"]

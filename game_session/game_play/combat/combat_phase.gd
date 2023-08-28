@@ -34,6 +34,7 @@ func confirm_combat():
 	play_state_machine.change_state(move_phase)
 
 func _enter_state():
+	%PhaseInstruction.text = """blablabla fight enemies"""
 	combat_phase_machine.change_subphase(main_combat)
 
 func _exit_state():

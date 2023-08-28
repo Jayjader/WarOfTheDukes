@@ -25,3 +25,16 @@ func cancel_attack():
 func confirm_attackers():
 	assert(len(attacking) > 0)
 	phase_state_machine.change_subphase(choose_defender)
+
+func _enter_subphase():
+	unit_layer.unit_clicked.connect(__on_unit_selection)
+	%SubPhaseInstruction.text = "Choose the next attacker(s) to participate in combat"
+
+func _exit_subphase():
+	unit_layer.unit_clicked.disconnect(__on_unit_selection)
+
+func __on_unit_selection(selected_unit: GamePiece, now_selected: bool):
+	if selected_unit in attacking:
+		remove_from_attackers(selected_unit)
+	elif selected_unit not in attacking:
+		choose_unit(selected_unit)

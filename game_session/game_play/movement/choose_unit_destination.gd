@@ -29,10 +29,16 @@ func choose_destination(tile: Vector2i):
 
 func _enter_subphase():
 	assert(moving != null)
+	%SubPhaseInstruction.text = "Choose the destination tile for the selected unit"
 	Board.report_click_for_tiles(destinations.keys())
 	Board.report_hover_for_tiles(destinations.keys())
 	Board.get_node("%HoverClick").draw_hover = true
 	tile_overlay.set_destinations(destinations)
+	Board.get_node("%UnitLayer").unit_clicked.connect(__on_unit_selection)
+
+func __on_unit_selection(unit_selected: GamePiece, now_selected: bool):
+	if not now_selected:
+		cancel_unit_choice()
 
 func _exit_subphase():
 	#moving = null <- wait until needed to implement
@@ -40,3 +46,4 @@ func _exit_subphase():
 	Board.report_hover_for_tiles([])
 	Board.get_node("%HoverClick").draw_hover = false
 	tile_overlay.clear_destinations()
+	Board.get_node("%UnitLayer").unit_clicked.disconnect(__on_unit_selection)

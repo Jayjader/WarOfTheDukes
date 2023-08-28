@@ -11,4 +11,3 @@ func change_subphase(new_subphase: CombatSubphase):
 		subphase._exit_subphase()
 	new_subphase._enter_subphase()
 	subphase = new_subphase
-
