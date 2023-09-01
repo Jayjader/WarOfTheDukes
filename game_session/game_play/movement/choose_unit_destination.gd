@@ -14,6 +14,7 @@ extends MovementSubphase
 @onready var unit_layer = Board.get_node("%UnitLayer")
 
 func cancel_unit_choice():
+	moving.unselect()
 	moving = null
 	phase_state_machine.change_subphase(choose_unit)
 
@@ -40,6 +41,8 @@ func _enter_subphase():
 	Board.get_node("%HoverClick").draw_hover = true
 	tile_overlay.set_destinations(destinations)
 	Board.hex_clicked.connect(__on_hex_click)
+	unit_layer.make_faction_selectable(null)
+	moving.selectable = true
 	unit_layer.unit_unselected.connect(__on_unit_unselection)
 
 func _exit_subphase():

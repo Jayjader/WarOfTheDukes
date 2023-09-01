@@ -121,7 +121,8 @@ func die():
 	queue_free()
 
 func unselect():
-	_selected = false
+	if _selected:
+		_selected = false
 
 func _unhandled_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
