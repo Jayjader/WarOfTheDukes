@@ -16,16 +16,6 @@ class_name HexMapData
 @export_group("Map Properties")
 @export var hex_size_in_pixels: float = 60
 
-class MapPathStep:
-	var tile
-	var cost_to_enter
-class MapPath:
-	var steps: Array[MapPathStep] = []
-	var total_cost:
-		get:
-			return steps.reduce(func(accum, next): accum + next.cost_to_enter, 0)
-
-
 func paths_from(start: Vector2i, max_cost=0) -> Dictionary:
 	var frontier = [[start, 0]]
 	var reached = {start: [start, 0]}
