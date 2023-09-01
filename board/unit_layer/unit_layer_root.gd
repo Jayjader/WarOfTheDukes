@@ -2,7 +2,8 @@ extends Node2D
 
 const Unit = preload("res://board/unit_layer/unit_root.tscn")
 
-signal unit_clicked(unit: GamePiece, selected: bool)
+signal unit_selected(unit: GamePiece)
+signal unit_unselected(unit: GamePiece)
 
 func _place_piece(tile: Vector2i, kind: Enums.Unit, faction: Enums.Faction):
 	print_debug("placing piece (%s, %s, %s)" % [tile, kind, faction])
@@ -11,12 +12,7 @@ func _place_piece(tile: Vector2i, kind: Enums.Unit, faction: Enums.Faction):
 	new_unit.kind = kind
 	new_unit.faction = faction
 	new_unit.tile = tile
-	new_unit.connect(
-		"selected",
-		func(value):
-			print_debug("selected unit %s" % new_unit)
-			unit_clicked.emit(new_unit, value)
-	)
+	new_unit.selected.connect(__on_unit_selected_toggle.bind(new_unit))
 
 
 func make_faction_selectable(faction, omit=[]):
@@ -31,10 +27,16 @@ func _unselect_all_units():
 	for unit in get_children():
 		unit.selected = false
 
-func move_unit(mover: GamePiece, from_: Vector2i, to_: Vector2i):
+func move_unit(mover: GamePiece, _from: Vector2i, to_: Vector2i):
 	mover.tile = to_
 	mover.unselect()
 
 func _remove_all_pieces():
 	for unit in get_children():
 		unit.queue_free()
+
+func __on_unit_selected_toggle(selected: bool, unit: GamePiece):
+	if selected:
+		unit_selected.emit(unit)
+	else:
+		unit_unselected.emit(unit)

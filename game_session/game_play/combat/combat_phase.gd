@@ -23,6 +23,10 @@ func clear():
 	died = []
 
 func confirm_combat():
+	for dead in died:
+		if dead not in play_state_machine.died:
+			dead.visible = false
+			play_state_machine.died.append(dead)
 	move_phase.clear()
 	if play_state_machine.current_player == Enums.Faction.Wulfenburg:
 		if play_state_machine.turn == Rules.MaxTurns:
@@ -34,11 +38,13 @@ func confirm_combat():
 	play_state_machine.change_state(move_phase)
 
 func _enter_state():
+	%CombatPhase.visible = true
 	%PhaseInstruction.text = """blablabla fight enemies"""
 	combat_phase_machine.change_subphase(main_combat)
 
 func _exit_state():
-	pass
+	%CombatPhase.visible = false
+	combat_phase_machine.exit_subphase()
 
 func _detect_game_result():
 	for capital_faction in [Enums.Faction.Orfburg, Enums.Faction.Wulfenburg]:

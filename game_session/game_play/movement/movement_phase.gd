@@ -20,6 +20,7 @@ func confirm_movement():
 	play_state_machine.change_state(combat_phase)
 
 func _enter_state():
+	%MovementPhase.visible = true
 	%PhaseInstruction.text = """Each of your units can move once during this phase, and each is limited in the total distance it can move.
 This limit is affected by the unit type, as well as the terrain you make your units cross.
 Mounted units (Cavalry and Dukes) start each turn with 6 movement points.
@@ -45,4 +46,6 @@ Rivers can not be crossed (but a Bridge over a River can be crossed - cost as sp
 	unit_layer.make_faction_selectable(play_state_machine.current_player)
 
 func _exit_state():
+	%MovementPhase.visible = false
+	move_phase_machine.exit_subphase()
 	state_finished.emit()

@@ -21,6 +21,14 @@ extends CombatSubphase
 var _random = RandomNumberGenerator.new()
 
 func _enter_subphase():
+	%SubPhaseInstruction.text = "(Resolving Combat...)"
+	get_tree().process_frame.connect(_resolve, CONNECT_ONE_SHOT)
+
+# TODO: Split combat resolution and advancing state machine to next subphase,
+# and gate the latter behind user interaction.
+# This way we give the user time to parse the combat result, and we don't
+# necessarily need to rely on the get_tree().process_frame hack.
+func _resolve():
 	var attackers = choose_attackers.attacking
 	assert(len(attackers) > 0)
 	var defender = choose_defender.defender
@@ -31,8 +39,8 @@ func _enter_subphase():
 		parent_phase.attacked[attacker] = defender
 	defender.unselect()
 	parent_phase.defended.append(defender)
-	result = _resolve_combat(choose_attackers.attacking, choose_defender.defender)
-	# result = Enums.CombatResult.Exchange
+	#result = _resolve_combat(choose_attackers.attacking, choose_defender.defender)
+	result = Enums.CombatResult.Exchange
 	
 	match result:
 		Enums.CombatResult.AttackerEliminated:
@@ -53,7 +61,8 @@ func _enter_subphase():
 				parent_phase.play_phase_state_machine.get_parent().game_over.emit(
 					Enums.GameResult.TOTAL_VICTORY, Enums.get_other_faction(defender.faction)
 				)
-			phase_state_machine.change_subphase(allocate_exchange_losses)
+			else:
+				phase_state_machine.change_subphase(allocate_exchange_losses)
 		Enums.CombatResult.DefenderRetreats:
 			# var has_room = len(allowed_retreat_destinations) > 0
 			var has_room = false
@@ -121,11 +130,10 @@ func _resolve_combat(attackers, defender):
 		numerator = 1
 		denominator = min(5, floori(1 / ratio))
 	print_debug("Effective Ratio: %s to %s" % [numerator, denominator])
-	#var result_spread = COMBAT_RESULTs[Vector2i(numerator, denominator)]
-	#var result = result_spread[_random.randi_range(0, 5)]
-	var result = Enums.CombatResult.Exchange
-	print_debug("Result: %s" % Enums.CombatResult.find_key(result))
-	return result
+	var result_spread = COMBAT_RESULTs[Vector2i(numerator, denominator)]
+	var _result = result_spread[_random.randi_range(0, 5)]
+	print_debug("Result: %s" % Enums.CombatResult.find_key(_result))
+	return _result
 
 const CR = Enums.CombatResult
 const COMBAT_RESULTs = {

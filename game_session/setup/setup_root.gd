@@ -167,7 +167,6 @@ func _exit_tree():
 func _on_auto_setup_pressed():
 	while get_first_with_remaining(current_player) != null:
 		var player_territory = "%sTerritory" % Enums.Faction.find_key(current_player)
-		var unit_kind = get_first_with_remaining(current_player)
 		if len(empty_cities_and_forts[current_player]) > 0:
 			var tile = empty_cities_and_forts[current_player][0]
 			choose_tile(tile, "City", [player_territory])

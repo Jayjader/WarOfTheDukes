@@ -1,6 +1,7 @@
 class_name ChooseDefenderForAttack
 extends CombatSubphase
 
+@export var can_defend: Array[GamePiece] = []
 @export var defender: GamePiece
 
 @export_category("States/Phases")
@@ -18,33 +19,41 @@ func cancel_attack():
 	choose_attackers.cancel_attack()
 	phase_state_machine.change_subphase(main_subphase)
 
+func change_attackers():
+	defender = null
+	can_defend.clear()
+	phase_state_machine.change_subphase(choose_attackers)
+
 func choose_defender(choice: GamePiece):
-	if choose_attackers.attacking.all(
-		func(attacker):
-			return Util.cube_distance(
-				Util.axial_to_cube(attacker.tile),
-				Util.axial_to_cube(defender.tile)
-			) <= (Rules.ArtilleryRange if attacker.kind == Enums.Unit.Artillery else 1)
-			):
-		defender = choice
+	assert(choice in can_defend)
+	defender = choice
+	%ConfirmDefender.visible = true
+
+func unchoose_defender(choice: GamePiece):
+	assert(choice == defender)
+	%ConfirmDefender.visible = false
 
 func confirm_attack():
+	assert(defender != null)
 	phase_state_machine.change_subphase(resolve_combat)
 
 func _enter_subphase():
-	unit_layer.unit_clicked.connect(__on_unit_selection)
 	%SubPhaseInstruction.text = "Choose defender for combat with the chosen attacker(s)"
-	for unit in choose_attackers.attacking:
-		unit.unselect()
-	unit_layer.make_faction_selectable(
-		Enums.get_other_faction(parent_phase.play_state_machine.current_player),
-		parent_phase.attacked
-	)
+	%ChangeAttackers.visible = true
+	%ConfirmDefender.visible = defender != null
+	unit_layer.make_faction_selectable(null)
+	for unit in can_defend:
+		unit.selectable = true
+	unit_layer.unit_selected.connect(__on_unit_selection)
 
 func _exit_subphase():
-	unit_layer.unit_clicked.disconnect(__on_unit_selection)
+	if unit_layer.unit_selected.is_connected(__on_unit_selection):
+		unit_layer.unit_selected.disconnect(__on_unit_selection)
+	%ChangeAttackers.visible = false
+	%ConfirmDefender.visible = false
 
-func __on_unit_selection(selected_unit: GamePiece, now_selected:bool):
-	if now_selected:
-		selected_unit.unselect()
-		choose_defender(selected_unit)
+func __on_unit_selection(selected_unit: GamePiece):
+	choose_defender(selected_unit)
+
+func __on_unit_deselection(unit: GamePiece):
+	unchoose_defender(unit)

@@ -20,3 +20,7 @@ func choose_ally(ally: GamePiece):
 
 func _enter_subphase():
 	assert(previous_subphase != null)
+	%UnitChosenToMakeWay.visible = true
+
+func _exit_subphase():
+	%UnitChosenToMakeWay.visible = false

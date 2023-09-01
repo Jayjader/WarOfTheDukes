@@ -16,34 +16,46 @@ extends MovementSubphase
 func cancel_unit_choice():
 	moving = null
 	phase_state_machine.change_subphase(choose_unit)
-	unit_layer.make_faction_selectable(null, parent_phase.moved)
 
 func choose_destination(tile: Vector2i):
 	assert(tile in destinations)
 	if destinations[tile].can_stop_here:
+		if unit_layer.unit_unselected.is_connected(__on_unit_unselection):
+			unit_layer.unit_unselected.disconnect(__on_unit_unselection)
+		moving.unselect()
 		moving.selectable = false
 		unit_layer.move_unit(moving, moving.tile, tile)
 		parent_phase.moved.append(moving)
 		phase_state_machine.change_subphase(choose_unit)
-		unit_layer.make_faction_selectable(moving.faction, parent_phase.moved)
 
 func _enter_subphase():
 	assert(moving != null)
 	%SubPhaseInstruction.text = "Choose the destination tile for the selected unit"
-	Board.report_click_for_tiles(destinations.keys())
-	Board.report_hover_for_tiles(destinations.keys())
+	%UnitChosenForMove.visible = true
+	var destination_tiles = [] as Array[Vector2i]
+	for d in destinations.keys():
+		destination_tiles.append(d as Vector2i)
+	Board.report_click_for_tiles(destination_tiles)
+	Board.report_hover_for_tiles(destination_tiles)
 	Board.get_node("%HoverClick").draw_hover = true
 	tile_overlay.set_destinations(destinations)
-	Board.get_node("%UnitLayer").unit_clicked.connect(__on_unit_selection)
-
-func __on_unit_selection(unit_selected: GamePiece, now_selected: bool):
-	if not now_selected:
-		cancel_unit_choice()
+	Board.hex_clicked.connect(__on_hex_click)
+	unit_layer.unit_unselected.connect(__on_unit_unselection)
 
 func _exit_subphase():
 	#moving = null <- wait until needed to implement
+	%UnitChosenForMove.visible = false
 	Board.report_click_for_tiles([])
 	Board.report_hover_for_tiles([])
 	Board.get_node("%HoverClick").draw_hover = false
 	tile_overlay.clear_destinations()
-	Board.get_node("%UnitLayer").unit_clicked.disconnect(__on_unit_selection)
+	Board.hex_clicked.disconnect(__on_hex_click)
+	if unit_layer.unit_unselected.is_connected(__on_unit_unselection):
+		unit_layer.unit_unselected.disconnect(__on_unit_unselection)
+
+func __on_unit_unselection(unit_selected: GamePiece):
+	assert(unit_selected == moving)
+	cancel_unit_choice()
+
+func __on_hex_click(tile: Vector2i, _kind, _zones):
+	choose_destination(tile)

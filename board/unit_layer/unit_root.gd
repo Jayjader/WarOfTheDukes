@@ -74,7 +74,7 @@ func attempt_retreat_from(defenders: Array) -> bool:
 			continue
 
 		elif len(current_tile_occupants) > 0:
-			var cascade_retreat_tiles = Util.neighbours_to_tile(candidate_tile).filter(func(tile): return len(Board.get_units_on(tile)) == 0)
+			var cascade_retreat_tiles = Util.neighbours_to_tile(candidate_tile).filter(func(n_tile): return len(Board.get_units_on(n_tile)) == 0)
 			if len(cascade_retreat_tiles) == 0:
 				continue
 
@@ -99,11 +99,11 @@ func attempt_retreat_from(defenders: Array) -> bool:
 		var units_to_push = Board.get_units_on(retreat_tile)
 		if len(units_to_push) > 0:
 			var cascade_retreat_tiles = Util.neighbours_to_tile(retreat_tile).filter(
-				func(tile):
+				func(n_tile):
 					return (
-							len(Board.get_units_on(tile)) == 0
+							len(Board.get_units_on(n_tile)) == 0
 						) and (
-							MapData.map.borders.get(Vector2(self.tile) + Vector2(tile - retreat_tile) / 2) == "River"
+							MapData.map.borders.get(Vector2(self.tile) + Vector2(n_tile - retreat_tile) / 2) == "River"
 						)
 			)
 			if len(cascade_retreat_tiles) == 0:

@@ -20,25 +20,45 @@ func allocate_attacker(attacker: GamePiece):
 	#	defense_strength -= _calculate_effective_attack_strength(attacker, attacker_duke_in_cube)
 	allocated_attackers.append(attacker)
 
+func unallocate_attacker(attacker: GamePiece):
+	assert(attacker in allocated_attackers)
+	assert(attacker in choose_attackers.attacking)
+	#	defense_strength += _calculate_effective_attack_strength(attacker, attacker_duke_in_cube)
+	allocated_attackers.erase(attacker)
+
 func confirm_loss_allocation():
-	parent_phase.died.append_array(allocated_attackers)
+	unit_layer.unit_selected.disconnect(__on_unit_selection)
+	for attacker in allocated_attackers:
+		attacker.unselect()
+		parent_phase.died.append(attacker)
 	phase_state_machine.change_subphase(main_combat)
 
 func _enter_subphase():
 	unit_layer.make_faction_selectable(null)
-	unit_layer.unit_clicked.connect(__on_unit_selection)
+	%SubPhaseInstruction.text = "Choose an attacker to allocate as loss"
+	%ConfirmLossAllocation.visible = true
+	unit_layer.unit_selected.connect(__on_unit_selection)
+	unit_layer.unit_unselected.connect(__on_unit_unselection)
 	for attacker in choose_attackers.attacking:
 		if attacker.kind != Enums.Unit.Artillery or \
-			2 > Util.cube_distance(
+			Rules.ArtilleryRange > Util.cube_distance(
 				Util.axial_to_cube(attacker.tile),
 				Util.axial_to_cube(choose_defender.defender.tile)
 			):
 			attacker.selectable = true
 
 func _exit_subphase():
-	unit_layer.unit_clicked.disconnect(__on_unit_selection)
-	%SubPhaseInstruction.text = "Choose an attacker to allocate as loss"
+	print_debug("allocate losses subphase exited")
+	if unit_layer.unit_selected.is_connected(__on_unit_selection):
+		unit_layer.unit_selected.disconnect(__on_unit_selection)
+	if unit_layer.unit_unselected.is_connected(__on_unit_unselection):
+		unit_layer.unit_unselected.disconnect(__on_unit_unselection)
+	%ConfirmLossAllocation.visible = false
 
-func __on_unit_selection(selected_unit: GamePiece, now_selected:bool):
-	if now_selected and not (selected_unit in allocated_attackers):
+func __on_unit_selection(selected_unit: GamePiece):
+	if selected_unit not in allocated_attackers:
 		allocate_attacker(selected_unit)
+
+func __on_unit_unselection(unit: GamePiece):
+	if unit in allocated_attackers:
+		allocated_attackers.erase(unit)

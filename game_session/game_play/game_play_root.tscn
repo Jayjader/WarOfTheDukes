@@ -1,8 +1,6 @@
-[gd_scene load_steps=21 format=3 uid="uid://dn24y8eq6bsf"]
+[gd_scene load_steps=19 format=3 uid="uid://dn24y8eq6bsf"]
 
 [ext_resource type="Script" path="res://game_session/game_play/game_play_root.gd" id="1_kicvc"]
-[ext_resource type="Script" path="res://game_session/game_play/proceed_button.gd" id="2_hmm0i"]
-[ext_resource type="Script" path="res://game_session/game_play/cancel_button.gd" id="3_2xix2"]
 [ext_resource type="Script" path="res://game_session/game_play/play_phase_state_machine.gd" id="4_rxnh7"]
 [ext_resource type="Script" path="res://game_session/game_play/movement/movement_phase.gd" id="5_qyd0w"]
 [ext_resource type="Script" path="res://game_session/game_play/movement/movement_phase_machine.gd" id="6_rh5ps"]
@@ -70,6 +68,7 @@ horizontal_alignment = 1
 
 [node name="OrfburgCurrentPlayer" type="Label" parent="TopMargin/Panel/Margins/HBox/VBox"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 text = "Current Player: Orfburg"
 
@@ -81,6 +80,7 @@ text = "Current Player: Wulfenburg"
 
 [node name="MovementPhase" type="Label" parent="TopMargin/Panel/Margins/HBox/VBox"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 text = "Movement Phase"
 horizontal_alignment = 1
@@ -89,7 +89,7 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-text = "CombatPhase"
+text = "Combat Phase"
 horizontal_alignment = 1
 
 [node name="SubPhaseInstruction" type="Label" parent="TopMargin/Panel/Margins/HBox/VBox"]
@@ -177,46 +177,78 @@ grow_vertical = 0
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="EndMovementPhase" type="Button" parent="BottomRightMargin"]
+[node name="HBox" type="HBoxContainer" parent="BottomRightMargin"]
+layout_mode = 2
+
+[node name="Cancel" type="HBoxContainer" parent="BottomRightMargin/HBox"]
+layout_mode = 2
+
+[node name="UnitChosenForMove" type="Button" parent="BottomRightMargin/HBox/Cancel"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-text = "End Movement Phase"
+text = "Cancel Unit Choice"
 
-[node name="EndCombatPhase" type="Button" parent="BottomRightMargin"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-text = "End Combat Phase"
-
-[node name="ConfirmAttackers" type="Button" parent="BottomRightMargin"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-text = "Choose Defender"
-
-[node name="CancelAttack" type="Button" parent="BottomRightMargin"]
+[node name="CancelAttack" type="Button" parent="BottomRightMargin/HBox/Cancel"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 text = "Cancel Attack"
 
-[node name="Proceed" type="Button" parent="BottomRightMargin"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "proceed"
-script = ExtResource("2_hmm0i")
-
-[node name="Cancel" type="Button" parent="BottomRightMargin"]
+[node name="ChangeAttackers" type="Button" parent="BottomRightMargin/HBox/Cancel"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-text = "cancel"
-script = ExtResource("3_2xix2")
+text = "Change Attackers"
 
-[node name="PlayStateMachine" type="Node" parent="." node_paths=PackedStringArray("move_phase")]
+[node name="ChangeAttackerForRetreat" type="Button" parent="BottomRightMargin/HBox/Cancel"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Choose A Different Attacker To Retreat"
+
+[node name="UnitChosenToMakeWay" type="Button" parent="BottomRightMargin/HBox/Cancel"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Choose A Different Ally To Make Way"
+
+[node name="Confirm" type="HBoxContainer" parent="BottomRightMargin/HBox"]
+layout_mode = 2
+
+[node name="EndMovementPhase" type="Button" parent="BottomRightMargin/HBox/Confirm"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "End Movement Phase"
+
+[node name="EndCombatPhase" type="Button" parent="BottomRightMargin/HBox/Confirm"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "End Combat Phase"
+
+[node name="ConfirmAttackers" type="Button" parent="BottomRightMargin/HBox/Confirm"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Choose Defender"
+
+[node name="ConfirmDefender" type="Button" parent="BottomRightMargin/HBox/Confirm"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Confirm Defender"
+
+[node name="ConfirmLossAllocation" type="Button" parent="BottomRightMargin/HBox/Confirm"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Confirm Loss Allocation"
+
+[node name="PlayStateMachine" type="Node" parent="." node_paths=PackedStringArray("current_phase")]
 script = ExtResource("4_rxnh7")
-move_phase = NodePath("MovementPhase")
+current_phase = NodePath("MovementPhase")
 
 [node name="MovementPhase" type="Node" parent="PlayStateMachine" node_paths=PackedStringArray("move_phase_machine", "combat_phase", "choose_unit")]
 script = ExtResource("5_qyd0w")
@@ -224,9 +256,8 @@ move_phase_machine = NodePath("MovementPhaseStateMachine")
 combat_phase = NodePath("../CombatPhase")
 choose_unit = NodePath("MovementPhaseStateMachine/ChooseUnitForMove")
 
-[node name="MovementPhaseStateMachine" type="Node" parent="PlayStateMachine/MovementPhase" node_paths=PackedStringArray("subphase")]
+[node name="MovementPhaseStateMachine" type="Node" parent="PlayStateMachine/MovementPhase"]
 script = ExtResource("6_rh5ps")
-subphase = NodePath("ChooseUnitForMove")
 
 [node name="ChooseUnitForMove" type="Node" parent="PlayStateMachine/MovementPhase/MovementPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "choose_destination")]
 script = ExtResource("7_77m47")
@@ -245,18 +276,18 @@ move_phase = NodePath("../MovementPhase")
 main_combat = NodePath("CombatPhaseStateMachine/MainCombatSubphase")
 choose_attackers = NodePath("CombatPhaseStateMachine/ChooseUnitsForAttack")
 
-[node name="CombatPhaseStateMachine" type="Node" parent="PlayStateMachine/CombatPhase" node_paths=PackedStringArray("subphase")]
+[node name="CombatPhaseStateMachine" type="Node" parent="PlayStateMachine/CombatPhase"]
 script = ExtResource("10_cw3gt")
-subphase = NodePath("ChooseUnitsForAttack")
 
 [node name="MainCombatSubphase" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "choose_attackers")]
 script = ExtResource("11_72puf")
 parent_phase = NodePath("../..")
 choose_attackers = NodePath("../ChooseUnitsForAttack")
 
-[node name="ChooseUnitsForAttack" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("main_subphase", "choose_defender")]
+[node name="ChooseUnitsForAttack" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("main_subphase", "main_combat", "choose_defender")]
 script = ExtResource("12_bclrs")
 main_subphase = NodePath("../MainCombatSubphase")
+main_combat = NodePath("../MainCombatSubphase")
 choose_defender = NodePath("../ChooseDefenderForAttack")
 
 [node name="ChooseDefenderForAttack" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "main_subphase", "choose_attackers", "resolve_combat")]
@@ -318,6 +349,13 @@ choose_attackers = NodePath("../ChooseUnitsForAttack")
 choose_defender = NodePath("../ChooseDefenderForAttack")
 
 [connection signal="toggled" from="BottomLeftMargin/HBoxContainer/VBox/ToggleInstructions" to="BottomLeftMargin/HBoxContainer/VBox/Panel" method="set_visible"]
-[connection signal="pressed" from="BottomRightMargin/EndMovementPhase" to="." method="confirm_movement"]
-[connection signal="pressed" from="BottomRightMargin/EndCombatPhase" to="." method="confirm_combat"]
-[connection signal="pressed" from="BottomRightMargin/ConfirmAttackers" to="." method="confirm_attackers"]
+[connection signal="pressed" from="BottomRightMargin/HBox/Cancel/UnitChosenForMove" to="PlayStateMachine/MovementPhase/MovementPhaseStateMachine/ChooseUnitDestination" method="cancel_unit_choice"]
+[connection signal="pressed" from="BottomRightMargin/HBox/Cancel/CancelAttack" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/ChooseUnitsForAttack" method="cancel_attack"]
+[connection signal="pressed" from="BottomRightMargin/HBox/Cancel/ChangeAttackers" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/ChooseDefenderForAttack" method="change_attackers"]
+[connection signal="pressed" from="BottomRightMargin/HBox/Cancel/ChangeAttackerForRetreat" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/RetreatAttacker" method="cancel_choice_of_retreater"]
+[connection signal="pressed" from="BottomRightMargin/HBox/Cancel/UnitChosenToMakeWay" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/ChooseAllyToMakeWay" method="cancel_choice_of_retreater"]
+[connection signal="pressed" from="BottomRightMargin/HBox/Confirm/EndMovementPhase" to="PlayStateMachine/MovementPhase" method="confirm_movement"]
+[connection signal="pressed" from="BottomRightMargin/HBox/Confirm/EndCombatPhase" to="PlayStateMachine/CombatPhase" method="confirm_combat"]
+[connection signal="pressed" from="BottomRightMargin/HBox/Confirm/ConfirmAttackers" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/ChooseUnitsForAttack" method="confirm_attackers"]
+[connection signal="pressed" from="BottomRightMargin/HBox/Confirm/ConfirmDefender" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/ChooseDefenderForAttack" method="confirm_attack"]
+[connection signal="pressed" from="BottomRightMargin/HBox/Confirm/ConfirmLossAllocation" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/AllocateExchangeLosses" method="confirm_loss_allocation"]

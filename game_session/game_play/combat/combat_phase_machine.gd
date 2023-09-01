@@ -3,11 +3,14 @@ extends Node
 
 @export var subphase: CombatSubphase
 
-func _ready():
-	change_subphase(subphase)
-
 func change_subphase(new_subphase: CombatSubphase):
 	if subphase is CombatSubphase:
+		print_debug("exiting combat subphase %s" % subphase.name)
 		subphase._exit_subphase()
 	new_subphase._enter_subphase()
 	subphase = new_subphase
+
+func exit_subphase():
+	if subphase is CombatSubphase:
+		subphase._exit_subphase()
+	subphase = null
