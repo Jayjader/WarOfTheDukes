@@ -28,14 +28,11 @@ func _clear():
 func confirm_combat():
 	for dead in died:
 		if dead not in play_state_machine.died:
-			unit_layer.move_unit(dead, dead.tile, Vector2i(-1, -1))
-			dead.visible = false
 			play_state_machine.died.append(dead)
 	if play_state_machine.current_player == Enums.Faction.Wulfenburg:
 		if play_state_machine.turn == Rules.MaxTurns:
 			var results = _detect_game_result()
 			last_turn_ended.emit(results[0], results[1])
-			play_state_machine.get_parent().game_over.emit(results[0], results[1])
 			return
 		play_state_machine.turn += 1
 	play_state_machine.current_player = Enums.get_other_faction(play_state_machine.current_player)

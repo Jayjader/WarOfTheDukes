@@ -64,6 +64,7 @@ script = ExtResource("4_7yuta")
 [node name="UnitLayer" type="Node2D" parent="ViewportContainer/SubViewport"]
 unique_name_in_owner = true
 script = ExtResource("4_3bm0a")
+graveyard = Vector2i(-1, -1)
 
 [node name="OverBoardCamera" type="Camera2D" parent="ViewportContainer/SubViewport"]
 editor_draw_limits = true

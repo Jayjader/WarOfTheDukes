@@ -19,6 +19,7 @@ class_name GamePiece
 @export var movement_points: int
 
 @onready var _original_outline: Color = $Label.get_theme_color("font_outline_color")
+@onready var unit_layer: UnitLayer = Board.get_node("%UnitLayer")
 
 func _set_label_text_outline():
 	if _selected:
@@ -113,12 +114,14 @@ func attempt_retreat_from(defenders: Array) -> bool:
 			cascade_retreat_tiles.shuffle()
 			var cascade_push_destination_tile = cascade_retreat_tiles.pop_front()
 			for unit in units_to_push:
-				Board.get_node("%UnitLayer").move_unit(unit, unit.tile, cascade_push_destination_tile)
-		Board.get_node("%UnitLayer").move_unit(self, self.tile, retreat_tile)
+				unit_layer.move_unit(unit, unit.tile, cascade_push_destination_tile)
+		unit_layer.move_unit(self, self.tile, retreat_tile)
 		return true
 
 func die():
-	queue_free()
+	#queue_free()
+	unit_layer.move_unit(self, self.tile, unit_layer.graveyard)
+	self.visible = false
 
 func unselect():
 	if _selected:

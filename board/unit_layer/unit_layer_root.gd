@@ -3,6 +3,8 @@ extends Node2D
 
 const Unit = preload("res://board/unit_layer/unit_root.tscn")
 
+@export var graveyard: Vector2i
+
 signal unit_selected(unit: GamePiece)
 signal unit_unselected(unit: GamePiece)
 
