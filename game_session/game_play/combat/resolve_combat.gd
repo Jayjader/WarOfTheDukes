@@ -3,6 +3,8 @@ extends CombatSubphase
 
 @export var result: Enums.CombatResult
 
+signal duke_died(faction: Enums.Faction)
+
 
 @export_category("States/Phases")
 @export var parent_phase: CombatPhase
@@ -22,6 +24,9 @@ var _random = RandomNumberGenerator.new()
 
 func _enter_subphase():
 	%SubPhaseInstruction.text = "(Resolving Combat...)"
+	# combat resolution changes the current subphase, which is basically a race condition on the subphase state machine when done inside an evaluation of _enter_subphase()
+	# so we schedule comabt resolution to be triggered by the next general/global processing frame
+	# this functions as a quick hack to hopefully delay the resulting change in subphase until after the side-effects from entering this subphase have finished propagating
 	get_tree().process_frame.connect(_resolve, CONNECT_ONE_SHOT)
 
 # TODO: Split combat resolution and advancing state machine to next subphase,
@@ -58,9 +63,7 @@ func _resolve():
 		Enums.CombatResult.Exchange:
 			parent_phase.died.append(defender)
 			if defender.kind == Enums.Unit.Duke:
-				parent_phase.play_phase_state_machine.get_parent().game_over.emit(
-					Enums.GameResult.TOTAL_VICTORY, Enums.get_other_faction(defender.faction)
-				)
+				duke_died.emit(defender.faction)
 			else:
 				phase_state_machine.change_subphase(allocate_exchange_losses)
 		Enums.CombatResult.DefenderRetreats:
@@ -74,13 +77,17 @@ func _resolve():
 				choose_ally_to_make_way.previous_subphase = self
 				phase_state_machine.change_subphase(choose_ally_to_make_way)
 			else:
-				phase_state_machine.change_subphase(main_combat)
+				parent_phase.died.append(defender)
+				if defender.kind == Enums.Unit.Duke:
+					duke_died.emit(defender.faction)
+				else:
+					phase_state_machine.change_subphase(main_combat)
 		Enums.CombatResult.DefenderEliminated:
 			parent_phase.died.append(defender)
 			if defender.kind == Enums.Unit.Duke:
-				parent_phase.play_phase_state_machine.get_parent().game_over.emit(Enums.GameResult.TOTAL_VICTORY, Enums.get_other_faction(defender.faction))
-			phase_state_machine.change_subphase(main_combat)
-			unit_layer.make_faction_selectable(parent_phase.play_state_machine.current_player, attackers)
+				duke_died.emit(defender.faction)
+			else:
+				phase_state_machine.change_subphase(main_combat)
 
 func _calculate_effective_attack_strength(unit: GamePiece, duke_tile_in_cube):
 	var tile = unit.tile

@@ -1,6 +1,8 @@
 class_name CombatPhase
 extends PlayPhase
 
+signal last_turn_ended(result: Enums.GameResult, winner: Enums.Faction)
+
 @export var attacked: Dictionary = {} # attacker -> defender
 @export var defended: Array[GamePiece] = [] # can only defend once
 @export var retreated: Array[GamePiece] = [] # can only retreat once
@@ -31,6 +33,7 @@ func confirm_combat():
 	if play_state_machine.current_player == Enums.Faction.Wulfenburg:
 		if play_state_machine.turn == Rules.MaxTurns:
 			var results = _detect_game_result()
+			last_turn_ended.emit(results[0], results[1])
 			play_state_machine.get_parent().game_over.emit(results[0], results[1])
 			return
 		play_state_machine.turn += 1

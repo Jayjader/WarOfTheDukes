@@ -359,3 +359,5 @@ choose_defender = NodePath("../ChooseDefenderForAttack")
 [connection signal="pressed" from="BottomRightMargin/HBox/Confirm/ConfirmAttackers" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/ChooseUnitsForAttack" method="confirm_attackers"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Confirm/ConfirmDefender" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/ChooseDefenderForAttack" method="confirm_attack"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Confirm/ConfirmLossAllocation" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/AllocateExchangeLosses" method="confirm_loss_allocation"]
+[connection signal="last_turn_ended" from="PlayStateMachine/CombatPhase" to="." method="__on_last_turn_end"]
+[connection signal="duke_died" from="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/ResolveCombat" to="." method="__on_duke_death"]
