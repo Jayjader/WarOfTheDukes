@@ -12,7 +12,7 @@ extends CombatSubphase
 @export var choose_defender: ChooseDefenderForAttack
 
 @onready var phase_state_machine: CombatPhaseStateMachine = get_parent()
-@onready var unit_layer = Board.get_node("%UnitLayer")
+@onready var unit_layer: UnitLayer = Board.get_node("%UnitLayer")
 
 func allocate_attacker(attacker: GamePiece):
 	assert(not attacker in allocated_attackers)
@@ -27,7 +27,7 @@ func unallocate_attacker(attacker: GamePiece):
 	allocated_attackers.erase(attacker)
 
 func confirm_loss_allocation():
-	unit_layer.unit_selected.disconnect(__on_unit_selection)
+	unit_layer.unit_unselected.disconnect(__on_unit_unselection)
 	for attacker in allocated_attackers:
 		attacker.unselect()
 		parent_phase.died.append(attacker)
@@ -48,7 +48,7 @@ func _enter_subphase():
 			attacker.selectable = true
 
 func _exit_subphase():
-	print_debug("allocate losses subphase exited")
+	unit_layer.make_faction_selectable(null)
 	if unit_layer.unit_selected.is_connected(__on_unit_selection):
 		unit_layer.unit_selected.disconnect(__on_unit_selection)
 	if unit_layer.unit_unselected.is_connected(__on_unit_unselection):
@@ -61,4 +61,4 @@ func __on_unit_selection(selected_unit: GamePiece):
 
 func __on_unit_unselection(unit: GamePiece):
 	if unit in allocated_attackers:
-		allocated_attackers.erase(unit)
+		unallocate_attacker(unit)
