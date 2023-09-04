@@ -17,6 +17,7 @@ signal last_turn_ended(result: Enums.GameResult, winner: Enums.Faction)
 @export var choose_attackers: ChooseUnitsForAttack
 
 @onready var play_state_machine: PlayPhaseStateMachine = get_parent()
+@onready var unit_layer: UnitLayer = Board.get_node("%UnitLayer")
 
 func _clear():
 	attacked = {}
@@ -27,6 +28,7 @@ func _clear():
 func confirm_combat():
 	for dead in died:
 		if dead not in play_state_machine.died:
+			unit_layer.move_unit(dead, dead.tile, Vector2i(-1, -1))
 			dead.visible = false
 			play_state_machine.died.append(dead)
 	if play_state_machine.current_player == Enums.Faction.Wulfenburg:
