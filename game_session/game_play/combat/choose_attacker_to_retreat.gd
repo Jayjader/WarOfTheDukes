@@ -30,6 +30,7 @@ func choose_attacker(attacker: GamePiece):
 		choose_ally_to_make_way.previous_subphase = self
 		phase_state_machine.change_subphase(choose_ally_to_make_way)
 	else:
+		attacker.die()
 		parent_phase.died.append(attacker)
 		phase_state_machine.change_subphase(main_combat)
 

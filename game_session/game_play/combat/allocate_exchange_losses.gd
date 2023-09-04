@@ -30,6 +30,7 @@ func confirm_loss_allocation():
 	unit_layer.unit_unselected.disconnect(__on_unit_unselection)
 	for attacker in allocated_attackers:
 		attacker.unselect()
+		attacker.die()
 		parent_phase.died.append(attacker)
 	phase_state_machine.change_subphase(main_combat)
 
