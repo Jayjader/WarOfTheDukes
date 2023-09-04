@@ -140,5 +140,3 @@ static func draw_zone(node: Node2D, zone: String, tiles_in_axial: Array, hex_siz
 				var second_corner = Util.hex_corner_trig(Util.hex_coords_to_pixel(tile, hex_size), hex_size, (direction_index)%6)
 				node.draw_line(origin_in_pix + first_corner, origin_in_pix + second_corner, Color.MEDIUM_PURPLE, 5)
 				node.draw_string(node.get_window().get_theme_default_font(), origin_in_pix + Util.hex_coords_to_pixel(tile, hex_size), "%s" % zone)
-				pass
-	pass
