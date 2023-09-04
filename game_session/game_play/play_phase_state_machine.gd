@@ -20,5 +20,7 @@ func _ready():
 func change_state(new_state: PlayPhase):
 	if current_phase is PlayPhase:
 		current_phase._exit_state()
-	new_state._enter_state()
+
 	current_phase = new_state
+	if current_phase is PlayPhase:
+		new_state._enter_state()
