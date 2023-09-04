@@ -24,7 +24,7 @@ func _set_label_text_outline():
 	if _selected:
 		$Label.add_theme_color_override("font_outline_color", Color.GOLD)
 	elif selectable:
-		$Label.add_theme_color_override("font_outline_color", Color.LIGHT_GRAY)
+		$Label.add_theme_color_override("font_outline_color", Color.LIGHT_SALMON)
 	else:
 		$Label.add_theme_color_override("font_outline_color", _original_outline)
 
