@@ -22,18 +22,12 @@ signal duke_died(faction: Enums.Faction)
 @onready var unit_layer = Board.get_node("%UnitLayer")
 var _random = RandomNumberGenerator.new()
 
+var _next_subphase: CombatSubphase
+var _died: Array[GamePiece] = []
+
 func _enter_subphase():
 	%SubPhaseInstruction.text = "(Resolving Combat...)"
-	# combat resolution changes the current subphase, which is basically a race condition on the subphase state machine when done inside an evaluation of _enter_subphase()
-	# so we schedule comabt resolution to be triggered by the next general/global processing frame
-	# this functions as a quick hack to hopefully delay the resulting change in subphase until after the side-effects from entering this subphase have finished propagating
-	get_tree().process_frame.connect(_resolve, CONNECT_ONE_SHOT)
-
-# TODO: Split combat resolution and advancing state machine to next subphase,
-# and gate the latter behind user interaction.
-# This way we give the user time to parse the combat result, and we don't
-# necessarily need to rely on the get_tree().process_frame hack.
-func _resolve():
+	_died.clear()
 	var attackers = choose_attackers.attacking
 	assert(len(attackers) > 0)
 	var defender = choose_defender.defender
@@ -47,6 +41,8 @@ func _resolve():
 	#result = _resolve_combat(choose_attackers.attacking, choose_defender.defender)
 	result = Enums.CombatResult.Exchange
 	
+	%SubPhaseInstruction.text = "Result: %s" % Enums.CombatResult.find_key(result)
+	
 	match result:
 		Enums.CombatResult.AttackerEliminated:
 			for attacker in attackers.attacking:
@@ -54,40 +50,42 @@ func _resolve():
 					Util.axial_to_cube(attacker.tile),
 					Util.axial_to_cube(defender.tile)
 					):
-					parent_phase.died.append(attacker)
-			parent_phase.died.append_array(attackers)
-			phase_state_machine.change_subphase(main_combat)
-			unit_layer.make_faction_selectable(parent_phase.play_state_machine.current_player)
+					_died.append(attacker)
+			_next_subphase = main_combat
 		Enums.CombatResult.AttackerRetreats:
-			phase_state_machine.change_subphase(choose_attacker_to_retreat)
+			_next_subphase = choose_attacker_to_retreat
 		Enums.CombatResult.Exchange:
-			parent_phase.died.append(defender)
 			if defender.kind == Enums.Unit.Duke:
 				duke_died.emit(defender.faction)
 			else:
-				phase_state_machine.change_subphase(allocate_exchange_losses)
+				_died.append(defender)
+				_next_subphase = allocate_exchange_losses
 		Enums.CombatResult.DefenderRetreats:
 			# var has_room = len(allowed_retreat_destinations) > 0
 			var has_room = false
 			# var can_make_way = len(allied_neighbors_on(allowed_retreat_destinations).filter(func(u): return not (u in parent_phase.retreated))) > 0
 			var can_make_way = false
 			if has_room:
-				phase_state_machine.change_subphase(retreat_defender)
+				_next_subphase = retreat_defender
 			elif can_make_way:
 				choose_ally_to_make_way.previous_subphase = self
-				phase_state_machine.change_subphase(choose_ally_to_make_way)
+				_next_subphase = choose_ally_to_make_way
 			else:
-				parent_phase.died.append(defender)
 				if defender.kind == Enums.Unit.Duke:
 					duke_died.emit(defender.faction)
 				else:
-					phase_state_machine.change_subphase(main_combat)
+					_died.append(defender)
+					_next_subphase = main_combat
 		Enums.CombatResult.DefenderEliminated:
-			parent_phase.died.append(defender)
 			if defender.kind == Enums.Unit.Duke:
 				duke_died.emit(defender.faction)
 			else:
-				phase_state_machine.change_subphase(main_combat)
+				_died.append(defender)
+				_next_subphase = main_combat
+	%ConfirmCombatResult.visible = true
+
+func _exit_subphase():
+	%ConfirmCombatResult.visible = false
 
 func _calculate_effective_attack_strength(unit: GamePiece, duke_tile_in_cube):
 	var tile = unit.tile
@@ -155,3 +153,8 @@ const COMBAT_RESULTs = {
 	Vector2i(5, 1): [CR.DefenderEliminated, CR.DefenderEliminated, CR.DefenderEliminated, CR.DefenderRetreats, CR.DefenderRetreats, CR.Exchange],
 	Vector2i(6, 1): [CR.DefenderEliminated, CR.DefenderEliminated, CR.DefenderEliminated, CR.DefenderEliminated, CR.Exchange, CR.Exchange],
 }
+
+func __on_user_ok():
+	for dead in _died:
+		dead.die()
+	phase_state_machine.change_subphase(_next_subphase)

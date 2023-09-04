@@ -7,8 +7,9 @@ func change_subphase(new_subphase: CombatSubphase):
 	if subphase is CombatSubphase:
 		print_debug("exiting combat subphase %s" % subphase.name)
 		subphase._exit_subphase()
-	new_subphase._enter_subphase()
 	subphase = new_subphase
+	if subphase is CombatSubphase:
+		subphase._enter_subphase()
 
 func exit_subphase():
 	if subphase is CombatSubphase:
