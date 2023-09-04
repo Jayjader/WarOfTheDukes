@@ -11,7 +11,10 @@ extends CombatSubphase
 @export var choose_defender: ChooseDefenderForAttack
 
 @onready var phase_state_machine: CombatPhaseStateMachine = get_parent()
-@onready var unit_layer = Board.get_node("%UnitLayer")
+@onready var unit_layer: UnitLayer = Board.get_node("%UnitLayer")
+
+func _clear():
+	attacking.clear()
 
 func choose_unit(new_attacker: GamePiece):
 	assert(new_attacker not in attacking)
@@ -52,6 +55,8 @@ func _enter_subphase():
 		unit_layer.unit_selected.connect(__on_unit_selection)
 	if not unit_layer.unit_unselected.is_connected(__on_unit_unselection):
 		unit_layer.unit_unselected.connect(__on_unit_unselection)
+	unit_layer.make_faction_selectable(null)
+	unit_layer.make_faction_selectable(main_combat.parent_phase.play_state_machine.current_player, main_combat.parent_phase.attacked.keys())
 	%SubPhaseInstruction.text = "Choose the next attacker(s) to participate in combat"
 
 func _exit_subphase():
