@@ -18,7 +18,7 @@ signal last_turn_ended(result: Enums.GameResult, winner: Enums.Faction)
 
 @onready var play_state_machine: PlayPhaseStateMachine = get_parent()
 
-func clear():
+func _clear():
 	attacked = {}
 	defended = []
 	retreated = []
@@ -29,7 +29,6 @@ func confirm_combat():
 		if dead not in play_state_machine.died:
 			dead.visible = false
 			play_state_machine.died.append(dead)
-	move_phase.clear()
 	if play_state_machine.current_player == Enums.Faction.Wulfenburg:
 		if play_state_machine.turn == Rules.MaxTurns:
 			var results = _detect_game_result()
@@ -38,6 +37,7 @@ func confirm_combat():
 			return
 		play_state_machine.turn += 1
 	play_state_machine.current_player = Enums.get_other_faction(play_state_machine.current_player)
+	move_phase._clear()
 	play_state_machine.change_state(move_phase)
 
 func _enter_state():

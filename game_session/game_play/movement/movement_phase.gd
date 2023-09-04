@@ -12,11 +12,11 @@ extends PlayPhase
 @onready var play_state_machine: PlayPhaseStateMachine = get_parent()
 @onready var unit_layer = Board.get_node("%UnitLayer")
 
-func clear():
+func _clear():
 	moved = []
 
 func confirm_movement():
-	combat_phase.clear()
+	combat_phase._clear()
 	play_state_machine.change_state(combat_phase)
 
 func _enter_state():
