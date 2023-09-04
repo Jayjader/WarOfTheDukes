@@ -1,3 +1,4 @@
+class_name UnitLayer
 extends Node2D
 
 const Unit = preload("res://board/unit_layer/unit_root.tscn")
@@ -8,6 +9,7 @@ signal unit_unselected(unit: GamePiece)
 func _place_piece(tile: Vector2i, kind: Enums.Unit, faction: Enums.Faction):
 	print_debug("placing piece (%s, %s, %s)" % [tile, kind, faction])
 	var new_unit = Unit.instantiate()
+	new_unit.name = "Unit%s-%s-%s" % [get_child_count(), Enums.Faction.find_key(faction), Enums.Unit.find_key(kind)]
 	add_child(new_unit)
 	new_unit.kind = kind
 	new_unit.faction = faction
@@ -15,9 +17,9 @@ func _place_piece(tile: Vector2i, kind: Enums.Unit, faction: Enums.Faction):
 	new_unit.selected.connect(__on_unit_selected_toggle.bind(new_unit))
 
 
-func make_faction_selectable(faction, omit=[]):
+func make_faction_selectable(faction, preserve=[]):
 	for unit in get_children():
-		if not omit.has(unit):
+		if not preserve.has(unit):
 			unit.selectable = unit.faction == faction
 
 func get_units(faction: Enums.Faction):
