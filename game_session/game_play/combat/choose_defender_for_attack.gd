@@ -13,7 +13,7 @@ extends CombatSubphase
 @export var resolve_combat: ResolveCombat
 
 @onready var phase_state_machine: CombatPhaseStateMachine = get_parent()
-@onready var unit_layer = Board.get_node("%UnitLayer")
+@onready var unit_layer: UnitLayer = Board.get_node("%UnitLayer")
 
 func cancel_attack():
 	choose_attackers.cancel_attack()
@@ -35,6 +35,7 @@ func unchoose_defender(choice: GamePiece):
 
 func confirm_attack():
 	assert(defender != null)
+	unit_layer.make_faction_selectable(null)
 	phase_state_machine.change_subphase(resolve_combat)
 
 func _enter_subphase():
