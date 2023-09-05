@@ -19,13 +19,26 @@ func _place_piece(tile: Vector2i, kind: Enums.Unit, faction: Enums.Faction):
 	new_unit.selected.connect(__on_unit_selected_toggle.bind(new_unit))
 
 
-func make_faction_selectable(faction, preserve=[]):
+func make_faction_selectable(faction: Enums.Faction, preserve=[]) -> void:
 	for unit in get_children():
 		if not preserve.has(unit):
 			unit.selectable = unit.faction == faction
 
-func get_units(faction: Enums.Faction):
-	return get_children().filter(func(unit): return unit.faction == faction)
+func make_units_selectable(units: Array[GamePiece], preserve_others=false) -> void:
+	for unit in get_children():
+		unit.selectable = units.has(unit) or (preserve_others and unit.selectable)
+
+func get_units(faction: Enums.Faction) -> Array[GamePiece]:
+	var units: Array[GamePiece] = []
+	for unit in get_children():
+		if unit.faction == faction:
+			units.append(unit)
+	return units
+
+func get_duke(faction: Enums.Faction):
+	for faction_unit in get_units(faction):
+		if faction_unit.kind == Enums.Unit.Duke:
+			return faction_unit
 
 func _unselect_all_units():
 	for unit in get_children():

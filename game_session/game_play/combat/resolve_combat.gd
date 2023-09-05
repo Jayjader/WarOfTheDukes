@@ -30,40 +30,46 @@ func _enter_subphase():
 	_died.clear()
 	var attackers = choose_attackers.attacking
 	assert(len(attackers) > 0)
-	var defender = choose_defender.defender
+	var defender = choose_defender.choice
 	assert(defender != null)
-	
-	for attacker in attackers:
-		attacker.unselect()
-		parent_phase.attacked[attacker] = defender
-	defender.unselect()
-	parent_phase.defended.append(defender)
-	#result = _resolve_combat(choose_attackers.attacking, choose_defender.defender)
+	var defender_effective_strength = choose_defender._choice_effective_strength
+
+	#result = _resolve_combat(attackers, defender, defender_effective_strength)
 	result = Enums.CombatResult.Exchange
-	
 	%SubPhaseInstruction.text = "Result: %s" % Enums.CombatResult.find_key(result)
 	
 	match result:
 		Enums.CombatResult.AttackerEliminated:
 			for attacker in attackers.attacking:
-				if attacker.kind != Enums.Unit.Artillery and 2 > Util.cube_distance(
-					Util.axial_to_cube(attacker.tile),
-					Util.axial_to_cube(defender.tile)
-					):
+				if attacker.kind != Enums.Unit.Artillery or not Rules.is_bombardment(attacker, defender):
 					_died.append(attacker)
 			_next_subphase = main_combat
 		Enums.CombatResult.AttackerRetreats:
-			_next_subphase = choose_attacker_to_retreat
+			choose_attacker_to_retreat._clear()
+			for attacker in attackers.attacking:
+				if attacker.kind != Enums.Unit.Artillery or not Rules.is_bombardment(attacker, defender):
+					choose_attacker_to_retreat.to_retreat.append(attacker)
+			if len(choose_attacker_to_retreat.to_retreat) > 0:
+				_next_subphase = choose_attacker_to_retreat
+			else:
+				_next_subphase = main_combat
 		Enums.CombatResult.Exchange:
 			if defender.kind == Enums.Unit.Duke:
 				duke_died.emit(defender.faction)
 			else:
 				_died.append(defender)
+				allocate_exchange_losses._clear()
+				allocate_exchange_losses.remaining_strength_to_allocate = choose_defender._choice_effective_strength
+				for attacker in choose_attackers.attacking:
+					if attacker.kind != Enums.Unit.Artillery or not Rules.is_bombardment(attacker, defender):
+						allocate_exchange_losses.can_be_allocated.append(attacker)
 				_next_subphase = allocate_exchange_losses
 		Enums.CombatResult.DefenderRetreats:
 			# var has_room = len(allowed_retreat_destinations) > 0
 			var has_room = false
-			# var can_make_way = len(allied_neighbors_on(allowed_retreat_destinations).filter(func(u): return not (u in parent_phase.retreated))) > 0
+			# var can_make_way = len(
+			#allied_neighbors_on(allowed_retreat_destinations).filter(func(u): return not (u in parent_phase.retreated))
+			#) > 0
 			var can_make_way = false
 			if has_room:
 				_next_subphase = retreat_defender
@@ -87,47 +93,15 @@ func _enter_subphase():
 func _exit_subphase():
 	%ConfirmCombatResult.visible = false
 
-func _calculate_effective_attack_strength(unit: GamePiece, duke_tile_in_cube):
-	var tile = unit.tile
-	var base_strength = Rules.AttackStrength[unit.kind]
-	match MapData.map.tiles[tile]:
-		"Forest":
-			base_strength += 2
-		"Cliff":
-			base_strength += 1
-	if Util.cube_distance(Util.axial_to_cube(tile), duke_tile_in_cube) <= Rules.DukeAura.range:
-		base_strength *= Rules.DukeAura.multiplier
-	return base_strength
-func _calculate_effective_defense_strength(unit: GamePiece, duke_tile_in_cube):
-	var tile = unit.tile
-	var base_strength = Rules.DefenseStrength[unit.kind]
-	var terrain_multiplier = Rules.DefenseMultiplier.get(MapData.map.tiles[tile])
-	if terrain_multiplier != null:
-		base_strength *= terrain_multiplier
-	if Util.cube_distance(Util.axial_to_cube(tile), duke_tile_in_cube) <= Rules.DukeAura.range:
-		base_strength *= Rules.DukeAura.multiplier
-	return base_strength
-
-func _resolve_combat(attackers, defender):
+func _resolve_combat(attackers: Dictionary, defender: GamePiece, defender_effective_strength: int):
 	print_debug("### Combat ###")
-	var attacker_duke_in_cube
-	for faction_unit in Board.get_node("%UnitLayer").get_units(attackers.front().faction):
-		if faction_unit.kind == Enums.Unit.Duke:
-			attacker_duke_in_cube = Util.axial_to_cube(faction_unit.tile)
-			break
-	var total_attack_strength = attackers.reduce(func(accum, a): return accum + _calculate_effective_attack_strength(a, attacker_duke_in_cube), 0)
+	var total_attack_strength = attackers.values().reduce(func(accum, a): return accum + a, 0)
 	print_debug("Effective Total Attack Strength: %s" % total_attack_strength)
-	var defender_duke_in_cube
-	for faction_unit in Board.get_node("%UnitLayer").get_units(defender.faction):
-		if faction_unit.kind == Enums.Unit.Duke:
-			defender_duke_in_cube = Util.axial_to_cube(faction_unit.tile)
-			break
-	var defense_strength = _calculate_effective_defense_strength(defender, defender_duke_in_cube)
-	print_debug("Effective Defense Strength: %s" % defense_strength)
+	print_debug("Effective Defense Strength: %s" % defender_effective_strength)
 
 	var numerator
 	var denominator
-	var ratio = float(total_attack_strength) / float(defense_strength)
+	var ratio = float(total_attack_strength) / float(defender_effective_strength)
 	if ratio > 1:
 		numerator = min(6, floori(ratio))
 		denominator = 1

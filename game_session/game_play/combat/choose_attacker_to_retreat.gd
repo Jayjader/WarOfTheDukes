@@ -16,6 +16,9 @@ extends CombatSubphase
 
 @onready var unit_layer = Board.get_node("%UnitLayer")
 
+func _clear():
+	to_retreat.clear()
+
 func choose_attacker(attacker: GamePiece):
 	assert(attacker in to_retreat)
 	to_retreat.erase(attacker)

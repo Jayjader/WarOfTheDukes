@@ -36,14 +36,13 @@ func _enter_subphase():
 	var destination_tiles = [] as Array[Vector2i]
 	for d in destinations.keys():
 		destination_tiles.append(d as Vector2i)
+	Board.hex_clicked.connect(__on_hex_click)
 	Board.report_click_for_tiles(destination_tiles)
 	Board.report_hover_for_tiles(destination_tiles)
-	Board.get_node("%HoverClick").draw_hover = true
 	tile_overlay.set_destinations(destinations)
-	Board.hex_clicked.connect(__on_hex_click)
-	unit_layer.make_faction_selectable(null)
-	moving.selectable = true
+	Board.get_node("%HoverClick").draw_hover = true
 	unit_layer.unit_unselected.connect(__on_unit_unselection)
+	unit_layer.make_units_selectable([moving] as Array[GamePiece])
 
 func _exit_subphase():
 	#moving = null <- wait until needed to implement

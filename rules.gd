@@ -45,4 +45,17 @@ const DukeAura = {
 
 const ArtilleryRange = 2
 
+static func is_in_range(attacker: GamePiece, defender: GamePiece):
+	return Util.cube_distance(
+				Util.axial_to_cube(attacker.tile),
+				Util.axial_to_cube(defender.tile)
+			) <= (1 if attacker.kind != Enums.Unit.Artillery else ArtilleryRange)
+
+static func is_bombardment(attacker: GamePiece, defender: GamePiece):
+	assert(attacker.kind == Enums.Unit.Artillery)
+	return Util.cube_distance(
+				Util.axial_to_cube(attacker.tile),
+				Util.axial_to_cube(defender.tile)
+			) > 1
+
 const MaxTurns = 15

@@ -15,12 +15,12 @@ extends CombatSubphase
 @onready var tile_overlay = Board.get_node("%TileOverlay")
 
 func choose_destination(tile: Vector2i):
-	var defender = choose_defender.defender
+	var defender = choose_defender.choice
 	unit_layer.move_unit(defender, defender.tile, tile)
 	parent_phase.retreated.append(defender)
 	phase_state_machine.change_subphase(main_combat)
 
 func _enter_subphase():
-	assert(choose_defender.defender != null)
+	assert(choose_defender.choice != null)
 	unit_layer.make_faction_selectable(null)
 	%SubPhaseInstruction.text = "Choose a tile for the defender to retreat to"

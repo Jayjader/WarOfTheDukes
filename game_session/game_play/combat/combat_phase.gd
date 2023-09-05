@@ -3,7 +3,9 @@ extends PlayPhase
 
 signal last_turn_ended(result: Enums.GameResult, winner: Enums.Faction)
 
+@export var can_attack: Array[GamePiece] # can only attack once
 @export var attacked: Dictionary = {} # attacker -> defender
+@export var can_defend: Array[GamePiece]
 @export var defended: Array[GamePiece] = [] # can only defend once
 @export var retreated: Array[GamePiece] = [] # can only retreat once
 @export var died: Array[GamePiece] = []
@@ -20,7 +22,9 @@ signal last_turn_ended(result: Enums.GameResult, winner: Enums.Faction)
 @onready var unit_layer: UnitLayer = Board.get_node("%UnitLayer")
 
 func _clear():
+	can_attack = []
 	attacked = {}
+	can_defend = []
 	defended = []
 	retreated = []
 	died = []

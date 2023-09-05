@@ -10,13 +10,19 @@ extends PlayPhase
 @export var choose_unit: ChooseUnitForMove
 
 @onready var play_state_machine: PlayPhaseStateMachine = get_parent()
-@onready var unit_layer = Board.get_node("%UnitLayer")
+@onready var unit_layer: UnitLayer = Board.get_node("%UnitLayer")
 
 func _clear():
 	moved = []
 
 func confirm_movement():
 	combat_phase._clear()
+	for unit in unit_layer.get_units(play_state_machine.current_player):
+		if unit not in play_state_machine.died:
+			combat_phase.can_attack.append(unit)
+	for unit in unit_layer.get_units(Enums.get_other_faction(play_state_machine.current_player)):
+		if unit not in play_state_machine.died:
+			combat_phase.can_defend.append(unit)
 	play_state_machine.change_state(combat_phase)
 
 func _enter_state():
@@ -35,13 +41,8 @@ Woods and Cliffs cost 2 points to enter.
 Lakes can not be entered.
 Rivers can not be crossed (but a Bridge over a River can be crossed - cost as specified above).
 """
-	match play_state_machine.current_player:
-		Enums.Faction.Orfburg:
-			play_state_machine.get_parent().get_node("%OrfburgCurrentPlayer").set_visible(true)
-			play_state_machine.get_parent().get_node("%WulfenburgCurrentPlayer").set_visible(false)
-		Enums.Faction.Wulfenburg:
-			play_state_machine.get_parent().get_node("%OrfburgCurrentPlayer").set_visible(false)
-			play_state_machine.get_parent().get_node("%WulfenburgCurrentPlayer").set_visible(true)
+	%OrfburgCurrentPlayer.set_visible(play_state_machine.current_player == Enums.Faction.Orfburg)
+	%WulfenburgCurrentPlayer.set_visible(play_state_machine.current_player == Enums.Faction.Wulfenburg)
 	move_phase_machine.change_subphase(choose_unit)
 	unit_layer.make_faction_selectable(play_state_machine.current_player)
 

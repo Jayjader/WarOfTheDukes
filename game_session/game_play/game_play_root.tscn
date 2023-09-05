@@ -97,6 +97,12 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Choose a unit to move"
 
+[node name="RemainingStrengthToAllocate" type="Label" parent="TopMargin/Panel/Margins/HBox/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "(remaining strength to allocate)"
+
 [node name="BottomLeftMargin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 2
@@ -296,9 +302,9 @@ script = ExtResource("11_72puf")
 parent_phase = NodePath("../..")
 choose_attackers = NodePath("../ChooseUnitsForAttack")
 
-[node name="ChooseUnitsForAttack" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("main_subphase", "main_combat", "choose_defender")]
+[node name="ChooseUnitsForAttack" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "main_combat", "choose_defender")]
 script = ExtResource("12_bclrs")
-main_subphase = NodePath("../MainCombatSubphase")
+parent_phase = NodePath("../..")
 main_combat = NodePath("../MainCombatSubphase")
 choose_defender = NodePath("../ChooseDefenderForAttack")
 
