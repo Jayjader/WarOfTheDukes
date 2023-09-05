@@ -35,18 +35,18 @@ func _enter_subphase():
 	var defender_effective_strength = choose_defender._choice_effective_strength
 
 	#result = _resolve_combat(attackers, defender, defender_effective_strength)
-	result = Enums.CombatResult.Exchange
+	result = Enums.CombatResult.DefenderEliminated
 	%SubPhaseInstruction.text = "Result: %s" % Enums.CombatResult.find_key(result)
 	
 	match result:
 		Enums.CombatResult.AttackerEliminated:
-			for attacker in attackers.attacking:
+			for attacker in attackers:
 				if attacker.kind != Enums.Unit.Artillery or not Rules.is_bombardment(attacker, defender):
 					_died.append(attacker)
 			_next_subphase = main_combat
 		Enums.CombatResult.AttackerRetreats:
 			choose_attacker_to_retreat._clear()
-			for attacker in attackers.attacking:
+			for attacker in attackers:
 				if attacker.kind != Enums.Unit.Artillery or not Rules.is_bombardment(attacker, defender):
 					choose_attacker_to_retreat.to_retreat.append(attacker)
 			if len(choose_attacker_to_retreat.to_retreat) > 0:
@@ -131,4 +131,5 @@ const COMBAT_RESULTs = {
 func __on_user_ok():
 	for dead in _died:
 		dead.die()
+		parent_phase.died.append(dead)
 	phase_state_machine.change_subphase(_next_subphase)
