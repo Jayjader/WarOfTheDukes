@@ -49,7 +49,15 @@ func confirm_attackers():
 	choose_defender.can_defend.clear()
 	choose_defender.duke_tile_in_cube = Util.axial_to_cube(unit_layer.get_duke(parent_phase.play_state_machine.current_player).tile)
 	for unit in parent_phase.can_defend:
-		if attacking.keys().all(func(attacker): return Rules.is_in_range(attacker, unit)):
+		if attacking.keys().all(
+			func(attacker):
+				if not Rules.is_in_range(attacker, unit):
+					return false
+				elif attacker.kind != Enums.Unit.Artillery and MapData.map.borders.get(0.5 * (attacker.tile + unit.tile)) == "River":
+					return false
+				else:
+					return true
+		):
 			choose_defender.can_defend.append(unit)
 	phase_state_machine.change_subphase(choose_defender)
 
