@@ -35,7 +35,7 @@ func _enter_subphase():
 	var defender_effective_strength = choose_defender._choice_effective_strength
 
 	#result = _resolve_combat(attackers, defender, defender_effective_strength)
-	result = Enums.CombatResult.DefenderEliminated
+	result = Enums.CombatResult.DefenderRetreats
 	%SubPhaseInstruction.text = "Result: %s" % Enums.CombatResult.find_key(result)
 	
 	match result:
@@ -65,13 +65,17 @@ func _enter_subphase():
 						allocate_exchange_losses.can_be_allocated.append(attacker)
 				_next_subphase = allocate_exchange_losses
 		Enums.CombatResult.DefenderRetreats:
-			# var has_room = len(allowed_retreat_destinations) > 0
-			var has_room = false
+			var other_live_units: Array[GamePiece] = []
+			for unit in unit_layer.get_children().filter(func(unit): return unit != defender):
+				other_live_units.append(unit)
+			var allowed_retreat_destinations = MapData.map.paths_for_retreat(defender, other_live_units)
+			var has_room = len(allowed_retreat_destinations) > 0
 			# var can_make_way = len(
 			#allied_neighbors_on(allowed_retreat_destinations).filter(func(u): return not (u in parent_phase.retreated))
 			#) > 0
 			var can_make_way = false
 			if has_room:
+				retreat_defender.destinations = allowed_retreat_destinations
 				_next_subphase = retreat_defender
 			elif can_make_way:
 				choose_ally_to_make_way.previous_subphase = self

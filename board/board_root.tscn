@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://bwst2xk4wn3l6"]
+[gd_scene load_steps=12 format=3 uid="uid://bwst2xk4wn3l6"]
 
 [ext_resource type="Script" path="res://board/BoardRoot.gd" id="1_7ngv4"]
 [ext_resource type="Script" path="res://board/tile_layer/TileOverlay.gd" id="2_g1bmc"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://board/tile_layer/movement_range.gd" id="4_6mrs1"]
 [ext_resource type="Script" path="res://board/tile_layer/hover_click.gd" id="4_7yuta"]
 [ext_resource type="Script" path="res://game_session/OverBoardCamera.gd" id="5_eokpn"]
+[ext_resource type="Script" path="res://board/tile_layer/retreat_range.gd" id="5_otyml"]
 [ext_resource type="Script" path="res://board/Direct.gd" id="6_s8gsq"]
 [ext_resource type="Script" path="res://board/Palette.gd" id="7_6tn5h"]
 [ext_resource type="ButtonGroup" uid="uid://c0b178urbj1gl" path="res://board/editing_palette_selection_button_group.tres" id="8_6v8i5"]
@@ -56,6 +57,9 @@ centered = false
 [node name="MovementRange" type="Node2D" parent="ViewportContainer/SubViewport/TileOverlay"]
 unique_name_in_owner = true
 script = ExtResource("4_6mrs1")
+
+[node name="RetreatRange" type="Node2D" parent="ViewportContainer/SubViewport/TileOverlay"]
+script = ExtResource("5_otyml")
 
 [node name="HoverClick" type="Node2D" parent="ViewportContainer/SubViewport/TileOverlay"]
 unique_name_in_owner = true
@@ -324,6 +328,7 @@ columns = 2
 [connection signal="tr_set" from="ViewportContainer/SubViewport/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_tr_set"]
 [connection signal="tile_hovered" from="ViewportContainer/SubViewport/TileOverlay/HoverClick" to="ViewportContainer/SubViewport/TileOverlay" method="_on_hex_hovered"]
 [connection signal="tile_hovered" from="ViewportContainer/SubViewport/TileOverlay/HoverClick" to="ViewportContainer/SubViewport/TileOverlay/MovementRange" method="_on_tile_hovered"]
+[connection signal="tile_hovered" from="ViewportContainer/SubViewport/TileOverlay/HoverClick" to="ViewportContainer/SubViewport/TileOverlay/RetreatRange" method="__on_tile_hovered"]
 [connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/RestartCalibration" to="ViewportContainer/SubViewport/TileOverlay" method="start_calibration"]
 [connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/ChangeCalibrationStep/Previous" to="ViewportContainer/SubViewport/TileOverlay" method="previous_calibration_step"]
 [connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/ChangeCalibrationStep/Next" to="ViewportContainer/SubViewport/TileOverlay" method="next_calibration_step"]
