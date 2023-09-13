@@ -63,7 +63,9 @@ func report_hover_for_tiles(tiles: Array[Vector2i]):
 func paths_from(tile: Vector2i, max_cost: int):
 	return MapData.map.paths_from(tile, max_cost)
 func paths_for(unit: GamePiece):
-	var units = %UnitLayer.get_children(true).filter(func(node): return node.name != unit.name)
+	var units: Array[GamePiece] = []
+	for other_unit in %UnitLayer.get_children(true).filter(func(other_unit: GamePiece): return unit.name != other_unit.name):
+		units.append(other_unit)
 	return MapData.map.paths_for(unit, units)
 
 func get_units_on(tile: Vector2i):
