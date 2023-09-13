@@ -26,7 +26,7 @@ func change_attackers():
 	can_defend.clear()
 	phase_state_machine.change_subphase(choose_attackers)
 
-func _calculate_effective_defense_strength(unit: GamePiece, duke_tile_in_cube):
+func _calculate_effective_defense_strength(unit: GamePiece):
 	var tile = unit.tile
 	var base_strength = Rules.DefenseStrength[unit.kind]
 	var terrain_multiplier = Rules.DefenseMultiplier.get(MapData.map.tiles[tile])
@@ -40,7 +40,7 @@ func _calculate_effective_defense_strength(unit: GamePiece, duke_tile_in_cube):
 func choose_defender(new_choice: GamePiece):
 	assert(new_choice in can_defend)
 	choice = new_choice
-	_choice_effective_strength = _calculate_effective_defense_strength(choice, duke_tile_in_cube)
+	_choice_effective_strength = _calculate_effective_defense_strength(choice)
 	%ConfirmDefender.visible = true
 
 func unchoose_defender():
