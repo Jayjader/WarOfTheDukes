@@ -46,15 +46,18 @@ func choose_destination(tile: Vector2i):
 	var vacated_tile = making_way.tile
 	unit_layer.move_unit(making_way, vacated_tile, tile)
 	var retreater
-	if choose_ally_to_make_way.previous_subphase is RetreatDefender:
-		retreater = choose_ally_to_make_way.previous_subphase.choose_defender.choice
-	elif choose_ally_to_make_way.previous_subphase is RetreatAttacker:
-		retreater = choose_ally_to_make_way.previous_subphase.to_retreat
+	var next_subphase
+	var previous_subphase = choose_ally_to_make_way.previous_subphase
+	if previous_subphase is RetreatDefender:
+		retreater = previous_subphase.choose_defender.choice
+		next_subphase = main_combat
+	elif previous_subphase is RetreatAttacker:
+		retreater = previous_subphase.to_retreat
+		var choose_retreater = previous_subphase.choose_retreater
+		next_subphase = choose_retreater if len(choose_retreater.to_retreat) > 0 else main_combat
 	unit_layer.move_unit(retreater, retreater.tile, vacated_tile)
 	parent_phase.retreated.append_array([making_way, retreater] as Array[GamePiece])
-	#parent_phase.retreated.append(making_way)
-	#parent_phase.retreated.append(retreater)
-	phase_state_machine.change_subphase(main_combat)
+	phase_state_machine.change_subphase(next_subphase)
 
 func __on_unit_unselected(_unit):
 	cancel_ally_choice()

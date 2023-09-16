@@ -33,15 +33,30 @@ func cancel_choice_of_retreater():
 
 func _enter_subphase():
 	assert(to_retreat != null)
-	assert(len(can_be_retreated_to) > 0)
-	%SubPhaseInstruction.text = "Choose a tile for the attacker to retreat to"
-	%ChangeAttackerForRetreat.visible = true
-	retreat_ui.retreat_from = to_retreat.tile
-	retreat_ui.destinations = can_be_retreated_to
-	retreat_ui.queue_redraw()
-	Board.report_hover_for_tiles(can_be_retreated_to)
-	Board.report_click_for_tiles(can_be_retreated_to)
-	Board.hex_clicked.connect(__on_hex_clicked)
+	if len(can_be_retreated_to) == 0:
+		var adjacent_tiles = Util.neighbours_to_tile(to_retreat.tile)
+		var can_make_way = {}
+		for unit in unit_layer.get_adjacent_allied_neighbors(to_retreat):
+			var destinations  = MapData.map.paths_for_retreat(unit, unit_layer.get_adjacent_units(unit))
+			if len(destinations) > 0:
+				can_make_way[unit] = destinations
+		if len(can_make_way) > 0:
+			choose_ally_to_make_way.previous_subphase = self
+			choose_ally_to_make_way.can_make_way = can_make_way
+			phase_state_machine.change_subphase(choose_ally_to_make_way)
+		else:
+			to_retreat.die()
+			parent_phase.died.append(to_retreat)
+			phase_state_machine.change_subphase(main_combat)
+	else:
+		%SubPhaseInstruction.text = "Choose a tile for the attacker to retreat to"
+		%ChangeAttackerForRetreat.visible = true
+		retreat_ui.retreat_from = to_retreat.tile
+		retreat_ui.destinations = can_be_retreated_to
+		retreat_ui.queue_redraw()
+		Board.report_hover_for_tiles(can_be_retreated_to)
+		Board.report_click_for_tiles(can_be_retreated_to)
+		Board.hex_clicked.connect(__on_hex_clicked)
 
 func _exit_subphase():
 	%ChangeAttackerForRetreat.visible = false

@@ -33,7 +33,7 @@ func _enter_subphase():
 
 	result = resolve_combat(attackers, defender_effective_strength)
 	if true:
-		result = Enums.CombatResult.DefenderRetreats
+		result = Enums.CombatResult.AttackersRetreat
 	prepareResolutionFollowup(attackers, defender)
 	
 	%SubPhaseInstruction.text = "Result: %s\nAttackers: %s = %s\nDefenders: %s" % [Enums.CombatResult.find_key(result), attackers.values(), attackers.values().reduce(func(accum, a): return accum + a, 0), defender_effective_strength]
@@ -45,7 +45,7 @@ func prepareResolutionFollowup(attackers: Dictionary, defender: GamePiece):
 				if attacker.kind != Enums.Unit.Artillery or not Rules.is_bombardment(attacker, defender):
 					_died.append(attacker)
 			_next_subphase = main_combat
-		Enums.CombatResult.AttackerRetreats:
+		Enums.CombatResult.AttackersRetreat:
 			choose_attacker_to_retreat._clear()
 			for attacker in attackers:
 				if attacker.kind != Enums.Unit.Artillery or not Rules.is_bombardment(attacker, defender):
@@ -110,13 +110,13 @@ func resolve_combat(attackers: Dictionary, defender_effective_strength: int):
 
 const CR = Enums.CombatResult
 const COMBAT_RESULTs = {
-	Vector2i(1, 5): [CR.AttackerRetreats,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated],
-	Vector2i(1, 4): [CR.AttackerRetreats,	CR.AttackerRetreats,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated],
-	Vector2i(1, 3): [CR.DefenderRetreats,	CR.AttackerRetreats,	CR.AttackerRetreats,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated],
-	Vector2i(1, 2): [CR.DefenderRetreats,	CR.DefenderRetreats,	CR.AttackerRetreats,	CR.AttackerRetreats,	CR.AttackerRetreats,	CR.AttackerRetreats],
-	Vector2i(1, 1): [CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.AttackerRetreats,	CR.AttackerRetreats,	CR.AttackerRetreats],
-	Vector2i(2, 1): [CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.AttackerRetreats,	CR.AttackerRetreats],
-	Vector2i(3, 1): [CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.AttackerRetreats],
+	Vector2i(1, 5): [CR.AttackersRetreat,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated],
+	Vector2i(1, 4): [CR.AttackersRetreat,	CR.AttackersRetreat,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated],
+	Vector2i(1, 3): [CR.DefenderRetreats,	CR.AttackersRetreat,	CR.AttackersRetreat,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated],
+	Vector2i(1, 2): [CR.DefenderRetreats,	CR.DefenderRetreats,	CR.AttackersRetreat,	CR.AttackersRetreat,	CR.AttackersRetreat,	CR.AttackersRetreat],
+	Vector2i(1, 1): [CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.AttackersRetreat,	CR.AttackersRetreat,	CR.AttackersRetreat],
+	Vector2i(2, 1): [CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.AttackersRetreat,	CR.AttackersRetreat],
+	Vector2i(3, 1): [CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.AttackersRetreat],
 	Vector2i(4, 1): [CR.DefenderEliminated,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.Exchange],
 	Vector2i(5, 1): [CR.DefenderEliminated,	CR.DefenderEliminated,	CR.DefenderEliminated,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.Exchange],
 	Vector2i(6, 1): [CR.DefenderEliminated,	CR.DefenderEliminated,	CR.DefenderEliminated,	CR.DefenderEliminated,	CR.Exchange,			CR.Exchange],
@@ -124,6 +124,9 @@ const COMBAT_RESULTs = {
 
 func __on_user_ok():
 	assert(_next_subphase != null)
+	for attacker in choose_attackers.attacking:
+		attacker.unselect()
+	choose_defender.choice.unselect()
 	for dead in _died:
 		dead.die()
 		parent_phase.died.append(dead)

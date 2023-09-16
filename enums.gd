@@ -58,7 +58,7 @@ const MaxUnitCount = {
 
 enum CombatResult {
 	AttackerEliminated,
-	AttackerRetreats,
+	AttackersRetreat,
 	Exchange,
 	DefenderRetreats,
 	DefenderEliminated,
