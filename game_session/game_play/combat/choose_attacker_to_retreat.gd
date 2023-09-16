@@ -32,9 +32,22 @@ func choose_attacker(attacker: GamePiece):
 		retreat_attacker.can_be_retreated_to = allowed_retreat_destinations
 		phase_state_machine.change_subphase(retreat_attacker)
 	else:
+		var adjacent_allied_neighbors: Array[GamePiece] = []
+		var adjacent_tiles = Util.neighbours_to_tile(attacker.tile)
+		for unit in other_live_units:
+			if unit.tile in adjacent_tiles:
+				adjacent_allied_neighbors.append(unit)
+		var can_make_way = {}
+		for unit in adjacent_allied_neighbors:
+			var others_for_unit: Array[GamePiece] = [attacker]
+			for live_unit in other_live_units:
+				if live_unit != unit:
+					others_for_unit.append(live_unit)
+			var destinations  = MapData.map.paths_for_retreat(unit, others_for_unit)
+			if len(destinations) > 0:
+				can_make_way[unit] = destinations
 		# var can_make_way = len(allied_neighbors_on(allowed_retreat_destinations).filter(func(u): return not (u in parent_phase.retreated))) > 0
-		var can_make_way = false
-		if can_make_way:
+		if len(can_make_way) > 0:
 			choose_ally_to_make_way.previous_subphase = self
 			phase_state_machine.change_subphase(choose_ally_to_make_way)
 		else:

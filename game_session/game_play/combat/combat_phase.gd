@@ -2,6 +2,7 @@ class_name CombatPhase
 extends PlayPhase
 
 signal last_turn_ended(result: Enums.GameResult, winner: Enums.Faction)
+signal duke_died(faction: Enums.Faction)
 
 @export var can_attack: Array[GamePiece] # can only attack once
 @export var attacked: Dictionary = {} # attacker -> defender

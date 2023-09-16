@@ -3,9 +3,6 @@ extends CombatSubphase
 
 @export var result: Enums.CombatResult
 
-signal duke_died(faction: Enums.Faction)
-
-
 @export_category("States/Phases")
 @export var parent_phase: CombatPhase
 @export var phase_state_machine: CombatPhaseStateMachine
@@ -34,10 +31,14 @@ func _enter_subphase():
 	assert(defender != null)
 	var defender_effective_strength = choose_defender._choice_effective_strength
 
-	#result = _resolve_combat(attackers, defender, defender_effective_strength)
-	result = Enums.CombatResult.DefenderRetreats
-	%SubPhaseInstruction.text = "Result: %s" % Enums.CombatResult.find_key(result)
+	result = resolve_combat(attackers, defender_effective_strength)
+	if true:
+		result = Enums.CombatResult.DefenderRetreats
+	prepareResolutionFollowup(attackers, defender)
 	
+	%SubPhaseInstruction.text = "Result: %s\nAttackers: %s = %s\nDefenders: %s" % [Enums.CombatResult.find_key(result), attackers.values(), attackers.values().reduce(func(accum, a): return accum + a, 0), defender_effective_strength]
+
+func prepareResolutionFollowup(attackers: Dictionary, defender: GamePiece):
 	match result:
 		Enums.CombatResult.AttackerEliminated:
 			for attacker in attackers:
@@ -55,7 +56,7 @@ func _enter_subphase():
 				_next_subphase = main_combat
 		Enums.CombatResult.Exchange:
 			if defender.kind == Enums.Unit.Duke:
-				duke_died.emit(defender.faction)
+				parent_phase.duke_died.emit(defender.faction)
 			else:
 				_died.append(defender)
 				allocate_exchange_losses._clear()
@@ -69,26 +70,12 @@ func _enter_subphase():
 			for unit in unit_layer.get_children().filter(func(unit): return unit != defender):
 				other_live_units.append(unit)
 			var allowed_retreat_destinations = MapData.map.paths_for_retreat(defender, other_live_units)
-			var has_room = len(allowed_retreat_destinations) > 0
-			# var can_make_way = len(
-			#allied_neighbors_on(allowed_retreat_destinations).filter(func(u): return not (u in parent_phase.retreated))
-			#) > 0
-			var can_make_way = false
-			if has_room:
-				retreat_defender.destinations = allowed_retreat_destinations
-				_next_subphase = retreat_defender
-			elif can_make_way:
-				choose_ally_to_make_way.previous_subphase = self
-				_next_subphase = choose_ally_to_make_way
-			else:
-				if defender.kind == Enums.Unit.Duke:
-					duke_died.emit(defender.faction)
-				else:
-					_died.append(defender)
-					_next_subphase = main_combat
+			retreat_defender.destinations = allowed_retreat_destinations
+			_next_subphase = retreat_defender
+			#else:
 		Enums.CombatResult.DefenderEliminated:
 			if defender.kind == Enums.Unit.Duke:
-				duke_died.emit(defender.faction)
+				parent_phase.duke_died.emit(defender.faction)
 			else:
 				_died.append(defender)
 				_next_subphase = main_combat
@@ -97,12 +84,15 @@ func _enter_subphase():
 func _exit_subphase():
 	%ConfirmCombatResult.visible = false
 
-func _resolve_combat(attackers: Dictionary, defender: GamePiece, defender_effective_strength: int):
+func _sample_random(start: int, end: int):
+	return _random.randi_range(start, end)
+
+func resolve_combat(attackers: Dictionary, defender_effective_strength: int):
 	print_debug("### Combat ###")
 	var total_attack_strength = attackers.values().reduce(func(accum, a): return accum + a, 0)
 	print_debug("Effective Total Attack Strength: %s" % total_attack_strength)
 	print_debug("Effective Defense Strength: %s" % defender_effective_strength)
-
+	
 	var numerator
 	var denominator
 	var ratio = float(total_attack_strength) / float(defender_effective_strength)
@@ -114,25 +104,26 @@ func _resolve_combat(attackers: Dictionary, defender: GamePiece, defender_effect
 		denominator = min(5, floori(1 / ratio))
 	print_debug("Effective Ratio: %s to %s" % [numerator, denominator])
 	var result_spread = COMBAT_RESULTs[Vector2i(numerator, denominator)]
-	var _result = result_spread[_random.randi_range(0, 5)]
+	var _result = result_spread[_sample_random(0, 5)]
 	print_debug("Result: %s" % Enums.CombatResult.find_key(_result))
 	return _result
 
 const CR = Enums.CombatResult
 const COMBAT_RESULTs = {
-	Vector2i(1, 5): [CR.AttackerRetreats, CR.AttackerEliminated, CR.AttackerEliminated, CR.AttackerEliminated, CR.AttackerEliminated, CR.AttackerEliminated],
-	Vector2i(1, 4): [CR.AttackerRetreats, CR.AttackerRetreats, CR.AttackerEliminated, CR.AttackerEliminated, CR.AttackerEliminated, CR.AttackerEliminated],
-	Vector2i(1, 3): [CR.DefenderRetreats, CR.AttackerRetreats, CR.AttackerRetreats, CR.AttackerEliminated, CR.AttackerEliminated, CR.AttackerEliminated],
-	Vector2i(1, 2): [CR.DefenderRetreats, CR.DefenderRetreats, CR.AttackerRetreats, CR.AttackerRetreats, CR.AttackerRetreats, CR.AttackerRetreats],
-	Vector2i(1, 1): [CR.DefenderRetreats, CR.DefenderRetreats, CR.DefenderRetreats, CR.AttackerRetreats, CR.AttackerRetreats, CR.AttackerRetreats],
-	Vector2i(2, 1): [CR.DefenderRetreats, CR.DefenderRetreats, CR.DefenderRetreats, CR.DefenderRetreats, CR.AttackerRetreats, CR.AttackerRetreats],
-	Vector2i(3, 1): [CR.DefenderRetreats, CR.DefenderRetreats, CR.DefenderRetreats, CR.DefenderRetreats, CR.DefenderRetreats, CR.AttackerRetreats],
-	Vector2i(4, 1): [CR.DefenderEliminated, CR.DefenderRetreats, CR.DefenderRetreats, CR.DefenderRetreats, CR.DefenderRetreats, CR.Exchange],
-	Vector2i(5, 1): [CR.DefenderEliminated, CR.DefenderEliminated, CR.DefenderEliminated, CR.DefenderRetreats, CR.DefenderRetreats, CR.Exchange],
-	Vector2i(6, 1): [CR.DefenderEliminated, CR.DefenderEliminated, CR.DefenderEliminated, CR.DefenderEliminated, CR.Exchange, CR.Exchange],
+	Vector2i(1, 5): [CR.AttackerRetreats,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated],
+	Vector2i(1, 4): [CR.AttackerRetreats,	CR.AttackerRetreats,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated],
+	Vector2i(1, 3): [CR.DefenderRetreats,	CR.AttackerRetreats,	CR.AttackerRetreats,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated],
+	Vector2i(1, 2): [CR.DefenderRetreats,	CR.DefenderRetreats,	CR.AttackerRetreats,	CR.AttackerRetreats,	CR.AttackerRetreats,	CR.AttackerRetreats],
+	Vector2i(1, 1): [CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.AttackerRetreats,	CR.AttackerRetreats,	CR.AttackerRetreats],
+	Vector2i(2, 1): [CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.AttackerRetreats,	CR.AttackerRetreats],
+	Vector2i(3, 1): [CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.AttackerRetreats],
+	Vector2i(4, 1): [CR.DefenderEliminated,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.Exchange],
+	Vector2i(5, 1): [CR.DefenderEliminated,	CR.DefenderEliminated,	CR.DefenderEliminated,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.Exchange],
+	Vector2i(6, 1): [CR.DefenderEliminated,	CR.DefenderEliminated,	CR.DefenderEliminated,	CR.DefenderEliminated,	CR.Exchange,			CR.Exchange],
 }
 
 func __on_user_ok():
+	assert(_next_subphase != null)
 	for dead in _died:
 		dead.die()
 		parent_phase.died.append(dead)

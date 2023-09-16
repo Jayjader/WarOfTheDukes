@@ -359,12 +359,13 @@ script = ExtResource("17_rmqba")
 parent_phase = NodePath("../..")
 choose_ally_to_make_way = NodePath("../ChooseAllyToMakeWay")
 
-[node name="RetreatDefender" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "main_combat", "choose_attackers", "choose_defender")]
+[node name="RetreatDefender" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "main_combat", "choose_attackers", "choose_defender", "choose_ally_to_make_way")]
 script = ExtResource("18_1m6pe")
 parent_phase = NodePath("../..")
 main_combat = NodePath("../MainCombatSubphase")
 choose_attackers = NodePath("../ChooseUnitsForAttack")
 choose_defender = NodePath("../ChooseDefenderForAttack")
+choose_ally_to_make_way = NodePath("../ChooseAllyToMakeWay")
 
 [connection signal="toggled" from="BottomLeftMargin/HBoxContainer/VBox/ToggleInstructions" to="BottomLeftMargin/HBoxContainer/VBox/Panel" method="set_visible"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Cancel/UnitChosenForMove" to="PlayStateMachine/MovementPhase/MovementPhaseStateMachine/ChooseUnitDestination" method="cancel_unit_choice"]
@@ -378,5 +379,5 @@ choose_defender = NodePath("../ChooseDefenderForAttack")
 [connection signal="pressed" from="BottomRightMargin/HBox/Confirm/ConfirmDefender" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/ChooseDefenderForAttack" method="confirm_attack"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Confirm/ConfirmCombatResult" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/ResolveCombat" method="__on_user_ok"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Confirm/ConfirmLossAllocation" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/AllocateExchangeLosses" method="confirm_loss_allocation"]
+[connection signal="duke_died" from="PlayStateMachine/CombatPhase" to="." method="__on_duke_death"]
 [connection signal="last_turn_ended" from="PlayStateMachine/CombatPhase" to="." method="__on_last_turn_end"]
-[connection signal="duke_died" from="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/ResolveCombat" to="." method="__on_duke_death"]

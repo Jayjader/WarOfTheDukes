@@ -52,5 +52,5 @@ func _exit_subphase():
 	retreat_ui.destinations.clear()
 	retreat_ui.queue_redraw()
 
-func __on_hex_clicked(axial, kind, zones):
+func __on_hex_clicked(axial, _kind, _zones):
 	choose_retreat_destination(axial)
