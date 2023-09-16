@@ -34,15 +34,15 @@ func is_in_enemy_zoc(tile: Vector2i, enemy_tiles: Array[Vector2i]) -> bool:
 
 func paths_for_retreat(unit: GamePiece, others: Array[GamePiece]) -> Array[Vector2i]:
 	var valid_tiles: Array[Vector2i] = []
-	var enemy_tiles = others.reduce(func(tiles, other_unit):
+	var enemy_tiles = others.reduce(func(array, other_unit):
 		if other_unit.faction != unit.faction:
-			tiles.append(other_unit.tile)
-		return tiles
+			array.append(other_unit.tile)
+		return array
 	, [] as Array[Vector2i])
-	var ally_tiles = others.reduce(func(tiles, other_unit):
+	var ally_tiles = others.reduce(func(array, other_unit):
 		if other_unit.faction == unit.faction:
-			tiles.append(other_unit.tile)
-		return tiles
+			array.append(other_unit.tile)
+		return array
 	, [] as Array[Vector2i])
 	var neighbor_tiles = neighbors_to(unit.tile)
 	for tile in neighbor_tiles:
@@ -64,10 +64,10 @@ func paths_for_retreat(unit: GamePiece, others: Array[GamePiece]) -> Array[Vecto
 
 func paths_for(unit: GamePiece, others: Array[GamePiece]) -> Dictionary:
 	var max_cost = unit.movement_points
-	var enemy_tiles = others.reduce(func(tiles, other_unit):
+	var enemy_tiles = others.reduce(func(array, other_unit):
 		if other_unit.faction != unit.faction:
-			tiles.append(other_unit.tile)
-		return tiles
+			array.append(other_unit.tile)
+		return array
 	, [] as Array[Vector2i])
 	var allies = others.filter(func(other_unit): return other_unit.faction == unit.faction)
 	var initial_frontier_datum = {

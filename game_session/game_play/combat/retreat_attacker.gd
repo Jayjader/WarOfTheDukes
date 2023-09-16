@@ -34,7 +34,6 @@ func cancel_choice_of_retreater():
 func _enter_subphase():
 	assert(to_retreat != null)
 	if len(can_be_retreated_to) == 0:
-		var adjacent_tiles = Util.neighbours_to_tile(to_retreat.tile)
 		var can_make_way = {}
 		for unit in unit_layer.get_adjacent_allied_neighbors(to_retreat):
 			var destinations  = MapData.map.paths_for_retreat(unit, unit_layer.get_adjacent_units(unit))
