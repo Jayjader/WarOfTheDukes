@@ -35,6 +35,21 @@ func get_units(faction: Enums.Faction) -> Array[GamePiece]:
 			units.append(unit)
 	return units
 
+func get_adjacent_units(unit: GamePiece) -> Array[GamePiece]:
+	var adjacent_units: Array[GamePiece] = []
+	var adjacent_tiles = Util.neighbours_to_tile(unit.tile)
+	for other_unit in get_children().filter(func(other_unit): return other_unit != unit):
+		if other_unit.tile in adjacent_tiles:
+			adjacent_units.append(other_unit)
+	return adjacent_units
+
+func get_adjacent_allied_neighbors(unit: GamePiece) -> Array[GamePiece]:
+	var adjacent_allied_neighbors: Array[GamePiece] = []
+	for other_unit in get_adjacent_units(unit):
+		if other_unit.faction == unit.faction:
+			adjacent_allied_neighbors.append(other_unit)
+	return adjacent_allied_neighbors
+
 func get_duke(faction: Enums.Faction):
 	for faction_unit in get_units(faction):
 		if faction_unit.kind == Enums.Unit.Duke:
