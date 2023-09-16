@@ -46,6 +46,8 @@ func paths_for_retreat(unit: GamePiece, others: Array[GamePiece]) -> Array[Vecto
 	, [] as Array[Vector2i])
 	var neighbor_tiles = neighbors_to(unit.tile)
 	for tile in neighbor_tiles:
+		if tiles.get(tile) == "Lake":
+			continue
 		var border_crossed = neighbor_tiles[tile]
 		if border_crossed == "River":
 			continue
