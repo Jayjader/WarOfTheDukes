@@ -354,9 +354,10 @@ script = ExtResource("18_ohqr4")
 parent_phase = NodePath("../..")
 make_way = NodePath("../MakeWayForRetreat")
 
-[node name="MakeWayForRetreat" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "choose_ally_to_make_way")]
+[node name="MakeWayForRetreat" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "main_combat", "choose_ally_to_make_way")]
 script = ExtResource("17_rmqba")
 parent_phase = NodePath("../..")
+main_combat = NodePath("../MainCombatSubphase")
 choose_ally_to_make_way = NodePath("../ChooseAllyToMakeWay")
 
 [node name="RetreatDefender" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "main_combat", "choose_attackers", "choose_defender", "choose_ally_to_make_way")]

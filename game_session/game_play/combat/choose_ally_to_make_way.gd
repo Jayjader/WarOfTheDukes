@@ -14,9 +14,6 @@ extends CombatSubphase
 
 @onready var unit_layer: UnitLayer = Board.get_node("%UnitLayer")
 
-func cancel_choice_of_retreater():
-	phase_state_machine.change_subphase(previous_subphase)
-
 func choose_ally(ally: GamePiece):
 	make_way.making_way = ally
 	phase_state_machine.change_subphase(make_way)

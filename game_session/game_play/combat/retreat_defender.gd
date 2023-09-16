@@ -36,18 +36,11 @@ func _enter_subphase():
 		retreat_ui.destinations = destinations
 		retreat_ui.queue_redraw()
 	else:
-		var _other_live_units: Array[GamePiece] = []
-		for unit in unit_layer.get_children().filter(func(unit): return unit != defender):
-			_other_live_units.append(unit)
 		var can_make_way = {}
 		for unit in unit_layer.get_adjacent_allied_neighbors(defender):
-			var others_for_unit: Array[GamePiece] = [defender]
-			for live_unit in _other_live_units:
-				if live_unit != unit:
-					others_for_unit.append(live_unit)
-			var destinations  = MapData.map.paths_for_retreat(unit, others_for_unit)
-			if len(destinations) > 0:
-				can_make_way[unit] = destinations
+			var others_destinations = MapData.map.paths_for_retreat(unit, unit_layer.get_adjacent_units(unit))
+			if len(others_destinations) > 0:
+				can_make_way[unit] = others_destinations
 		if len(can_make_way) > 0:
 			choose_ally_to_make_way.can_make_way = can_make_way
 			choose_ally_to_make_way.previous_subphase = self
@@ -56,6 +49,7 @@ func _enter_subphase():
 			if defender.kind == Enums.Unit.Duke:
 				phase_state_machine.duke_died.emit(defender.faction)
 			else:
+				defender.die()
 				parent_phase.died.append(defender)
 				phase_state_machine.change_subphase(main_combat)
 
