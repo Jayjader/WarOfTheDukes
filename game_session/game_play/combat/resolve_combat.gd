@@ -32,11 +32,12 @@ func _enter_subphase():
 	var defender_effective_strength = choose_defender._choice_effective_strength
 
 	result = resolve_combat(attackers, defender_effective_strength)
-	if true:
-		result = Enums.CombatResult.AttackersRetreat
 	prepareResolutionFollowup(attackers, defender)
-	
-	%SubPhaseInstruction.text = "Result: %s\nAttackers: %s = %s\nDefenders: %s" % [Enums.CombatResult.find_key(result), attackers.values(), attackers.values().reduce(func(accum, a): return accum + a, 0), defender_effective_strength]
+	%SubPhaseInstruction.text = "Result: %s\nAttackers: %s = %s\nDefenders: %s" % [
+		Enums.CombatResult.find_key(result),
+		attackers.values(),
+		attackers.values().reduce(func(accum, a): return accum + a, 0), defender_effective_strength
+	]
 
 func prepareResolutionFollowup(attackers: Dictionary, defender: GamePiece):
 	match result:
@@ -104,7 +105,14 @@ func resolve_combat(attackers: Dictionary, defender_effective_strength: int):
 		denominator = min(5, floori(1 / ratio))
 	print_debug("Effective Ratio: %s to %s" % [numerator, denominator])
 	var result_spread = COMBAT_RESULTs[Vector2i(numerator, denominator)]
-	var _result = result_spread[_sample_random(0, 5)]
+	var die_roll = _sample_random(0, 5)
+	match MapData.map.tiles[choose_defender.choice.tile]:
+		"Forest":
+			die_roll += 2
+		"Cliff":
+			die_roll += 1
+	die_roll = min(die_roll, 5)
+	var _result = result_spread[die_roll]
 	print_debug("Result: %s" % Enums.CombatResult.find_key(_result))
 	return _result
 

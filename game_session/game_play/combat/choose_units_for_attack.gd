@@ -15,14 +15,8 @@ extends CombatSubphase
 @onready var unit_layer: UnitLayer = Board.get_node("%UnitLayer")
 
 func _calculate_effective_attack_strength(unit: GamePiece):
-	var tile = unit.tile
 	var base_strength = Rules.AttackStrength[unit.kind]
-	match MapData.map.tiles[tile]:
-		"Forest":
-			base_strength += 2
-		"Cliff":
-			base_strength += 1
-	if Util.cube_distance(Util.axial_to_cube(tile), duke_tile_in_cube) <= Rules.DukeAura.range:
+	if Util.cube_distance(Util.axial_to_cube(unit.tile), duke_tile_in_cube) <= Rules.DukeAura.range:
 		base_strength *= Rules.DukeAura.multiplier
 	return base_strength
 
