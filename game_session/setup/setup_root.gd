@@ -143,8 +143,11 @@ func choose_tile(tile: Vector2i, kind: String, zones: Array):
 
 
 func _ready():
-	Board.report_hovered_hex = true
-	Board.report_clicked_hex = true
+	var tiles: Array[Vector2i] = []
+	for tile in MapData.map.tiles:
+		tiles.append(tile)
+	Board.report_hover_for_tiles(tiles)
+	Board.report_click_for_tiles(tiles)
 	Board.hex_clicked.connect(self.choose_tile)
 	unit_placed.connect(Board._on_setup_root_unit_placed)
 	display_remaining_counts()
