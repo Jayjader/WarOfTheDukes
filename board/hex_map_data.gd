@@ -124,7 +124,7 @@ func paths_for(unit: GamePiece, others: Array[GamePiece]) -> Dictionary:
 					from = next.tile,
 					cost_to_reach = movement_cost,
 					can_stop_here = len(allies_on_destination) == 0 or (
-						len(allies_on_destination) == 1 and
+						len(allies_on_destination) == 1 and to_kind in ["City", "Fortress"] and
 						(unit.kind == Enums.Unit.Duke) != (allies_on_destination[0].kind == Enums.Unit.Duke)
 						),
 					is_in_enemy_zoc = is_moving_into_enemy_zoc
