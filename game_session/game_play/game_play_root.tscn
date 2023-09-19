@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://dn24y8eq6bsf"]
+[gd_scene load_steps=20 format=3 uid="uid://dn24y8eq6bsf"]
 
 [ext_resource type="Script" path="res://game_session/game_play/game_play_root.gd" id="1_kicvc"]
 [ext_resource type="Script" path="res://game_session/game_play/play_phase_state_machine.gd" id="4_rxnh7"]
@@ -18,6 +18,7 @@
 [ext_resource type="Script" path="res://game_session/game_play/combat/make_way_for_retreat.gd" id="17_rmqba"]
 [ext_resource type="Script" path="res://game_session/game_play/combat/retreat_defender.gd" id="18_1m6pe"]
 [ext_resource type="Script" path="res://game_session/game_play/combat/choose_ally_to_make_way.gd" id="18_ohqr4"]
+[ext_resource type="Script" path="res://game_session/game_play/combat/pursue_retreating_defender.gd" id="19_l7c67"]
 
 [node name="GamePlayRoot" type="Control" node_paths=PackedStringArray("play_phase_state_machine")]
 layout_mode = 3
@@ -225,6 +226,12 @@ visible = false
 layout_mode = 2
 text = "Choose A Different Ally To Make Way"
 
+[node name="CancelPursuit" type="Button" parent="BottomRightMargin/HBox/Cancel"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Don't Pursue"
+
 [node name="Confirm" type="HBoxContainer" parent="BottomRightMargin/HBox"]
 layout_mode = 2
 
@@ -354,19 +361,27 @@ script = ExtResource("18_ohqr4")
 parent_phase = NodePath("../..")
 make_way = NodePath("../MakeWayForRetreat")
 
-[node name="MakeWayForRetreat" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "main_combat", "choose_ally_to_make_way")]
+[node name="MakeWayForRetreat" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "main_combat", "choose_attackers", "choose_ally_to_make_way", "choose_attacker_to_pursue")]
 script = ExtResource("17_rmqba")
 parent_phase = NodePath("../..")
 main_combat = NodePath("../MainCombatSubphase")
+choose_attackers = NodePath("../ChooseUnitsForAttack")
 choose_ally_to_make_way = NodePath("../ChooseAllyToMakeWay")
+choose_attacker_to_pursue = NodePath("../ChooseAttackerToPursueRetreatingDefender")
 
-[node name="RetreatDefender" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "main_combat", "choose_attackers", "choose_defender", "choose_ally_to_make_way")]
+[node name="RetreatDefender" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "main_combat", "choose_attackers", "choose_defender", "choose_ally_to_make_way", "choose_attacker_to_pursue")]
 script = ExtResource("18_1m6pe")
 parent_phase = NodePath("../..")
 main_combat = NodePath("../MainCombatSubphase")
 choose_attackers = NodePath("../ChooseUnitsForAttack")
 choose_defender = NodePath("../ChooseDefenderForAttack")
 choose_ally_to_make_way = NodePath("../ChooseAllyToMakeWay")
+choose_attacker_to_pursue = NodePath("../ChooseAttackerToPursueRetreatingDefender")
+
+[node name="ChooseAttackerToPursueRetreatingDefender" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("phase_state_machine", "main_combat")]
+script = ExtResource("19_l7c67")
+phase_state_machine = NodePath("..")
+main_combat = NodePath("../MainCombatSubphase")
 
 [connection signal="toggled" from="BottomLeftMargin/HBoxContainer/VBox/ToggleInstructions" to="BottomLeftMargin/HBoxContainer/VBox/Panel" method="set_visible"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Cancel/UnitChosenForMove" to="PlayStateMachine/MovementPhase/MovementPhaseStateMachine/ChooseUnitDestination" method="cancel_unit_choice"]
@@ -374,6 +389,7 @@ choose_ally_to_make_way = NodePath("../ChooseAllyToMakeWay")
 [connection signal="pressed" from="BottomRightMargin/HBox/Cancel/ChangeAttackers" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/ChooseDefenderForAttack" method="change_attackers"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Cancel/ChangeAttackerForRetreat" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/RetreatAttacker" method="cancel_choice_of_retreater"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Cancel/UnitChosenToMakeWay" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/ChooseAllyToMakeWay" method="cancel_choice_of_retreater"]
+[connection signal="pressed" from="BottomRightMargin/HBox/Cancel/CancelPursuit" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/ChooseAttackerToPursueRetreatingDefender" method="cancel"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Confirm/EndMovementPhase" to="PlayStateMachine/MovementPhase" method="confirm_movement"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Confirm/EndCombatPhase" to="PlayStateMachine/CombatPhase" method="confirm_combat"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Confirm/ConfirmAttackers" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/ChooseUnitsForAttack" method="confirm_attackers"]

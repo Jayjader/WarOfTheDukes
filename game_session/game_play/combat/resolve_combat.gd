@@ -73,7 +73,6 @@ func prepareResolutionFollowup(attackers: Dictionary, defender: GamePiece):
 			var allowed_retreat_destinations = MapData.map.paths_for_retreat(defender, other_live_units)
 			retreat_defender.destinations = allowed_retreat_destinations
 			_next_subphase = retreat_defender
-			#else:
 		Enums.CombatResult.DefenderEliminated:
 			if defender.kind == Enums.Unit.Duke:
 				parent_phase.duke_died.emit(defender.faction)

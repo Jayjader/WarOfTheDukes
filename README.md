@@ -67,6 +67,20 @@ Only 1 "additional" unit can "participate" in a retreat for a given combat.
 
 Rationale: simplicity in game logic and gameplay. This also makes "lines" of units "deeper" than 2 more risky, rewards flanking more, and makes massed combat more deadly in general, as melee combattants are much more likely to be unable to to retreat from a lost combat.
 
+#### Post-Retreat Pursuit (Who Can?)
+##### Problem statement
+The document states that "in the case of a combat resulting in the defender retreating, the attacking unit can pursue them and occupy the newly vacated tile." It does not clarify how to proceed when a combat has multiple attackers, nor does it imply that Artillery bombarding from a distance cannot pursue - or only "pursue" over a distance of 1 tile.
+
+#### Choice made: Only Melee
+When the defender retreats, the attacking player may choose up to 1 Cavalry or Infantry unit among the attackers to pursue it.
+
+This neatly resolves the problem, and best preserves the medieval-europe-wargame "flavor" of the game:
+ - to attack in real life, the cavalry and infantry of the time needed to get within close physical proximity. they would thus be almost in the defender's position. a "pursuit" would realistically take place over a much smaller distance than what an entire tile's breadth represents.
+ - a retreating unit's allies would need to make way and/or be careful of them. they would thus be hard-pressed to exercise their zone of control, potentially even blocked from doing so by their retreating ally. the pursuing unit would realistically have an easier time advancing to the same position than otherwise.
+ - attacking artillery would remain stationary. thus even against the equivalent of an "adjacent" unit, they would not be close enough to pursue their retreating opponents "in the moment".
+ - pursuit over/across rivers makes no sense.
+ - the game's rules only allow stacking units on the same tile in specific cases; the most relevant being that 1 of the 2 stacked units will always be a Duke. Several attackers occupying the same vacated tile is thus guaranteed to be forbidden in most multiple-attacker combats. In the remaining cases where it _would_ be allowed (a Duke is already stacked with one of the attackers), we can justify maintaining the ban as a non-fighter Duke, as the game's rules and stats imply, would not realistically pursue a retreating enemy "in the heat of the moment" on the battlefield.
+
 ### Exchange
 #### Loss Allocation (Random vs Player Choice)
 ##### Problem statement

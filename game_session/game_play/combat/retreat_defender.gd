@@ -13,15 +13,21 @@ extends CombatSubphase
 @export var choose_attackers: ChooseUnitsForAttack
 @export var choose_defender: ChooseDefenderForAttack
 @export var choose_ally_to_make_way: ChooseAllyToMakeWay
+@export var choose_attacker_to_pursue: ChooseAttackerToPursueRetreatingDefender
 
 @onready var unit_layer: UnitLayer = Board.get_node("%UnitLayer")
 @onready var retreat_ui = Board.get_node("%TileOverlay/RetreatRange")
 
 func choose_destination(tile: Vector2i):
 	var defender = choose_defender.choice
+	choose_attacker_to_pursue.pursue_to = defender.tile
 	unit_layer.move_unit(defender, defender.tile, tile)
 	parent_phase.retreated.append(defender)
-	phase_state_machine.change_subphase(main_combat)
+	choose_attacker_to_pursue.can_pursue.clear()
+	for attacker in choose_attackers.attacking:
+		if attacker.kind != Enums.Unit.Artillery:
+			choose_attacker_to_pursue.can_pursue.append(attacker)
+	phase_state_machine.change_subphase(choose_attacker_to_pursue)
 
 func _enter_subphase():
 	assert(choose_defender.choice != null)

@@ -8,7 +8,9 @@ extends CombatSubphase
 @export var main_combat: MainCombatSubphase
 
 @export_category("Subphases")
+@export var choose_attackers: ChooseUnitsForAttack
 @export var choose_ally_to_make_way: ChooseAllyToMakeWay
+@export var choose_attacker_to_pursue: ChooseAttackerToPursueRetreatingDefender
 
 @onready var phase_state_machine: CombatPhaseStateMachine = get_parent()
 @onready var unit_layer: UnitLayer = Board.get_node("%UnitLayer")
@@ -50,7 +52,12 @@ func choose_destination(tile: Vector2i):
 	var previous_subphase = choose_ally_to_make_way.previous_subphase
 	if previous_subphase is RetreatDefender:
 		retreater = previous_subphase.choose_defender.choice
-		next_subphase = main_combat
+		choose_attacker_to_pursue.pursue_to = retreater.tile
+		choose_attacker_to_pursue.can_pursue.clear()
+		for attacker in choose_attackers.attacking:
+			if attacker.kind != Enums.Unit.Artillery:
+				choose_attacker_to_pursue.can_pursue.append(attacker)
+		next_subphase = choose_attacker_to_pursue
 	elif previous_subphase is RetreatAttacker:
 		retreater = previous_subphase.to_retreat
 		var choose_retreater = previous_subphase.choose_retreater
