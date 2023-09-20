@@ -18,7 +18,7 @@ func _clear():
 func confirm_movement():
 	combat_phase._clear()
 	for unit in unit_layer.get_units(play_state_machine.current_player):
-		if unit not in play_state_machine.died:
+		if unit not in play_state_machine.died and unit.kind != Enums.Unit.Duke:
 			combat_phase.can_attack.append(unit)
 	for unit in unit_layer.get_units(Enums.get_other_faction(play_state_machine.current_player)):
 		if unit not in play_state_machine.died:
