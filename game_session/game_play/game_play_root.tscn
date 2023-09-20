@@ -369,6 +369,11 @@ choose_attackers = NodePath("../ChooseUnitsForAttack")
 choose_ally_to_make_way = NodePath("../ChooseAllyToMakeWay")
 choose_attacker_to_pursue = NodePath("../ChooseAttackerToPursueRetreatingDefender")
 
+[node name="ChooseAttackerToPursueRetreatingDefender" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("phase_state_machine", "main_combat")]
+script = ExtResource("19_l7c67")
+phase_state_machine = NodePath("..")
+main_combat = NodePath("../MainCombatSubphase")
+
 [node name="RetreatDefender" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("parent_phase", "main_combat", "choose_attackers", "choose_defender", "choose_ally_to_make_way", "choose_attacker_to_pursue")]
 script = ExtResource("18_1m6pe")
 parent_phase = NodePath("../..")
@@ -377,11 +382,6 @@ choose_attackers = NodePath("../ChooseUnitsForAttack")
 choose_defender = NodePath("../ChooseDefenderForAttack")
 choose_ally_to_make_way = NodePath("../ChooseAllyToMakeWay")
 choose_attacker_to_pursue = NodePath("../ChooseAttackerToPursueRetreatingDefender")
-
-[node name="ChooseAttackerToPursueRetreatingDefender" type="Node" parent="PlayStateMachine/CombatPhase/CombatPhaseStateMachine" node_paths=PackedStringArray("phase_state_machine", "main_combat")]
-script = ExtResource("19_l7c67")
-phase_state_machine = NodePath("..")
-main_combat = NodePath("../MainCombatSubphase")
 
 [connection signal="toggled" from="BottomLeftMargin/HBoxContainer/VBox/ToggleInstructions" to="BottomLeftMargin/HBoxContainer/VBox/Panel" method="set_visible"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Cancel/UnitChosenForMove" to="PlayStateMachine/MovementPhase/MovementPhaseStateMachine/ChooseUnitDestination" method="cancel_unit_choice"]

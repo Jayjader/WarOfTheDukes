@@ -62,7 +62,9 @@ func choose_destination(tile: Vector2i):
 		retreater = previous_subphase.to_retreat
 		var choose_retreater = previous_subphase.choose_retreater
 		next_subphase = choose_retreater if len(choose_retreater.to_retreat) > 0 else main_combat
-	unit_layer.move_unit(retreater, retreater.tile, vacated_tile)
+	
+	for unit in Board.get_units_on(retreater.tile):
+		unit_layer.move_unit(unit, unit.tile, vacated_tile)
 	parent_phase.retreated.append_array([making_way, retreater] as Array[GamePiece])
 	phase_state_machine.change_subphase(next_subphase)
 

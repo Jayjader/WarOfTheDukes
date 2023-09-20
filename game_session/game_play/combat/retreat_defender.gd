@@ -21,7 +21,8 @@ extends CombatSubphase
 func choose_destination(tile: Vector2i):
 	var defender = choose_defender.choice
 	choose_attacker_to_pursue.pursue_to = defender.tile
-	unit_layer.move_unit(defender, defender.tile, tile)
+	for unit in Board.get_units_on(defender.tile):
+		unit_layer.move_unit(unit, unit.tile, tile)
 	parent_phase.retreated.append(defender)
 	choose_attacker_to_pursue.can_pursue.clear()
 	for attacker in choose_attackers.attacking:
@@ -53,7 +54,7 @@ func _enter_subphase():
 			phase_state_machine.change_subphase(choose_ally_to_make_way)
 		else:
 			if defender.kind == Enums.Unit.Duke:
-				phase_state_machine.duke_died.emit(defender.faction)
+				parent_phase.duke_died.emit(defender.faction)
 			else:
 				defender.die()
 				parent_phase.died.append(defender)

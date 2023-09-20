@@ -34,6 +34,15 @@ This presents several benefits:
 
 
 ## Combat Specifics
+### Defenders (Can Stacked Dukes Be Targeted?)
+#### Problem statement
+The document is unclear on how to handle combat when the defender is 1 of 2 units stacked on the same tile. Given that this is only possible when 1 of the 2 is a Duke, and that a duke's death is immediate game over and defeat for its player, it is important to be clear about this.
+#### Choice Made: Only lone Dukes can be targeted
+A Duke can only be chosen as defender for a combat when it is the sole occupant of its tile on the board. Furthermore, when the unit stacked with a Duke is forced to retreat, the Duke retreats with them.
+
+This gives us extra simplicity of choice for the attacking/current turn's player, encourages players to use their Dukes more aggressively in "urban combat", and can be justified by the duke "remaining in the center of its tile" during combat, as it does not attack; an opponent must eliminate their "guard" first, and they also provide enough cover while retreating for the Duke to keep pace.
+
+
 ### Retreat
 #### Directions Allowed (What Is Backwards?)
 ##### Problem statement
@@ -47,11 +56,7 @@ More concretely, consider an adjacent attacker/defender pair (respectively `A` a
 
 To retreat, the attacker could either choose from any of the top three pink tiles, or be forced to choose the tile above it.
 ##### Choice made: Backwards is Straight
-Units can only retreat following the axis determined by their tile and the "center of mass" of attacker's tiles, **away** from that center. If this falls upon the border between 2 tiles, a **random** choice is made between the 2.
-
-This gives us:
-- simplicity in implementation (no need to hand control over to opposite player, no need to discriminate between attacker retreating and defender retreating in logic)
-- simplicity in gameplay (less granular decisions for the player to make, player retains control throughout their turn)
+The retreating player can choose from any adjacent tile that allows it to legally retreat. In practice this will be from amongst at most the 3 tiles "opposite" from its opponent(s).
 
 #### Pushing Allies (Chain vs Single)
 ##### Problem statement

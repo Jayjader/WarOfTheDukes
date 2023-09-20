@@ -49,6 +49,8 @@ func confirm_attackers():
 					return false
 				elif attacker.kind != Enums.Unit.Artillery and MapData.map.borders.get(0.5 * (attacker.tile + unit.tile)) == "River":
 					return false
+				elif unit.kind == Enums.Unit.Duke and len(Board.get_units_on(unit.tile)) > 1:
+					return false
 				else:
 					return true
 		):
