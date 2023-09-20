@@ -33,7 +33,6 @@ func is_in_enemy_zoc(tile: Vector2i, enemy_tiles: Array[Vector2i]) -> bool:
 	return false
 
 func paths_for_retreat(unit: GamePiece, others: Array[GamePiece]) -> Array[Vector2i]:
-	var valid_tiles: Array[Vector2i] = []
 	var enemy_tiles = others.reduce(func(array, other_unit):
 		if other_unit.faction != unit.faction:
 			array.append(other_unit.tile)
@@ -44,21 +43,24 @@ func paths_for_retreat(unit: GamePiece, others: Array[GamePiece]) -> Array[Vecto
 			array.append(other_unit.tile)
 		return array
 	, [] as Array[Vector2i])
+	var is_duke = unit.kind == Enums.Unit.Duke
+	var valid_tiles: Array[Vector2i] = []
+	
 	var neighbor_tiles = neighbors_to(unit.tile)
 	for tile in neighbor_tiles:
 		var border_crossed = neighbor_tiles[tile]
-		if tiles.get(tile) == "Lake" and border_crossed == null:
+		if (tiles.get(tile) == "Lake" and border_crossed == null) or (border_crossed == "River") or (tile in enemy_tiles) or is_in_enemy_zoc(tile, enemy_tiles):
 			continue
-		if border_crossed == "River":
-			continue
-		elif tile in ally_tiles:
-			continue
-		elif tile in enemy_tiles:
-			continue
-		elif is_in_enemy_zoc(tile, enemy_tiles):
-			continue
-		else:
-			valid_tiles.append(tile)
+		
+		if tile in ally_tiles:
+			var ally_kind
+			for other in others:
+				if other.tile == tile:
+					ally_kind = other.kind
+			if  is_duke == (ally_kind == Enums.Unit.Duke):
+				continue
+		
+		valid_tiles.append(tile)
 
 	return valid_tiles
 
