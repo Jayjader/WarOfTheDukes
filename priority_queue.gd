@@ -1,5 +1,5 @@
-extends Object
 class_name PriorityQueue
+extends RefCounted
 
 enum TYPE { MAX, MIN }
 
