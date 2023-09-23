@@ -1,8 +1,77 @@
-[gd_scene load_steps=4 format=3 uid="uid://b13hl7reavp6q"]
+[gd_scene load_steps=11 format=3 uid="uid://b13hl7reavp6q"]
 
 [ext_resource type="Script" path="res://lobby/lobby_root.gd" id="1_lrfw5"]
-[ext_resource type="ButtonGroup" uid="uid://hlyc51m413nx" path="res://lobby/player_1_faction_choice.tres" id="2_dphmm"]
-[ext_resource type="Script" path="res://lobby/FactionDetails.gd" id="3_jgbwk"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_juxf0"]
+content_margin_left = 10.0
+content_margin_right = 10.0
+draw_center = false
+border_width_left = 3
+border_width_top = 3
+border_width_bottom = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g1jh4"]
+draw_center = false
+border_width_left = 6
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 6
+expand_margin_left = 11.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kolfh"]
+draw_center = false
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 6
+expand_margin_left = 11.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t44h0"]
+content_margin_left = 10.0
+draw_center = false
+border_width_left = 3
+expand_margin_top = 11.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g7hdb"]
+content_margin_left = 5.0
+content_margin_right = 5.0
+draw_center = false
+border_width_left = 6
+border_width_right = 3
+border_width_bottom = 3
+expand_margin_left = 11.0
+expand_margin_top = 11.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_50ejo"]
+content_margin_left = 4.0
+content_margin_right = 4.0
+draw_center = false
+border_width_right = 3
+expand_margin_top = 11.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mwo1j"]
+content_margin_left = 10.0
+draw_center = false
+border_width_left = 3
+border_width_top = 3
+border_width_bottom = 3
+expand_margin_top = 11.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_snrw6"]
+content_margin_left = 5.0
+content_margin_right = 5.0
+draw_center = false
+border_width_left = 6
+border_width_right = 3
+border_width_bottom = 3
+expand_margin_left = 11.0
+expand_margin_top = 11.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tx0yk"]
+draw_center = false
+border_width_right = 3
+border_width_bottom = 3
+expand_margin_left = 11.0
+expand_margin_top = 11.0
 
 [node name="LobbyRoot" type="Control"]
 layout_mode = 3
@@ -13,86 +82,156 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_lrfw5")
 
-[node name="HBox" type="HBoxContainer" parent="."]
+[node name="HFlowContainer" type="HFlowContainer" parent="."]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = 14
+anchor_top = 0.5
 anchor_right = 1.0
-anchor_bottom = 1.0
+anchor_bottom = 0.5
+offset_top = -371.5
+offset_bottom = 371.5
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/h_separation = 360
 alignment = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="HBox"]
+[node name="PanelContainer" type="PanelContainer" parent="HFlowContainer"]
+custom_minimum_size = Vector2(860, 0)
 layout_mode = 2
-theme_override_constants/margin_top = 40
-theme_override_constants/margin_bottom = 40
 
-[node name="PanelContainer" type="PanelContainer" parent="HBox/MarginContainer"]
+[node name="inner padding" type="MarginContainer" parent="HFlowContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="vbox" type="VBoxContainer" parent="HFlowContainer/PanelContainer/inner padding"]
+layout_mode = 2
+
+[node name="victory explanation" type="Label" parent="HFlowContainer/PanelContainer/inner padding/vbox"]
+layout_mode = 2
+text = "There are 2 contested zones on the board, 1 in each faction's territory: the river-island city of Kaiserberg and the land between the two river tributaries further south."
+autowrap_mode = 3
+
+[node name="GridContainer" type="GridContainer" parent="HFlowContainer/PanelContainer/inner padding/vbox"]
+layout_mode = 2
+theme_override_constants/h_separation = 11
+columns = 3
+
+[node name="title" type="Label" parent="HFlowContainer/PanelContainer/inner padding/vbox/GridContainer"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/normal = SubResource("StyleBoxFlat_juxf0")
+text = "Victory Conditions"
+
+[node name="minor label" type="Label" parent="HFlowContainer/PanelContainer/inner padding/vbox/GridContainer"]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_styles/normal = SubResource("StyleBoxFlat_g1jh4")
+text = "Minor"
+
+[node name="major label" type="Label" parent="HFlowContainer/PanelContainer/inner padding/vbox/GridContainer"]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_styles/normal = SubResource("StyleBoxFlat_kolfh")
+text = "Major"
+
+[node name="orfburg label" type="Label" parent="HFlowContainer/PanelContainer/inner padding/vbox/GridContainer"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/normal = SubResource("StyleBoxFlat_t44h0")
+text = "Orfburg"
+
+[node name="orf minor" type="Label" parent="HFlowContainer/PanelContainer/inner padding/vbox/GridContainer"]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/normal = SubResource("StyleBoxFlat_g7hdb")
+text = "Control both contested zones at the end of the game"
+autowrap_mode = 3
+
+[node name="orf major" type="Label" parent="HFlowContainer/PanelContainer/inner padding/vbox/GridContainer"]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/normal = SubResource("StyleBoxFlat_50ejo")
+text = "Kill the enemy duke, or control the enemy capital at the end of the game"
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="wulfenburg label" type="Label" parent="HFlowContainer/PanelContainer/inner padding/vbox/GridContainer"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/normal = SubResource("StyleBoxFlat_mwo1j")
+text = "Wulfenburg"
+
+[node name="wulf minor" type="Label" parent="HFlowContainer/PanelContainer/inner padding/vbox/GridContainer"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/normal = SubResource("StyleBoxFlat_snrw6")
+text = "Control at least 1 contested zone at the end of the game"
+autowrap_mode = 3
+
+[node name="empty2" type="Label" parent="HFlowContainer/PanelContainer/inner padding/vbox/GridContainer"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/normal = SubResource("StyleBoxFlat_tx0yk")
+
+[node name="PanelContainer2" type="PanelContainer" parent="HFlowContainer"]
 custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
+size_flags_vertical = 4
 
-[node name="Margins" type="MarginContainer" parent="HBox/MarginContainer/PanelContainer"]
+[node name="Margins" type="MarginContainer" parent="HFlowContainer/PanelContainer2"]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="VBox" type="VBoxContainer" parent="HBox/MarginContainer/PanelContainer/Margins"]
+[node name="VBox" type="VBoxContainer" parent="HFlowContainer/PanelContainer2/Margins"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Title" type="Label" parent="HBox/MarginContainer/PanelContainer/Margins/VBox"]
+[node name="Title" type="Label" parent="HFlowContainer/PanelContainer2/Margins/VBox"]
 layout_mode = 2
-text = "Choose your Faction:"
+text = "Game Lobby"
 horizontal_alignment = 1
 
-[node name="Choice" type="HBoxContainer" parent="HBox/MarginContainer/PanelContainer/Margins/VBox"]
+[node name="Players" type="GridContainer" parent="HFlowContainer/PanelContainer2/Margins/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 10
-alignment = 1
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 20
+columns = 2
 
-[node name="Orfburg" type="Button" parent="HBox/MarginContainer/PanelContainer/Margins/VBox/Choice"]
-unique_name_in_owner = true
+[node name="orfburg label" type="Label" parent="HFlowContainer/PanelContainer2/Margins/VBox/Players"]
 layout_mode = 2
-toggle_mode = true
-button_pressed = true
-button_group = ExtResource("2_dphmm")
-text = "Orfburg"
+text = "Orfburg:"
 
-[node name="Wulfenburg" type="Button" parent="HBox/MarginContainer/PanelContainer/Margins/VBox/Choice"]
-unique_name_in_owner = true
+[node name="orfburg is ai" type="CheckButton" parent="HFlowContainer/PanelContainer2/Margins/VBox/Players"]
 layout_mode = 2
-toggle_mode = true
-button_group = ExtResource("2_dphmm")
-text = "Wulfenburg"
+size_flags_horizontal = 4
+action_mode = 0
+text = "Computer"
 
-[node name="Hint" type="Label" parent="HBox/MarginContainer/PanelContainer/Margins/VBox"]
+[node name="wulfenburg label" type="Label" parent="HFlowContainer/PanelContainer2/Margins/VBox/Players"]
+layout_mode = 2
+text = "Wulfenburg:"
+
+[node name="wulfenburg is ai" type="CheckButton" parent="HFlowContainer/PanelContainer2/Margins/VBox/Players"]
+layout_mode = 2
+size_flags_horizontal = 4
+action_mode = 0
+text = "Computer"
+
+[node name="Hint" type="Label" parent="HFlowContainer/PanelContainer2/Margins/VBox"]
 layout_mode = 2
 text = "(Orfburg goes first)"
 horizontal_alignment = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="HBox/MarginContainer/PanelContainer/Margins/VBox"]
-layout_mode = 2
-size_flags_vertical = 3
-horizontal_scroll_mode = 0
-
-[node name="FactionDetails" type="Label" parent="HBox/MarginContainer/PanelContainer/Margins/VBox/ScrollContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-text = "The Duchy of Orfburg wins by seizing the city of Kaiserburg, all while maintaining control of the territory between the two smaller rivers.
-
-Minor Victory: Control the city of Kaiserburg and all of your existing territory in the map corner delimited by the smaller rivers and the cities of Mursk, Urft, and Grossburg.
-
-Total Victory: Control the city of Wulfenburg or kill the Duke of Wulfenburg."
-autowrap_mode = 3
-script = ExtResource("3_jgbwk")
-
-[node name="Confirm" type="Button" parent="HBox/MarginContainer/PanelContainer/Margins/VBox"]
+[node name="Confirm" type="Button" parent="HFlowContainer/PanelContainer2/Margins/VBox"]
 layout_mode = 2
 text = "Confirm"
 
-[connection signal="player_1_faction_chosen" from="." to="HBox/MarginContainer/PanelContainer/Margins/VBox/ScrollContainer/FactionDetails" method="faction_selected"]
-[connection signal="toggled" from="HBox/MarginContainer/PanelContainer/Margins/VBox/Choice/Wulfenburg" to="." method="_on_wulfen_is_toggled_for_player_1"]
-[connection signal="pressed" from="HBox/MarginContainer/PanelContainer/Margins/VBox/Confirm" to="." method="_on_confirm_pressed"]
+[connection signal="pressed" from="HFlowContainer/PanelContainer2/Margins/VBox/Confirm" to="." method="_on_confirm_pressed"]
