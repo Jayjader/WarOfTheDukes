@@ -1,7 +1,18 @@
-[gd_scene load_steps=3 format=3 uid="uid://l1t0k3vqogft"]
+[gd_scene load_steps=6 format=3 uid="uid://l1t0k3vqogft"]
 
 [ext_resource type="Script" path="res://game_session/GameSessionRoot.gd" id="1_7lw6w"]
+[ext_resource type="Script" path="res://player_resource.gd" id="2_6j07u"]
 [ext_resource type="PackedScene" uid="uid://urgscxvof7o8" path="res://game_session/setup/setup_root.tscn" id="3_2cv6m"]
+
+[sub_resource type="Resource" id="Resource_fk7j2"]
+script = ExtResource("2_6j07u")
+faction = 0
+is_ai = false
+
+[sub_resource type="Resource" id="Resource_3makx"]
+script = ExtResource("2_6j07u")
+faction = 1
+is_ai = false
 
 [node name="GameSessionRoot" type="Control"]
 layout_mode = 3
@@ -12,6 +23,8 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_7lw6w")
+player_1 = SubResource("Resource_fk7j2")
+player_2 = SubResource("Resource_3makx")
 
 [node name="SetupRoot" parent="." instance=ExtResource("3_2cv6m")]
 layout_mode = 1

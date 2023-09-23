@@ -22,12 +22,13 @@ var data
 				_cleanup_current_mode()
 				var lobby = Lobby.instantiate()
 				add_child(lobby)
-				lobby.player_1_faction_confirmed.connect(_on_lobby_player_1_faction_choice_confirmed)
+				lobby.lobby_ready.connect(__on_lobby_ready_start_game)
 			Enums.MainMode.InGame:
 				_cleanup_current_mode()
 				Board.wipe_units_off()
 				var game_session = GameSession.instantiate()
-				game_session.player_1 = data as Enums.Faction
+				game_session.player_1.is_computer = data[0]
+				game_session.player_2.is_computer = data[1]
 				add_child(game_session)
 				game_session.new_lobby_started.connect(_on_new_game_started)
 				game_session.session_closed.connect(_on_game_session_closed)
@@ -42,8 +43,8 @@ func _on_new_game_started():
 	mode = Enums.MainMode.NewGameLobby
 
 
-func _on_lobby_player_1_faction_choice_confirmed(faction: Enums.Faction):
-	data = faction
+func __on_lobby_ready_start_game(orf_is_computer: bool, wulf_is_computer: bool):
+	data = [orf_is_computer, wulf_is_computer]
 	mode = Enums.MainMode.InGame
 
 func _on_game_session_closed():

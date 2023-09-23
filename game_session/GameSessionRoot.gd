@@ -4,12 +4,11 @@ const Setup = preload("res://game_session/setup/setup_root.tscn")
 const GamePlay = preload("res://game_session/game_play/game_play_root.tscn")
 const GameOver = preload("res://game_session/game_over/game_over_root.tscn")
 
-@export var player_1: Enums.Faction
 
-var player_2:
-	get:
-		return Enums.Faction.Wulfenburg if player_1 == Enums.Faction.Orfburg else Enums.Faction.Orfburg
+@export var player_1: PlayerRs
 
+@export var player_2: PlayerRs
+	
 @export var mode: Enums.SessionMode = Enums.SessionMode.SETUP
 
 func _is_city_or_fort(tile, map_data):
