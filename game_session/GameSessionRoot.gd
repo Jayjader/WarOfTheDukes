@@ -1,9 +1,12 @@
 extends Control
 
-const Setup = preload("res://game_session/setup/setup_root.tscn")
-const GamePlay = preload("res://game_session/game_play/game_play_root.tscn")
-const GameOver = preload("res://game_session/game_over/game_over_root.tscn")
+const _Setup = preload("res://game_session/setup/setup_root.tscn")
+const _GamePlay = preload("res://game_session/game_play/game_play_root.tscn")
+const _GameOver = preload("res://game_session/game_over/game_over_root.tscn")
 
+var setup
+var game_play
+var game_over
 
 @export var player_1: PlayerRs
 
@@ -11,29 +14,32 @@ const GameOver = preload("res://game_session/game_over/game_over_root.tscn")
 	
 @export var mode: Enums.SessionMode = Enums.SessionMode.SETUP
 
-func _is_city_or_fort(tile, map_data):
-	var tile_kind = map_data.tiles[tile]
-	return (tile_kind == "City") or (tile_kind == "Fortress")
+const CITY_OR_FORTRESS = ["City", "Fortress"]
+
+func _is_city_or_fort(tile):
+	return CITY_OR_FORTRESS.has(MapData.map.tiles[tile])
 
 func _ready():
 	Board.toggled_editing.connect(self._on_board_root_toggled_editing)
-	var setup_root = $SetupRoot
-	var orf_tiles = {}
-	for tile in MapData.map.zones.OrfburgTerritory:
-		if _is_city_or_fort(tile, MapData.map):
-			orf_tiles[tile] = true
-	setup_root.empty_cities_and_forts[Enums.Faction.Orfburg] = orf_tiles.keys()
-
-	var wulf_tiles = {}
-	for tile in MapData.map.zones.WulfenburgTerritory:
-		if _is_city_or_fort(tile, MapData.map):
-			wulf_tiles[tile] = true
-	setup_root.empty_cities_and_forts[Enums.Faction.Wulfenburg] = wulf_tiles.keys()
+	setup = $SetupRoot
+	setup.empty_cities_and_forts[Enums.Faction.Orfburg] = MapData.map.zones.OrfburgTerritory.reduce(func(accu, next):
+		if _is_city_or_fort(next) and next not in accu:
+			accu.append(next)
+		return accu, [])
+	setup.empty_cities_and_forts[Enums.Faction.Wulfenburg] = MapData.map.zones.WulfenburgTerritory.reduce(func(accu, next):
+		if _is_city_or_fort(next) and next not in accu:
+			accu.append(next)
+		return accu, [])
+	setup.players.clear()
+	setup.players.append(player_1)
+	setup.players.append(player_2)
+	#setup.start()
+	
 
 func finish_setup():
 	mode = Enums.SessionMode.PLAY
-	$SetupRoot.queue_free()
-	var game_play = GamePlay.instantiate()
+	setup.queue_free()
+	game_play = _GamePlay.instantiate()
 	add_child(game_play)
 	game_play.game_over.connect(end_game)
 
@@ -43,7 +49,7 @@ signal session_closed
 func end_game(result: Enums.GameResult, winner=null):
 	mode = Enums.SessionMode.GAME_OVER
 	$GamePlayRoot.queue_free()
-	var game_over = GameOver.instantiate()
+	game_over = _GameOver.instantiate()
 	game_over.result = result
 	game_over.winner = winner
 	add_child(game_over)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://bwst2xk4wn3l6"]
+[gd_scene load_steps=13 format=3 uid="uid://bwst2xk4wn3l6"]
 
 [ext_resource type="Script" path="res://board/BoardRoot.gd" id="1_7ngv4"]
 [ext_resource type="Script" path="res://board/tile_layer/TileOverlay.gd" id="2_g1bmc"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://board/unit_layer/unit_layer_root.gd" id="4_3bm0a"]
 [ext_resource type="Script" path="res://board/tile_layer/movement_range.gd" id="4_6mrs1"]
 [ext_resource type="Script" path="res://board/tile_layer/hover_click.gd" id="4_7yuta"]
+[ext_resource type="Script" path="res://board/tile_layer/deployment_zone.gd" id="4_dn2ii"]
 [ext_resource type="Script" path="res://game_session/OverBoardCamera.gd" id="5_eokpn"]
 [ext_resource type="Script" path="res://board/tile_layer/retreat_range.gd" id="5_otyml"]
 [ext_resource type="Script" path="res://board/Direct.gd" id="6_s8gsq"]
@@ -53,6 +54,9 @@ self_modulate = Color(1, 1, 1, 0)
 show_behind_parent = true
 texture = ExtResource("3_o7vri")
 centered = false
+
+[node name="DeploymentZone" type="Node2D" parent="ViewportContainer/SubViewport/TileOverlay"]
+script = ExtResource("4_dn2ii")
 
 [node name="MovementRange" type="Node2D" parent="ViewportContainer/SubViewport/TileOverlay"]
 unique_name_in_owner = true

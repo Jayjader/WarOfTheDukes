@@ -1,8 +1,18 @@
-[gd_scene load_steps=4 format=3 uid="uid://urgscxvof7o8"]
+[gd_scene load_steps=11 format=3 uid="uid://urgscxvof7o8"]
 
 [ext_resource type="Script" path="res://game_session/setup/setup_root.gd" id="1_autkv"]
-[ext_resource type="Script" path="res://board/PlayerValue.gd" id="2_mxi6t"]
+[ext_resource type="Script" path="res://game_session/setup/PlayerValue.gd" id="2_eoobw"]
 [ext_resource type="ButtonGroup" uid="uid://bfis28ta025kj" path="res://game_session/setup/unit_selection_button_group.tres" id="3_fneyt"]
+[ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="4_7ptxt"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="5_nnlnq"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="6_pkpi8"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="7_xfxhw"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="8_fq8f0"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/expression_guard.gd" id="9_84nl1"]
+
+[sub_resource type="Resource" id="Resource_y6716"]
+script = ExtResource("9_84nl1")
+expression = "empty_city_or_fortress_tiles == 0"
 
 [node name="SetupRoot" type="Control"]
 layout_mode = 3
@@ -76,8 +86,8 @@ text = "Current Player:"
 
 [node name="Value" type="Label" parent="MarginContainer/PanelContainer/Margins/HBox/VBox/CurrentPlayer"]
 layout_mode = 2
-text = "Orfburg"
-script = ExtResource("2_mxi6t")
+text = "Orfburg (Computer)"
+script = ExtResource("2_eoobw")
 
 [node name="AutoSetup" type="Button" parent="MarginContainer/PanelContainer/Margins/HBox/VBox"]
 layout_mode = 2
@@ -218,4 +228,53 @@ layout_mode = 2
 text = "1"
 horizontal_alignment = 2
 
+[node name="StateChartDebugger" parent="." instance=ExtResource("4_7ptxt")]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+offset_left = -805.0
+offset_top = -524.0
+grow_horizontal = 0
+grow_vertical = 0
+initial_node_to_watch = NodePath("../StateChart")
+
+[node name="StateChart" type="Node" parent="."]
+script = ExtResource("5_nnlnq")
+
+[node name="Root" type="Node" parent="StateChart"]
+script = ExtResource("6_pkpi8")
+initial_state = NodePath("Uninitialized")
+
+[node name="Uninitialized" type="Node" parent="StateChart/Root"]
+script = ExtResource("7_xfxhw")
+
+[node name="to start" type="Node" parent="StateChart/Root/Uninitialized"]
+script = ExtResource("8_fq8f0")
+to = NodePath("../../Started")
+event = &"start"
+
+[node name="Started" type="Node" parent="StateChart/Root"]
+script = ExtResource("6_pkpi8")
+initial_state = NodePath("Fill Cities And Forts")
+
+[node name="Fill Cities And Forts" type="Node" parent="StateChart/Root/Started"]
+script = ExtResource("7_xfxhw")
+
+[node name="cities and forts filled" type="Node" parent="StateChart/Root/Started/Fill Cities And Forts"]
+script = ExtResource("8_fq8f0")
+to = NodePath("../../Place Remaining Units In Own Territory")
+guard = SubResource("Resource_y6716")
+
+[node name="Place Remaining Units In Own Territory" type="Node" parent="StateChart/Root/Started"]
+script = ExtResource("7_xfxhw")
+
+[node name="to finished" type="Node" parent="StateChart/Root/Started/Place Remaining Units In Own Territory"]
+script = ExtResource("8_fq8f0")
+to = NodePath("../../../Finished")
+
+[node name="Finished" type="Node" parent="StateChart/Root"]
+script = ExtResource("7_xfxhw")
+
 [connection signal="pressed" from="MarginContainer/PanelContainer/Margins/HBox/VBox/AutoSetup" to="." method="_on_auto_setup_pressed"]
+[connection signal="state_entered" from="StateChart/Root/Started/Fill Cities And Forts" to="." method="_on_fill_cities_and_forts_state_entered"]
