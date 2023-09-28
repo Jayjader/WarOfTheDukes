@@ -21,8 +21,7 @@ func set_phase(value):
 		if value != null:
 			assert(value in players)
 			player_ui.player = current_player
-			if not current_player.is_computer:
-				placing = get_first_with_remaining(current_player.faction)
+			placing = get_first_with_remaining(current_player.faction)
 
 
 @onready var state_chart: StateChart = $StateChart
@@ -57,30 +56,30 @@ func _pieces_placed_summary():
 	var orf_duke = placed[Enums.Faction.Orfburg][Enums.Unit.Duke]
 	if orf_duke != null:
 		pieces_placed.append({
-			unit_kind = Enums.Unit.Duke,
-			allied = current_player.faction != Enums.Faction.Orfburg,
+			kind = Enums.Unit.Duke,
+			allied = current_player.faction == Enums.Faction.Orfburg,
 			tile = orf_duke
 		})
 	for unit_kind in [Enums.Unit.Infantry, Enums.Unit.Cavalry, Enums.Unit.Artillery]:
 		pieces_placed.append_array(placed[Enums.Faction.Orfburg][unit_kind].map(func(tile):
 			return {
-				unit_kind = unit_kind,
-				allied = current_player.faction != Enums.Faction.Orfburg,
+				kind = unit_kind,
+				allied = current_player.faction == Enums.Faction.Orfburg,
 				tile = tile
 			}
 		))
 	var wulf_duke = placed[Enums.Faction.Wulfenburg][Enums.Unit.Duke]
 	if wulf_duke != null:
 		pieces_placed.append({
-			unit_kind = Enums.Unit.Duke,
-			allied = current_player.faction != Enums.Faction.Wulfenburg,
+			kind = Enums.Unit.Duke,
+			allied = current_player.faction == Enums.Faction.Wulfenburg,
 			tile = wulf_duke
 		})
 	for unit_kind in [Enums.Unit.Infantry, Enums.Unit.Cavalry, Enums.Unit.Artillery]:
 		pieces_placed.append_array(placed[Enums.Faction.Wulfenburg][unit_kind].map(func(tile):
 			return {
-				unit_kind = unit_kind,
-				allied = current_player.faction != Enums.Faction.Wulfenburg,
+				kind = unit_kind,
+				allied = current_player.faction == Enums.Faction.Wulfenburg,
 				tile = tile
 			}
 		))
@@ -89,6 +88,7 @@ func _pieces_placed_summary():
 func query_current_player_for_deployment_tile():
 	var pieces_placed = _pieces_placed_summary()
 	print_debug("querying %s..." % Enums.Faction.find_key(current_player.faction))
+	var choice
 	if current_player.is_computer:
 		var strategy = SetupStrategy.new()
 		var tiles = {}
@@ -107,8 +107,9 @@ func query_current_player_for_deployment_tile():
 					return ["Road", "Bridge"].has(MapData.map.borders.get((tile + other_tile) * 0.5)))
 				}
 		
-		var choice = strategy.choose_piece_to_place(pieces_placed, tiles)
-		choose_tile(current_player, choice[0], choice[1])
+		var choices = strategy.choose_piece_to_place(pieces_placed, tiles)
+		placing = choices[0]
+		choice = choices[1]
 	else:
 		var occupied_tiles = pieces_placed.map(func(p): return p.tile)
 		var current_tiles: Array[Vector2i] = []
@@ -119,12 +120,13 @@ func query_current_player_for_deployment_tile():
 		Board.report_click_for_tiles(current_tiles)
 		deployment_ui.tiles = current_tiles
 		deployment_ui.queue_redraw()
-		var choice = (await Board.hex_clicked)[0]
+		choice = (await Board.hex_clicked)[0]
 		deployment_ui.tiles.clear()
 		deployment_ui.queue_redraw()
 		Board.report_hover_for_tiles([])
 		Board.report_click_for_tiles([])
-		choose_tile(current_player, placing, choice)
+	print_debug("%s chosen." % Enums.Unit.find_key(placing))
+	choose_tile(current_player, placing, choice)
 
 var placed: Dictionary
 
@@ -205,30 +207,37 @@ func choose_tile(player: PlayerRs, unit: Enums.Unit, tile: Vector2i):
 	
 	display_remaining_counts()
 	
-	%Selection/Buttons/Infantry.disabled = pieces_remaining(current_player.faction, Enums.Unit.Infantry) == 0
-	%Selection/Buttons/Cavalry.disabled = pieces_remaining(current_player.faction, Enums.Unit.Cavalry) == 0
-	%Selection/Buttons/Artillery.disabled = pieces_remaining(current_player.faction, Enums.Unit.Artillery) == 0
-	%Selection/Buttons/Duke.disabled = pieces_remaining(current_player.faction, Enums.Unit.Duke) == 0
-	var selection_button
-	match get_first_with_remaining(current_player.faction):
-		Enums.Unit.Duke:
-			selection_button = %Selection/Buttons/Duke
-		Enums.Unit.Infantry:
-			selection_button = %Selection/Buttons/Infantry
-		Enums.Unit.Cavalry:
-			selection_button = %Selection/Buttons/Cavalry
-		Enums.Unit.Artillery:
-			selection_button = %Selection/Buttons/Artillery
-	if selection_button != null:
-		selection_button.grab_focus()
-		selection_button.set_pressed(true)
+	if player.is_computer:
+		placing = get_first_with_remaining(current_player.faction)
 	else:
-		setup_finished.emit()
-		return
+		%Selection/Buttons/Infantry.disabled = pieces_remaining(player.faction, Enums.Unit.Infantry) == 0
+		%Selection/Buttons/Cavalry.disabled = pieces_remaining(player.faction, Enums.Unit.Cavalry) == 0
+		%Selection/Buttons/Artillery.disabled = pieces_remaining(player.faction, Enums.Unit.Artillery) == 0
+		%Selection/Buttons/Duke.disabled = pieces_remaining(player.faction, Enums.Unit.Duke) == 0
+		if pieces_remaining(player.faction, placing) == 0:
+			placing = get_first_with_remaining(player.faction)
+		
+		var selection_button
+		match placing:
+			Enums.Unit.Duke:
+				selection_button = %Selection/Buttons/Duke
+			Enums.Unit.Infantry:
+				selection_button = %Selection/Buttons/Infantry
+			Enums.Unit.Cavalry:
+				selection_button = %Selection/Buttons/Cavalry
+			Enums.Unit.Artillery:
+				selection_button = %Selection/Buttons/Artillery
+		if selection_button != null:
+			selection_button.grab_focus()
+			selection_button.set_pressed(true)
 	
 	var next_game_action
-	if phase == Enums.SetupPhase.FILL_CITIES_FORTS:
-		if len(empty_cities_and_forts[current_player.faction]) - Enums.Unit.values().reduce(func(sum, next): return sum + piece_count(placed[current_player.faction], next), 0) > 0:
+	if placing == null:
+		next_game_action = func(): setup_finished.emit()
+	elif phase == Enums.SetupPhase.FILL_CITIES_FORTS:
+		if len(empty_cities_and_forts[current_player.faction]) - Enums.Unit.values().reduce(
+			func(sum, next): return sum + piece_count(placed[current_player.faction], next),
+		0) > 0:
 			next_game_action = query_current_player_for_deployment_tile
 		else:
 			if player == players.back():
@@ -271,9 +280,6 @@ func _ready():
 	%Selection/Buttons.get_child(0).get_button_group().pressed.connect(func(button): change_selection(Enums.Unit[button.name]))
 	
 	start.call_deferred()
-
-func __on_tile_clicked(tile, kind, zones):
-	choose_tile(current_player, placing, tile)
 
 func _on_auto_setup_pressed():
 	while placing != null:
