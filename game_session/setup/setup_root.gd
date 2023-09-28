@@ -85,6 +85,28 @@ func _pieces_placed_summary():
 		))
 	return pieces_placed
 
+func _sync_buttons(player: PlayerRs):
+		%Selection/Buttons/Infantry.disabled = pieces_remaining(player.faction, Enums.Unit.Infantry) == 0
+		%Selection/Buttons/Cavalry.disabled = pieces_remaining(player.faction, Enums.Unit.Cavalry) == 0
+		%Selection/Buttons/Artillery.disabled = pieces_remaining(player.faction, Enums.Unit.Artillery) == 0
+		%Selection/Buttons/Duke.disabled = pieces_remaining(player.faction, Enums.Unit.Duke) == 0
+		if pieces_remaining(player.faction, placing) == 0:
+			placing = get_first_with_remaining(player.faction)
+		
+		var selection_button
+		match placing:
+			Enums.Unit.Duke:
+				selection_button = %Selection/Buttons/Duke
+			Enums.Unit.Infantry:
+				selection_button = %Selection/Buttons/Infantry
+			Enums.Unit.Cavalry:
+				selection_button = %Selection/Buttons/Cavalry
+			Enums.Unit.Artillery:
+				selection_button = %Selection/Buttons/Artillery
+		if selection_button != null:
+			selection_button.grab_focus()
+			selection_button.set_pressed(true)
+	
 func query_current_player_for_deployment_tile():
 	var pieces_placed = _pieces_placed_summary()
 	print_debug("querying %s..." % Enums.Faction.find_key(current_player.faction))
@@ -108,9 +130,10 @@ func query_current_player_for_deployment_tile():
 				}
 		
 		var choices = strategy.choose_piece_to_place(pieces_placed, tiles)
-		placing = choices[0]
+		placing = get_first_with_remaining(current_player.faction) # choices[0]
 		choice = choices[1]
 	else:
+		_sync_buttons(current_player)
 		var occupied_tiles = pieces_placed.map(func(p): return p.tile)
 		var current_tiles: Array[Vector2i] = []
 		for tile in deployment_tiles_for_player(current_player, phase):
@@ -207,32 +230,8 @@ func choose_tile(player: PlayerRs, unit: Enums.Unit, tile: Vector2i):
 	
 	display_remaining_counts()
 	
-	if player.is_computer:
-		placing = get_first_with_remaining(current_player.faction)
-	else:
-		%Selection/Buttons/Infantry.disabled = pieces_remaining(player.faction, Enums.Unit.Infantry) == 0
-		%Selection/Buttons/Cavalry.disabled = pieces_remaining(player.faction, Enums.Unit.Cavalry) == 0
-		%Selection/Buttons/Artillery.disabled = pieces_remaining(player.faction, Enums.Unit.Artillery) == 0
-		%Selection/Buttons/Duke.disabled = pieces_remaining(player.faction, Enums.Unit.Duke) == 0
-		if pieces_remaining(player.faction, placing) == 0:
-			placing = get_first_with_remaining(player.faction)
-		
-		var selection_button
-		match placing:
-			Enums.Unit.Duke:
-				selection_button = %Selection/Buttons/Duke
-			Enums.Unit.Infantry:
-				selection_button = %Selection/Buttons/Infantry
-			Enums.Unit.Cavalry:
-				selection_button = %Selection/Buttons/Cavalry
-			Enums.Unit.Artillery:
-				selection_button = %Selection/Buttons/Artillery
-		if selection_button != null:
-			selection_button.grab_focus()
-			selection_button.set_pressed(true)
-	
 	var next_game_action
-	if placing == null:
+	if players.all(func(p): return get_first_with_remaining(p.faction) == null):
 		next_game_action = func(): setup_finished.emit()
 	elif phase == Enums.SetupPhase.FILL_CITIES_FORTS:
 		if len(empty_cities_and_forts[current_player.faction]) - Enums.Unit.values().reduce(
@@ -266,6 +265,8 @@ func ___choose_tile(tile: Vector2i, kind: String, zones: Array):
 func deployment_tiles_for_player(player: PlayerRs, current_phase: Enums.SetupPhase) -> Array[Vector2i]:
 	var tiles: Array[Vector2i] = []
 	for tile in MapData.map.tiles:
+		if MapData.map.tiles[tile] == "Lake":
+			continue
 		if tile not in MapData.map.zones["%sTerritory" % Enums.Faction.find_key(player.faction)]:
 			continue
 		if current_phase == Enums.SetupPhase.FILL_CITIES_FORTS and MapData.map.tiles[tile] not in ["City", "Fortress"]:
@@ -303,10 +304,14 @@ func _on_fill_cities_and_forts_state_entered():
 
 func _on_player_1_state_entered():
 	current_player = players[0]
+	if !current_player.is_computer:
+		_sync_buttons(current_player)
 	query_current_player_for_deployment_tile.call_deferred()
 
 func _on_player_2_state_entered():
 	current_player = players[1]
+	if !current_player.is_computer:
+		_sync_buttons(current_player)
 	query_current_player_for_deployment_tile.call_deferred()
 
 
