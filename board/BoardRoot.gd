@@ -64,8 +64,9 @@ func paths_from(tile: Vector2i, max_cost: int):
 	return MapData.map.paths_from(tile, max_cost)
 func paths_for(unit: GamePiece):
 	var units: Array[GamePiece] = []
-	for other_unit in %UnitLayer.get_children(true).filter(func(other_unit: GamePiece): return unit.name != other_unit.name):
-		units.append(other_unit)
+	for other_unit in %UnitLayer.get_children(true):
+		if unit.name != other_unit.name:
+			units.append(other_unit)
 	return MapData.map.paths_for(unit, units)
 
 func get_units_on(tile: Vector2i):
