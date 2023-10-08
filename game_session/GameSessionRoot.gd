@@ -11,7 +11,7 @@ var game_over
 @export var player_1: PlayerRs
 
 @export var player_2: PlayerRs
-	
+
 @export var mode: Enums.SessionMode = Enums.SessionMode.SETUP
 
 const CITY_OR_FORTRESS = ["City", "Fortress"]
@@ -34,12 +34,13 @@ func _ready():
 	setup.players.append(player_1)
 	setup.players.append(player_2)
 	#setup.start()
-	
+
 
 func finish_setup():
 	mode = Enums.SessionMode.PLAY
 	setup.queue_free()
 	game_play = _GamePlay.instantiate()
+	game_play.players.append_array([player_1, player_2])
 	add_child(game_play)
 	game_play.game_over.connect(end_game)
 
