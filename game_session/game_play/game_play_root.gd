@@ -22,6 +22,9 @@ func __on_combat_state_exited():
 	if turn_counter > Rules.MaxTurns:
 		pass # todo: detect winner, then __on_last_turn_end(...)
 
+var died: Array[GamePiece] = []
+
+## Movement
 var moved: Array[GamePiece] = []
 func __on_movement_state_entered():
 	moved.clear()
@@ -43,7 +46,13 @@ Rivers can not be crossed (but a Bridge over a River can be crossed - cost as sp
 
 func __on_movement_state_exited():
 	%MovementPhase.hide()
-	mover = null
+	# move the following to _on_combat_entered:
+	#for unit in unit_layer.get_units(current_player.faction):
+	#	if unit not in died and unit.kind != Enums.Unit.Duke:
+	#		can_attack.append(unit)
+	#for unit in unit_layer.get_units(Enums.get_other_faction(current_player.faction)):
+	#	if unit not in died:
+	#		can_defend.append(unit)
 
 var current_player: PlayerRs
 func _set_current_player(p: PlayerRs):
@@ -90,6 +99,7 @@ func __on_mover_choice_cancelled(_unit=null):
 	state_chart.send_event.call_deferred("mover choice canceled")
 func __on_tile_chosen_as_destination(tile: Vector2i, _kind, _zones):
 	unit_layer.move_unit(mover, mover.tile, tile)
+	moved.append(mover)
 	state_chart.send_event.call_deferred("unit moved")
 
 func __on_choose_destination_state_entered():
