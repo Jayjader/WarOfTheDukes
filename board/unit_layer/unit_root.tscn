@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://bw38xklp365ls"]
+[gd_scene load_steps=3 format=3 uid="uid://bw38xklp365ls"]
 
 [ext_resource type="Script" path="res://board/unit_layer/unit_root.gd" id="1_euwlh"]
+[ext_resource type="Texture2D" uid="uid://cf4v2hvguyeu7" path="res://board/unit_layer/infantry.png" id="2_d3fca"]
 
 [node name="UnitRoot" type="Node2D"]
 script = ExtResource("1_euwlh")
@@ -20,3 +21,6 @@ grow_vertical = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0)
 theme_override_constants/outline_size = 8
 horizontal_alignment = 1
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_d3fca")
