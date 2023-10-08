@@ -108,6 +108,7 @@ func __on_choose_destination_state_entered():
 		pass
 	else:
 		%CancelMoverChoice.show()
+		mover.selectable = true
 		unit_layer.unit_unselected.connect(__on_mover_choice_cancelled, CONNECT_ONE_SHOT)
 		var destinations = Board.paths_for(mover)
 		tile_layer.set_destinations(destinations)
@@ -117,6 +118,7 @@ func __on_choose_destination_state_entered():
 			can_cross.append(tile)
 			if destinations[tile].can_stop_here:
 				can_stop.append(tile)
+		can_stop.erase(mover.tile)
 		var hover_click = Board.get_node("%HoverClick")
 		hover_click.show()
 		Board.report_hover_for_tiles(can_cross)

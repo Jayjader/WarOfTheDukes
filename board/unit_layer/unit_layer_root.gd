@@ -12,11 +12,11 @@ func _place_piece(tile: Vector2i, kind: Enums.Unit, faction: Enums.Faction):
 	#print_debug("placing piece (%s, %s, %s)" % [tile, kind, faction])
 	var new_unit = Unit.instantiate()
 	new_unit.name = "Unit%s-%s-%s" % [get_child_count(), Enums.Faction.find_key(faction), Enums.Unit.find_key(kind)]
-	add_child(new_unit)
 	new_unit.kind = kind
 	new_unit.faction = faction
 	new_unit.tile = tile
 	new_unit.selected.connect(__on_unit_selected_toggle.bind(new_unit))
+	add_child(new_unit)
 
 
 func make_faction_selectable(faction: Enums.Faction, preserve=[]) -> void:
