@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://dn24y8eq6bsf"]
+[gd_scene load_steps=27 format=3 uid="uid://dn24y8eq6bsf"]
 
 [ext_resource type="Script" path="res://game_session/game_play/game_play_root.gd" id="1_kicvc"]
 [ext_resource type="Script" path="res://game_session/game_play/play_phase_state_machine.gd" id="4_rxnh7"]
@@ -19,8 +19,15 @@
 [ext_resource type="Script" path="res://game_session/game_play/combat/retreat_defender.gd" id="18_1m6pe"]
 [ext_resource type="Script" path="res://game_session/game_play/combat/choose_ally_to_make_way.gd" id="18_ohqr4"]
 [ext_resource type="Script" path="res://game_session/game_play/combat/pursue_retreating_defender.gd" id="19_l7c67"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="20_qywoi"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/parallel_state.gd" id="21_i6w5i"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="22_07qe0"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="23_hxj8n"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="24_uvwcr"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/history_state.gd" id="25_kms61"]
+[ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="26_5lf1w"]
 
-[node name="GamePlayRoot" type="Control" node_paths=PackedStringArray("play_phase_state_machine")]
+[node name="GamePlayRoot" type="Control" node_paths=PackedStringArray("state_chart")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -29,7 +36,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_kicvc")
-play_phase_state_machine = NodePath("PlayStateMachine")
+state_chart = NodePath("StateChart")
 
 [node name="TopMargin" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -196,7 +203,7 @@ layout_mode = 2
 [node name="Cancel" type="HBoxContainer" parent="BottomRightMargin/HBox"]
 layout_mode = 2
 
-[node name="UnitChosenForMove" type="Button" parent="BottomRightMargin/HBox/Cancel"]
+[node name="CancelMoverChoice" type="Button" parent="BottomRightMargin/HBox/Cancel"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
@@ -383,14 +390,202 @@ choose_defender = NodePath("../ChooseDefenderForAttack")
 choose_ally_to_make_way = NodePath("../ChooseAllyToMakeWay")
 choose_attacker_to_pursue = NodePath("../ChooseAttackerToPursueRetreatingDefender")
 
+[node name="StateChart" type="Node" parent="."]
+script = ExtResource("20_qywoi")
+
+[node name="ParallelState" type="Node" parent="StateChart"]
+script = ExtResource("21_i6w5i")
+
+[node name="Player" type="Node" parent="StateChart/ParallelState"]
+script = ExtResource("22_07qe0")
+initial_state = NodePath("Player 1")
+
+[node name="Player 1" type="Node" parent="StateChart/ParallelState/Player"]
+script = ExtResource("24_uvwcr")
+
+[node name="to player 2" type="Node" parent="StateChart/ParallelState/Player/Player 1"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../Player 2")
+event = &"end combat"
+
+[node name="Player 2" type="Node" parent="StateChart/ParallelState/Player"]
+script = ExtResource("24_uvwcr")
+
+[node name="to player 1" type="Node" parent="StateChart/ParallelState/Player/Player 2"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../Player 1")
+event = &"end combat"
+
+[node name="Phase" type="Node" parent="StateChart/ParallelState"]
+script = ExtResource("22_07qe0")
+initial_state = NodePath("Movement")
+
+[node name="Movement" type="Node" parent="StateChart/ParallelState/Phase"]
+script = ExtResource("22_07qe0")
+initial_state = NodePath("Choose Mover")
+
+[node name="to combat" type="Node" parent="StateChart/ParallelState/Phase/Movement"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../Combat")
+event = &"movement ended"
+
+[node name="Choose Mover" type="Node" parent="StateChart/ParallelState/Phase/Movement"]
+script = ExtResource("24_uvwcr")
+
+[node name="choose unit" type="Node" parent="StateChart/ParallelState/Phase/Movement/Choose Mover"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../Choose Destination")
+event = &"mover chosen"
+
+[node name="Choose Destination" type="Node" parent="StateChart/ParallelState/Phase/Movement"]
+script = ExtResource("24_uvwcr")
+
+[node name="choose tile" type="Node" parent="StateChart/ParallelState/Phase/Movement/Choose Destination"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../Choose Mover")
+event = &"unit moved"
+
+[node name="cancel choice of mover" type="Node" parent="StateChart/ParallelState/Phase/Movement/Choose Destination"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../Choose Mover")
+event = &"mover choice canceled"
+
+[node name="Combat" type="Node" parent="StateChart/ParallelState/Phase"]
+script = ExtResource("22_07qe0")
+initial_state = NodePath("Choose Attackers")
+
+[node name="to movement" type="Node" parent="StateChart/ParallelState/Phase/Combat"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../Movement")
+event = &"end combat"
+
+[node name="Choose Attackers" type="Node" parent="StateChart/ParallelState/Phase/Combat"]
+script = ExtResource("24_uvwcr")
+
+[node name="choose defender" type="Node" parent="StateChart/ParallelState/Phase/Combat/Choose Attackers"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../Choose Defender")
+event = &"attackers chosen"
+
+[node name="Choose Defender" type="Node" parent="StateChart/ParallelState/Phase/Combat"]
+script = ExtResource("24_uvwcr")
+
+[node name="resolve combat" type="Node" parent="StateChart/ParallelState/Phase/Combat/Choose Defender"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../Resolve Combat")
+event = &"defender chosen"
+
+[node name="Resolve Combat" type="Node" parent="StateChart/ParallelState/Phase/Combat"]
+script = ExtResource("22_07qe0")
+initial_state = NodePath("View Result")
+
+[node name="View Result" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat"]
+script = ExtResource("24_uvwcr")
+
+[node name="choose next attackers" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/View Result"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../../Choose Attackers")
+event = &"combat resolved"
+
+[node name="retreat defender" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/View Result"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../Retreat Defender")
+event = &"defender retreats"
+
+[node name="retreat attackers" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/View Result"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../Retreat Attackers")
+
+[node name="exchange" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/View Result"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../Exchange")
+
+[node name="Retreat Defender" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat"]
+script = ExtResource("24_uvwcr")
+
+[node name="choose next attackers" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/Retreat Defender"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../../Choose Attackers")
+event = &"combat resolved"
+
+[node name="to make way" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/Retreat Defender"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../../Make Way")
+
+[node name="Retreat Attackers" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat"]
+script = ExtResource("22_07qe0")
+initial_state = NodePath("Choose Retreater")
+
+[node name="Choose Retreater" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/Retreat Attackers"]
+script = ExtResource("24_uvwcr")
+
+[node name="choose destination" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/Retreat Attackers/Choose Retreater"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../Choose Destination")
+
+[node name="Choose Destination" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/Retreat Attackers"]
+script = ExtResource("24_uvwcr")
+
+[node name="choose next attackers" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/Retreat Attackers/Choose Destination"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../../../Choose Attackers")
+
+[node name="choose next retreater" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/Retreat Attackers/Choose Destination"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../Choose Retreater")
+event = &"combat resolved"
+
+[node name="to make way" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/Retreat Attackers/Choose Destination"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../../../Make Way")
+
+[node name="Resume Retreat" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat"]
+script = ExtResource("25_kms61")
+default_state = NodePath("../Retreat Defender")
+
+[node name="Exchange" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat"]
+script = ExtResource("24_uvwcr")
+
+[node name="choose next attackers" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/Exchange"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../../Choose Attackers")
+event = &"combat resolved"
+
+[node name="Make Way" type="Node" parent="StateChart/ParallelState/Phase/Combat"]
+script = ExtResource("22_07qe0")
+initial_state = NodePath("Choose Ally")
+
+[node name="Choose Ally" type="Node" parent="StateChart/ParallelState/Phase/Combat/Make Way"]
+script = ExtResource("24_uvwcr")
+
+[node name="choose destination" type="Node" parent="StateChart/ParallelState/Phase/Combat/Make Way/Choose Ally"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../Choose Destination")
+
+[node name="Choose Destination" type="Node" parent="StateChart/ParallelState/Phase/Combat/Make Way"]
+script = ExtResource("24_uvwcr")
+
+[node name="resume retreat" type="Node" parent="StateChart/ParallelState/Phase/Combat/Make Way/Choose Destination"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../../Resolve Combat/Resume Retreat")
+
+[node name="StateChartDebugger" parent="." instance=ExtResource("26_5lf1w")]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+offset_left = -505.0
+offset_bottom = -129.0
+grow_horizontal = 0
+initial_node_to_watch = NodePath("../StateChart")
+
 [connection signal="toggled" from="BottomLeftMargin/HBoxContainer/VBox/ToggleInstructions" to="BottomLeftMargin/HBoxContainer/VBox/Panel" method="set_visible"]
-[connection signal="pressed" from="BottomRightMargin/HBox/Cancel/UnitChosenForMove" to="PlayStateMachine/MovementPhase/MovementPhaseStateMachine/ChooseUnitDestination" method="cancel_unit_choice"]
+[connection signal="pressed" from="BottomRightMargin/HBox/Cancel/CancelMoverChoice" to="." method="__on_mover_choice_cancelled"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Cancel/CancelAttack" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/ChooseUnitsForAttack" method="cancel_attack"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Cancel/ChangeAttackers" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/ChooseDefenderForAttack" method="change_attackers"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Cancel/ChangeAttackerForRetreat" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/RetreatAttacker" method="cancel_choice_of_retreater"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Cancel/UnitChosenToMakeWay" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/ChooseAllyToMakeWay" method="cancel_choice_of_retreater"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Cancel/CancelPursuit" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/ChooseAttackerToPursueRetreatingDefender" method="cancel"]
-[connection signal="pressed" from="BottomRightMargin/HBox/Confirm/EndMovementPhase" to="PlayStateMachine/MovementPhase" method="confirm_movement"]
+[connection signal="pressed" from="BottomRightMargin/HBox/Confirm/EndMovementPhase" to="." method="__on_movement_ended"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Confirm/EndCombatPhase" to="PlayStateMachine/CombatPhase" method="confirm_combat"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Confirm/ConfirmAttackers" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/ChooseUnitsForAttack" method="confirm_attackers"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Confirm/ConfirmDefender" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/ChooseDefenderForAttack" method="confirm_attack"]
@@ -398,3 +593,12 @@ choose_attacker_to_pursue = NodePath("../ChooseAttackerToPursueRetreatingDefende
 [connection signal="pressed" from="BottomRightMargin/HBox/Confirm/ConfirmLossAllocation" to="PlayStateMachine/CombatPhase/CombatPhaseStateMachine/AllocateExchangeLosses" method="confirm_loss_allocation"]
 [connection signal="duke_died" from="PlayStateMachine/CombatPhase" to="." method="__on_duke_death"]
 [connection signal="last_turn_ended" from="PlayStateMachine/CombatPhase" to="." method="__on_last_turn_end"]
+[connection signal="state_entered" from="StateChart/ParallelState/Player/Player 1" to="." method="__on_player_1_state_entered"]
+[connection signal="state_entered" from="StateChart/ParallelState/Player/Player 2" to="." method="__on_player_2_state_entered"]
+[connection signal="state_entered" from="StateChart/ParallelState/Phase/Movement" to="." method="__on_movement_state_entered"]
+[connection signal="state_exited" from="StateChart/ParallelState/Phase/Movement" to="." method="__on_movement_state_exited"]
+[connection signal="state_entered" from="StateChart/ParallelState/Phase/Movement/Choose Mover" to="." method="__on_choose_mover_state_entered"]
+[connection signal="state_exited" from="StateChart/ParallelState/Phase/Movement/Choose Mover" to="." method="__on_choose_mover_state_exited"]
+[connection signal="state_entered" from="StateChart/ParallelState/Phase/Movement/Choose Destination" to="." method="__on_choose_destination_state_entered"]
+[connection signal="state_exited" from="StateChart/ParallelState/Phase/Movement/Choose Destination" to="." method="__on_choose_destination_state_exited"]
+[connection signal="state_exited" from="StateChart/ParallelState/Phase/Combat" to="." method="__on_combat_state_exited"]

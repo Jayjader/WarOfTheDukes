@@ -15,15 +15,17 @@ func choose_unit(unit: GamePiece):
 	phase_state_machine.change_subphase(choose_destination)
 
 func _enter_subphase():
-	%SubPhaseInstruction.text = "Choose a unit to move"
-	%EndMovementPhase.visible = true
-	unit_layer.unit_selected.connect(__on_unit_selection)
-	unit_layer.make_faction_selectable(parent_phase.play_state_machine.current_player, parent_phase.moved)
+	pass
+	#%SubPhaseInstruction.text = "Choose a unit to move"
+	#%EndMovementPhase.visible = true
+	#unit_layer.unit_selected.connect(__on_unit_selection)
+	#unit_layer.make_faction_selectable(parent_phase.play_state_machine.current_player, parent_phase.moved)
 
 func __on_unit_selection(selected_unit: GamePiece):
 	assert(selected_unit not in parent_phase.moved)
 	choose_unit(selected_unit)
 
 func _exit_subphase():
-	%EndMovementPhase.visible = false
-	unit_layer.unit_selected.disconnect(__on_unit_selection)
+	pass
+	#%EndMovementPhase.visible = false
+	#unit_layer.unit_selected.disconnect(__on_unit_selection)

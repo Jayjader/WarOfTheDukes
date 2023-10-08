@@ -32,7 +32,7 @@ func choose_destination(tile: Vector2i):
 func _enter_subphase():
 	assert(moving != null)
 	%SubPhaseInstruction.text = "Choose the destination tile for the selected unit"
-	%UnitChosenForMove.visible = true
+	%CancelMoverChoice.show()
 	var destination_tiles = [] as Array[Vector2i]
 	for d in destinations.keys():
 		destination_tiles.append(d as Vector2i)
@@ -46,7 +46,7 @@ func _enter_subphase():
 
 func _exit_subphase():
 	#moving = null <- wait until needed to implement
-	%UnitChosenForMove.visible = false
+	%CancelMoverChoice.hide()
 	Board.report_click_for_tiles([])
 	Board.report_hover_for_tiles([])
 	Board.get_node("%HoverClick").draw_hover = false

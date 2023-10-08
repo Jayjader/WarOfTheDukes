@@ -1,8 +1,9 @@
-[gd_scene load_steps=9 format=3 uid="uid://urgscxvof7o8"]
+[gd_scene load_steps=10 format=3 uid="uid://urgscxvof7o8"]
 
 [ext_resource type="Script" path="res://game_session/setup/setup_root.gd" id="1_autkv"]
 [ext_resource type="Script" path="res://game_session/setup/PlayerValue.gd" id="2_eoobw"]
 [ext_resource type="ButtonGroup" uid="uid://bfis28ta025kj" path="res://game_session/setup/unit_selection_button_group.tres" id="3_fneyt"]
+[ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="4_7ptxt"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="5_nnlnq"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="6_pkpi8"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="7_xfxhw"]
@@ -283,6 +284,13 @@ event = &"next player"
 
 [node name="Finished" type="Node" parent="StateChart/Root"]
 script = ExtResource("7_xfxhw")
+
+[node name="StateChartDebugger" parent="." instance=ExtResource("4_7ptxt")]
+layout_mode = 1
+offset_top = 494.0
+offset_right = -624.0
+enabled = false
+initial_node_to_watch = NodePath("../StateChart")
 
 [connection signal="pressed" from="MarginContainer/PanelContainer/Margins/HBox/VBox/AutoSetup" to="." method="_on_auto_setup_pressed"]
 [connection signal="state_entered" from="StateChart/Root/Started/Phase/Fill Cities And Forts" to="." method="_on_fill_cities_and_forts_state_entered"]
