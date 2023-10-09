@@ -25,9 +25,9 @@
      inkscape:document-units="px"
      inkscape:zoom="5.2258842"
      inkscape:cx="127.34687"
-     inkscape:cy="47.838795"
-     inkscape:window-width="2164"
-     inkscape:window-height="2106"
+     inkscape:cy="47.743117"
+     inkscape:window-width="2205"
+     inkscape:window-height="505"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -39,7 +39,7 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
-       style="display:inline;fill:#ffffff;fill-opacity:0.156652;stroke:#ffffff;stroke-width:2.08465;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       style="display:inline;fill:#ffffff;fill-opacity:0.246563;stroke:#ffffff;stroke-width:2.08465;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
        id="rect1"
        width="65.648582"
        height="40.248589"
@@ -53,7 +53,10 @@
        id="g5"
        inkscape:label="artillery"
        style="display:inline"
-       sodipodi:insensitive="true">
+       sodipodi:insensitive="true"
+       inkscape:export-filename="artillery.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96">
       <ellipse
          style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:2.41062;stroke-linecap:butt;stroke-linejoin:round;stroke-dasharray:none"
          id="path6"
@@ -66,7 +69,10 @@
        id="g2"
        inkscape:label="cavalry"
        style="display:inline"
-       sodipodi:insensitive="true">
+       sodipodi:insensitive="true"
+       inkscape:export-filename="cavalry.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96">
       <path
          style="fill:none;stroke:#ffffff;stroke-width:2.08636;stroke-linecap:butt;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
          d="M 67.191105,13.591189 0.54222774,54.142265"
@@ -92,7 +98,10 @@
     <g
        id="g7"
        inkscape:label="duke"
-       style="display:inline">
+       style="display:inline"
+       inkscape:export-filename="duke.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96">
       <path
          style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:2.11667;stroke-linecap:butt;stroke-linejoin:round;stroke-dasharray:none"
          d="m 13.229167,8.9958332 6.879166,8.9958328 H 47.624999 L 54.504166,8.9958332 45.508333,13.758333 V 2.6458333 l -6.879167,7.9374997 -4.7625,-9.5249997 -4.7625,9.5249997 L 22.225,2.6458333 V 13.758333 Z"
