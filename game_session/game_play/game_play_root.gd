@@ -10,6 +10,8 @@ signal game_over(result: Enums.GameResult, winner: Enums.Faction)
 @onready var unit_layer: UnitLayer = Board.get_node("%UnitLayer")
 @onready var hover_click = Board.get_node("%HoverClick")
 
+var _random = RandomNumberGenerator.new()
+
 func __on_duke_death(faction: Enums.Faction):
 	game_over.emit(Enums.GameResult.TOTAL_VICTORY, Enums.get_other_faction(faction))
 
@@ -73,10 +75,25 @@ func __on_unit_selected_for_move(unit):
 	mover = unit
 	state_chart.send_event.call_deferred("mover chosen")
 
+func _get_ai_movement_choice():
+	var strategy = MovementStrategy.new()
+	var allies: Array[GamePiece] = []
+	var enemies: Array[GamePiece] = []
+	for unit in alive:
+		if unit.faction == current_player.faction:
+			allies.append(unit)
+		else:
+			enemies.append(unit)
+	var choice = strategy.choose_next_mover(moved, allies, enemies, MapData.map)
+	if choice is GamePiece:
+		__on_unit_selected_for_move(choice)
+	else:
+		__on_end_movement_pressed()
+
 func __on_choose_mover_state_entered():
 	%SubPhaseInstruction.text = "Choose a unit to move"
 	if current_player.is_computer:
-		__on_end_movement_pressed.call_deferred() # todo ai
+		_get_ai_movement_choice.call_deferred()
 	else:
 		%EndMovementPhase.show()
 		mover = null
@@ -93,7 +110,7 @@ func __on_choose_mover_state_exited():
 ### Choose Destination
 func __on_mover_choice_cancelled(_unit=null):
 	state_chart.send_event.call_deferred("mover choice canceled")
-func __on_tile_chosen_as_destination(tile: Vector2i, _kind, _zones):
+func __on_tile_chosen_as_destination(tile: Vector2i, _kind=null, _zones=null):
 	unit_layer.move_unit(mover, mover.tile, tile)
 	moved.append(mover)
 	state_chart.send_event.call_deferred("unit moved")
@@ -101,7 +118,7 @@ func __on_tile_chosen_as_destination(tile: Vector2i, _kind, _zones):
 func __on_choose_destination_state_entered():
 	%SubPhaseInstruction.text = "Choose the destination for the selected unit"
 	if current_player.is_computer:
-		pass
+		_get_ai_movement_destination.call_deferred()
 	else:
 		%CancelMoverChoice.show()
 		mover.selectable = true
@@ -138,6 +155,14 @@ func __on_choose_destination_state_exited():
 		tile_layer.clear_destinations()
 
 
+func _get_ai_movement_destination():
+	var others: Array[GamePiece] = []
+	for unit in alive:
+		if unit != mover:
+			others.append(unit)
+	var strategy = MovementStrategy.new()
+	__on_tile_chosen_as_destination(strategy.choose_destination(mover, others, MapData.map))
+
 ## Combat
 
 var _attacking_duke_tile
@@ -146,13 +171,17 @@ var attacked := {}
 var defended: Array[GamePiece] = []
 var retreated: Array[GamePiece] = []
 
-func __on_combat_state_entered():
+func _cache_duke_tiles():
+	_attacking_duke_tile = null
+	_defending_duke_tile = null
 	for unit in alive:
 		if unit.kind == Enums.Unit.Duke:
 			if unit.faction == current_player.faction:
 				_attacking_duke_tile = Util.axial_to_cube(unit.tile)
 			else:
 				_defending_duke_tile = Util.axial_to_cube(unit.tile)
+
+func __on_combat_state_entered():
 	attacked.clear()
 	defended.clear()
 	retreated.clear()
@@ -258,6 +287,7 @@ func __on_confirm_attackers_pressed():
 	state_chart.send_event.call_deferred("attackers confirmed")
 
 func __on_choose_attackers_state_entered():
+	_cache_duke_tiles()
 	%SubPhaseInstruction.text = "Choose a unit to attack with"
 	for unit in alive:
 		unit.selectable = (
@@ -285,13 +315,24 @@ func __on_choose_attackers_state_exited():
 		%CancelAttack.hide()
 		%ConfirmAttackers.hide()
 		%EndCombatPhase.hide()
-		unit_layer.unit_selected.disconnect(__on_unit_selected_for_attack)
-		unit_layer.unit_unselected.disconnect(__on_unit_unselected_for_attack)
+		if unit_layer.unit_selected.is_connected(__on_unit_selected_for_attack):
+			unit_layer.unit_selected.disconnect(__on_unit_selected_for_attack)
+		if unit_layer.unit_unselected.is_connected(__on_unit_unselected_for_attack):
+			unit_layer.unit_unselected.disconnect(__on_unit_unselected_for_attack)
 	for unit in alive:
 		unit.selectable = false
 		if unit in attacking:
 			unit._selected = true
 
+
+func _calculate_effective_defense_strength(unit: GamePiece):
+	var base_strength = Rules.DefenseStrength[unit.kind]
+	var terrain_multiplier = Rules.DefenseMultiplier.get(MapData.map.tiles[unit.tile])
+	if terrain_multiplier != null:
+		base_strength *= terrain_multiplier
+	if Util.cube_distance(Util.axial_to_cube(unit.tile), _defending_duke_tile) <= Rules.DukeAura.range:
+		base_strength *= Rules.DukeAura.multiplier
+	return base_strength
 
 ### Choose Defender
 var defending # : GamePiece
@@ -324,7 +365,7 @@ func __on_choose_defender_state_entered():
 					return false
 				elif attacker.kind != Enums.Unit.Artillery and MapData.map.borders.get(0.5 * (attacker.tile + unit.tile)) == "River":
 					return false
-				elif unit.kind == Enums.Unit.Duke and len(Board.get_units_on_(unit.tile)) > 1:
+				elif unit.kind == Enums.Unit.Duke and len(Board.get_units_on(unit.tile)) > 1:
 					return false
 				else:
 					return true
@@ -363,3 +404,65 @@ func __on_choose_defender_state_exited():
 			if unit not in attacking:
 				unit.selectable = false
 
+
+func _sample_random(start: int, end: int):
+	return _random.randi_range(start, end)
+
+func resolve_combat(attackers: Dictionary, defending: GamePiece):
+	print_debug("### Combat ###")
+	var total_attack_strength = attackers.values().reduce(func(accum, a): return accum + a, 0)
+	print_debug("Effective Total Attack Strength: %s" % total_attack_strength)
+	var defender_effective_strength = _calculate_effective_defense_strength(defending)
+	print_debug("Effective Defense Strength: %s" % defender_effective_strength)
+	
+	var numerator
+	var denominator
+	var ratio = float(total_attack_strength) / float(defender_effective_strength)
+	if ratio > 1:
+		numerator = min(6, floori(ratio))
+		denominator = 1
+	else:
+		numerator = 1
+		denominator = min(5, floori(1 / ratio))
+	print_debug("Effective Ratio: %d to %d" % [numerator, denominator])
+	var result_spread = COMBAT_RESULTs[Vector2i(numerator, denominator)]
+	var die_roll = _sample_random(0, 5)
+	print_debug("Die roll (unaltered): %s" % die_roll)
+	match MapData.map.tiles[defending.tile]:
+		"Forest":
+			die_roll += 2
+		"Cliff":
+			die_roll += 1
+	print_debug("Die roll (terrain bonus applied): %d" % die_roll)
+	die_roll = min(die_roll, 5)
+	print_debug("Die roll (clamped): %d" % die_roll)
+	var _result = result_spread[die_roll]
+	print_debug("Result: %s" % Enums.CombatResult.find_key(_result))
+	return _result
+
+const CR = Enums.CombatResult
+const COMBAT_RESULTs = {
+	Vector2i(1, 5): [CR.AttackersRetreat,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated],
+	Vector2i(1, 4): [CR.AttackersRetreat,	CR.AttackersRetreat,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated],
+	Vector2i(1, 3): [CR.DefenderRetreats,	CR.AttackersRetreat,	CR.AttackersRetreat,	CR.AttackerEliminated,	CR.AttackerEliminated,	CR.AttackerEliminated],
+	Vector2i(1, 2): [CR.DefenderRetreats,	CR.DefenderRetreats,	CR.AttackersRetreat,	CR.AttackersRetreat,	CR.AttackersRetreat,	CR.AttackersRetreat],
+	Vector2i(1, 1): [CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.AttackersRetreat,	CR.AttackersRetreat,	CR.AttackersRetreat],
+	Vector2i(2, 1): [CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.AttackersRetreat,	CR.AttackersRetreat],
+	Vector2i(3, 1): [CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.AttackersRetreat],
+	Vector2i(4, 1): [CR.DefenderEliminated,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.Exchange],
+	Vector2i(5, 1): [CR.DefenderEliminated,	CR.DefenderEliminated,	CR.DefenderEliminated,	CR.DefenderRetreats,	CR.DefenderRetreats,	CR.Exchange],
+	Vector2i(6, 1): [CR.DefenderEliminated,	CR.DefenderEliminated,	CR.DefenderEliminated,	CR.DefenderEliminated,	CR.Exchange,			CR.Exchange],
+}
+
+var result # : Enums.CombatResult
+func __on_resolve_combat_state_entered():
+	%SubPhaseInstruction.text = '(Resolving Combat...)'
+	# roll die, determine result
+	assert(len(attacking) > 0, "Must have at least 1 attacker")
+	assert(defending != null, "Must have a defender")
+	result = resolve_combat(attacking, defending)
+
+func __on_view_result_state_entered():
+	# 1. display result onscreen, and
+	# 2. set up any connections needed to trigger the outgoing state chart transition
+	pass

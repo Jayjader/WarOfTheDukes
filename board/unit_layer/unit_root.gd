@@ -49,19 +49,25 @@ func _set_label_text_outline():
 signal selected(value: bool)
 var _selected: bool = false:
 	set(value):
-		if _selected != value:
-			_selected = value
-			_set_label_text_outline()
-			selected.emit(_selected)
+#		if _selected != value:
+		_selected = value
+		_set_label_text_outline()
+#			selected.emit(_selected)
 
 func die():
 	#queue_free()
 	unit_layer.move_unit(self, self.tile, unit_layer.graveyard)
 	self.visible = false
 
+func select():
+	if not _selected:
+		_selected = true
+		selected.emit(true)
+
 func unselect():
 	if _selected:
 		_selected = false
+		selected.emit(false)
 
 func _ready():
 	sprite.texture = Textures[kind]
@@ -75,4 +81,7 @@ func _unhandled_input(event):
 			var clicked_tile = Util.nearest_hex_in_axial(get_viewport_transform().affine_inverse() * event.position, Vector2i(0, 0), hex_size)
 			if clicked_tile == self.tile:
 				get_viewport().set_input_as_handled()
-				_selected = not _selected
+				if _selected:
+					unselect()
+				else:
+					select()

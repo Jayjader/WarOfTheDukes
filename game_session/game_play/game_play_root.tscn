@@ -348,7 +348,7 @@ event = &"change attackers"
 [node name="resolve combat" type="Node" parent="StateChart/ParallelState/Phase/Combat/Choose Defender"]
 script = ExtResource("23_hxj8n")
 to = NodePath("../../Resolve Combat")
-event = &"defender chosen"
+event = &"defender confirmed"
 
 [node name="Resolve Combat" type="Node" parent="StateChart/ParallelState/Phase/Combat"]
 script = ExtResource("22_07qe0")
@@ -370,10 +370,12 @@ event = &"defender retreats"
 [node name="retreat attackers" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/View Result"]
 script = ExtResource("23_hxj8n")
 to = NodePath("../../Retreat Attackers")
+event = &"attackers retreat"
 
 [node name="exchange" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/View Result"]
 script = ExtResource("23_hxj8n")
 to = NodePath("../../Exchange")
+event = &"attackers and defenders exchange"
 
 [node name="Retreat Defender" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat"]
 script = ExtResource("24_uvwcr")
@@ -386,6 +388,7 @@ event = &"combat resolved"
 [node name="to make way" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/Retreat Defender"]
 script = ExtResource("23_hxj8n")
 to = NodePath("../../../Make Way")
+event = &"way maker needed"
 
 [node name="Retreat Attackers" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat"]
 script = ExtResource("22_07qe0")
@@ -397,6 +400,7 @@ script = ExtResource("24_uvwcr")
 [node name="choose destination" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/Retreat Attackers/Choose Retreater"]
 script = ExtResource("23_hxj8n")
 to = NodePath("../../Choose Destination")
+event = &"retreater chosen"
 
 [node name="Choose Destination" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/Retreat Attackers"]
 script = ExtResource("24_uvwcr")
@@ -404,6 +408,7 @@ script = ExtResource("24_uvwcr")
 [node name="choose next attackers" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/Retreat Attackers/Choose Destination"]
 script = ExtResource("23_hxj8n")
 to = NodePath("../../../../Choose Attackers")
+event = &"retreat finished"
 
 [node name="choose next retreater" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/Retreat Attackers/Choose Destination"]
 script = ExtResource("23_hxj8n")
@@ -413,6 +418,7 @@ event = &"combat resolved"
 [node name="to make way" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/Retreat Attackers/Choose Destination"]
 script = ExtResource("23_hxj8n")
 to = NodePath("../../../../Make Way")
+event = &"way maker needed"
 
 [node name="Resume Retreat" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat"]
 script = ExtResource("25_kms61")
@@ -436,6 +442,7 @@ script = ExtResource("24_uvwcr")
 [node name="choose destination" type="Node" parent="StateChart/ParallelState/Phase/Combat/Make Way/Choose Ally"]
 script = ExtResource("23_hxj8n")
 to = NodePath("../../Choose Destination")
+event = &"way maker chosen"
 
 [node name="Choose Destination" type="Node" parent="StateChart/ParallelState/Phase/Combat/Make Way"]
 script = ExtResource("24_uvwcr")
@@ -443,6 +450,7 @@ script = ExtResource("24_uvwcr")
 [node name="resume retreat" type="Node" parent="StateChart/ParallelState/Phase/Combat/Make Way/Choose Destination"]
 script = ExtResource("23_hxj8n")
 to = NodePath("../../../Resolve Combat/Resume Retreat")
+event = &"destination chosen"
 
 [node name="StateChartDebugger" parent="." instance=ExtResource("26_5lf1w")]
 layout_mode = 1
@@ -476,3 +484,5 @@ initial_node_to_watch = NodePath("../StateChart")
 [connection signal="state_exited" from="StateChart/ParallelState/Phase/Combat/Choose Attackers" to="." method="__on_choose_attackers_state_exited"]
 [connection signal="state_entered" from="StateChart/ParallelState/Phase/Combat/Choose Defender" to="." method="__on_choose_defender_state_entered"]
 [connection signal="state_exited" from="StateChart/ParallelState/Phase/Combat/Choose Defender" to="." method="__on_choose_defender_state_exited"]
+[connection signal="state_entered" from="StateChart/ParallelState/Phase/Combat/Resolve Combat" to="." method="__on_resolve_combat_state_entered"]
+[connection signal="state_entered" from="StateChart/ParallelState/Phase/Combat/Resolve Combat/View Result" to="." method="__on_view_result_state_entered"]
