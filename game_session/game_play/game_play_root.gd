@@ -406,15 +406,15 @@ func __on_choose_defender_state_exited():
 			if unit not in attacking:
 				unit.selectable = false
 
-
+## Combat Resolution
 func _sample_random(start: int, end: int):
 	return _random.randi_range(start, end)
 
-func resolve_combat(attackers: Dictionary, defending: GamePiece):
+func resolve_combat(attackers: Dictionary, defender: GamePiece):
 	print_debug("### Combat ###")
 	var total_attack_strength = attackers.values().reduce(func(accum, a): return accum + a, 0)
 	print_debug("Effective Total Attack Strength: %s" % total_attack_strength)
-	var defender_effective_strength = _calculate_effective_defense_strength(defending)
+	var defender_effective_strength = _calculate_effective_defense_strength(defender)
 	print_debug("Effective Defense Strength: %s" % defender_effective_strength)
 	
 	var numerator
@@ -468,8 +468,9 @@ func __on_resolve_combat_state_entered():
 	if result == null:
 		%SubPhaseInstruction.text = '(Resolving Combat...)'
 		result = resolve_combat(attacking, defending)
-		result = Enums.CombatResult.DefenderRetreats
+		result = Enums.CombatResult.AttackersRetreat
 
+## View Result
 var emitted_event: String
 func __on_view_result_state_entered():
 	# 1. display result onscreen
@@ -516,17 +517,16 @@ func __on_view_result_state_entered():
 				emitted_event = "attackers and defender exchange"
 		Enums.CombatResult.DefenderRetreats:
 			emitted_event = "defender retreats"
-	%ConfirmCombatResult.visible = true
-
-func __on_view_result_state_exited():
-	%ConfirmCombatResult.visible = false
-
+	%ConfirmCombatResult.show()
 func __on_confirm_combat_result_pressed():
 	state_chart.send_event.call_deferred(emitted_event)
 	defending.unselect()
 	for unit in attacking:
 		unit.unselect()
+func __on_view_result_state_exited():
+	%ConfirmCombatResult.hide()
 
+## Retreat Defender
 func __on_retreat_defender_state_entered():
 	assert(defending != null)
 	var other_live_units: Array[GamePiece] = []
@@ -562,7 +562,6 @@ func __on_retreat_defender_state_entered():
 			else:
 				died_from_last_combat.append(defending)
 				state_chart.send_event.call_deferred("combat resolved")
-
 func __on_hex_clicked_for_retreat(tile, _kind, _zones):
 	pursue_to = defending.tile # save before moving defending/defender
 	for unit in Board.get_units_on(defending.tile):
@@ -573,7 +572,6 @@ func __on_hex_clicked_for_retreat(tile, _kind, _zones):
 		if attacker.kind != Enums.Unit.Artillery:
 			can_pursue.append(attacker)
 	state_chart.send_event.call_deferred("defender retreated")  
-
 func __on_retreat_defender_state_exited():
 	Board.report_hover_for_tiles([])
 	Board.report_click_for_tiles([])
@@ -582,50 +580,125 @@ func __on_retreat_defender_state_exited():
 	retreat_ui.destinations.clear()
 	retreat_ui.queue_redraw()
 
-
+## Retreat Attackers
+var retreating: GamePiece
 func __on_retreat_attackers_state_entered():
-	assert(len(to_retreat) > 0)
-
+	#todo check if needed: assert(len(to_retreat) > 0)
+	pass
 func __on_choose_retreating_attacker_state_entered():
-	pass # Replace with function body.
-
+	if len(to_retreat) == 0:
+		state_chart.send_event.call_deferred("combat resolved")
+		return
+	%SubPhaseInstruction.text = "Choose a unit among the attackers to retreat"
+	unit_layer.unit_selected.connect(__on_attacker_selected_for_retreat)
+	unit_layer.make_units_selectable(to_retreat)
+	if len(to_retreat) == 1:
+		to_retreat[0].select.call_deferred()
+	if current_player.is_computer:
+		pass # insert ai here. todo: disable human<->unit interaction during ai turns
+func __on_attacker_selected_for_retreat(unit: GamePiece):
+	assert(unit in attacking)
+	to_retreat.erase(unit)
+	retreating = unit
+	state_chart.send_event.call_deferred("attacker chosen to retreat")
 func __on_choose_retreating_attacker_state_exited():
-	pass # Replace with function body.
-
+	unit_layer.make_units_selectable([])
+	if unit_layer.unit_selected.is_connected(__on_attacker_selected_for_retreat):
+		unit_layer.unit_selected.disconnect(__on_attacker_selected_for_retreat)
 func __on_choose_retreating_attacker_destination_state_entered():
-	pass # Replace with function body.
-
+	var other_live_units: Array[GamePiece] = []
+	for unit in alive:
+		if unit != retreating:
+			other_live_units.append(unit)
+	var allowed_retreat_destinations = MapData.map.paths_for_retreat(retreating, unit_layer.get_adjacent_units(retreating))
+	if len(allowed_retreat_destinations) == 1:
+		__on_hex_clicked_for_attacker_retreat(allowed_retreat_destinations[0])
+		return
+	if len(allowed_retreat_destinations) > 0:
+		%SubPhaseInstruction.text = "Choose a tile for the attacker to retreat to"
+		%ChangeAttackerForRetreat.show()
+		Board.report_hover_for_tiles(allowed_retreat_destinations)
+		Board.report_click_for_tiles(allowed_retreat_destinations)
+		Board.hex_clicked.connect(__on_hex_clicked_for_attacker_retreat)
+		retreat_ui.retreat_from = retreating.tile
+		retreat_ui.destinations = allowed_retreat_destinations
+		retreat_ui.queue_redraw()
+	else:
+		assert(making_way == null, "no valid retreat destinations found after making way for retreating attacker")
+		var enemy_tiles: Array[Vector2i] = []
+		for unit in alive:
+			if unit.faction != retreating.faction:
+				enemy_tiles.append(unit.tile)
+		for unit in unit_layer.get_adjacent_allied_neighbors(retreating):
+			if not MapData.map.is_in_enemy_zoc(unit.tile, enemy_tiles):
+				var others_destinations = MapData.map.paths_for_retreat(unit, unit_layer.get_adjacent_units(unit))
+				if len(others_destinations) > 0:
+					can_make_way[unit] = others_destinations
+		if len(can_make_way) > 0:
+			retreating.unselect()
+			state_chart.send_event.call_deferred("ally needed to make way")
+		else:
+			if retreating.kind == Enums.Unit.Duke:
+				__on_duke_death(defending.faction)
+			else:
+				died_from_last_combat.append(retreating)
+				state_chart.send_event.call_deferred("attacker retreated")
+func __on_retreating_attacker_choice_cancelled():
+	to_retreat.append(retreating)
+	retreating.unselect()
+	retreating = null
+	state_chart.send_event.call_deferred("unit choice for retreat cancelled")
+func __on_hex_clicked_for_attacker_retreat(tile, _kind=null, _zones=null):
+	Board.hex_clicked.disconnect(__on_hex_clicked_for_attacker_retreat)
+	unit_layer.move_unit(retreating, retreating.tile, tile)
+	retreated.append(retreating)
+	retreating.unselect()
+	retreating = null
+	state_chart.send_event.call_deferred("attacker retreated")
 func __on_choose_retreating_attacker_destination_state_exited():
-	pass # Replace with function body.
+	%ChangeAttackerForRetreat.hide()
+	retreat_ui.destinations.clear()
+	retreat_ui.queue_redraw()
 
-
+## Exchange
 func __on_exchange_state_entered():
 	pass
 
+
+## Make Way For Retreat
 var can_make_way := {}
-var making_way: GamePiece
 func __on_make_way_state_entered():
 	assert(len(can_make_way) > 0)
 func __on_make_way_state_exited():
 	can_make_way.clear()
+
+var making_way: GamePiece
 func __on_choose_ally_to_make_way_state_entered():
+	making_way = null
 	%SubPhaseInstruction.text = "Choose a unit to make way for the retreating unit"
 	unit_layer.unit_selected.connect(__on_unit_selected_for_making_way)
 	var selectable: Array[GamePiece] = []
 	for unit in can_make_way:
 		selectable.append(unit)
 	unit_layer.make_units_selectable(selectable)
-func __on_choose_ally_to_make_way_state_exited():
-	if unit_layer.unit_selected.is_connected(__on_unit_selected_for_making_way):
-		unit_layer.unit_selected.disconnect(__on_unit_selected_for_making_way)
 func __on_unit_selected_for_making_way(unit: GamePiece):
 	making_way = unit
 	state_chart.send_event.call_deferred("unit chosen to make way")
+func __on_choose_ally_to_make_way_state_exited():
+	if unit_layer.unit_selected.is_connected(__on_unit_selected_for_making_way):
+		unit_layer.unit_selected.disconnect(__on_unit_selected_for_making_way)
+	for unit in can_make_way:
+		if unit != making_way:
+			unit.unselect()
+	unit_layer.make_units_selectable([])
+	making_way.select()
+
 func __on_choose_destination_to_make_way_state_entered():
 	assert(making_way != null)
 	%SubPhaseInstruction.text = "Choose a destination for the unit making way"
 	unit_layer.unit_unselected.connect(__on_making_way_unit_choice_canceled)
-	var destinations: Array[Vector2i] = can_make_way[making_way]
+	unit_layer.make_units_selectable([making_way])
+	var destinations: Array[Vector2i] = can_make_way[making_way].slice(0)
 	if current_player.is_computer:
 		pass
 	else:
@@ -637,16 +710,18 @@ func __on_choose_destination_to_make_way_state_entered():
 		retreat_ui.destinations = destinations
 		retreat_ui.queue_redraw()
 func __on_making_way_unit_choice_canceled(_unit=making_way):
-	making_way = null
 	state_chart.send_event.call_deferred("unit choice for making way cancelled")
 func __on_destination_chosen_for_making_way(tile: Vector2i, _kind=null, _zones=null):
 	var vacated_tile = making_way.tile
+	if unit_layer.unit_unselected.is_connected(__on_making_way_unit_choice_canceled):
+		unit_layer.unit_unselected.disconnect(__on_making_way_unit_choice_canceled)
 	unit_layer.move_unit(making_way, vacated_tile, tile)
-	state_chart.send_event.call_deferred("destination chosen")
+	state_chart.send_event.call_deferred("destination for making way chosen")
 func __on_choose_destination_to_make_way_state_exited():
 	if unit_layer.unit_unselected.is_connected(__on_making_way_unit_choice_canceled):
 		unit_layer.unit_unselected.disconnect(__on_making_way_unit_choice_canceled)
 	making_way.unselect()
+	making_way = null
 	if current_player.is_computer:
 		pass
 	else:
@@ -654,9 +729,10 @@ func __on_choose_destination_to_make_way_state_exited():
 		Board.hex_clicked.disconnect(__on_destination_chosen_for_making_way)
 		Board.report_hover_for_tiles([])
 		Board.report_click_for_tiles([])
-		retreat_ui.destinations = []
+		retreat_ui.destinations.clear()
 		retreat_ui.queue_redraw()
 
+## Post-Retreat Pursuit
 var pursue_to: Vector2i
 var can_pursue: Array[GamePiece] = []
 func __on_pursue_retreating_defender_state_entered():
