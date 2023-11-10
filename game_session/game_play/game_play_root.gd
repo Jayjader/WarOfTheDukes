@@ -455,6 +455,10 @@ const COMBAT_RESULTs = {
 }
 
 var result # : Enums.CombatResult
+var died_from_last_combat: Array[GamePiece] = []
+var to_retreat: Array[GamePiece] = []
+var strength_to_allocate := 0
+var can_be_allocated: Array[GamePiece] = []
 func __on_resolve_combat_state_entered():
 	%SubPhaseInstruction.text = '(Resolving Combat...)'
 	# roll die, determine result
@@ -462,7 +466,74 @@ func __on_resolve_combat_state_entered():
 	assert(defending != null, "Must have a defender")
 	result = resolve_combat(attacking, defending)
 
+var emitted_event: String
 func __on_view_result_state_entered():
-	# 1. display result onscreen, and
+	# 1. display result onscreen
+	%SubPhaseInstruction.text = "Result: %s\nAttackers: %s = %s\nDefenders: %s" % [
+		Enums.CombatResult.find_key(result),
+		attacking.values(),
+		attacking.values().reduce(func(accum, a): return accum + a, 0), _calculate_effective_defense_strength(defending)
+	]
 	# 2. set up any connections needed to trigger the outgoing state chart transition
+	match result:
+		Enums.CombatResult.AttackerEliminated:
+			for attacker in attacking:
+				if attacker.kind != Enums.Unit.Artillery or not Rules.is_bombardment(attacker, defending):
+					died_from_last_combat.append(attacker)
+					emitted_event = "combat resolved"
+		Enums.CombatResult.DefenderEliminated:
+			if defending.kind == Enums.Unit.Duke:
+				__on_duke_death(defending.faction)
+			else:
+				died_from_last_combat.append(defending)
+				emitted_event = "combat resolved"
+		Enums.CombatResult.AttackersRetreat:
+			to_retreat.clear()
+			for attacker in attacking:
+				if attacker.kind != Enums.Unit.Artillery or not Rules.is_bombardment(attacker, defending):
+					to_retreat.append(attacker)
+			if len(to_retreat) > 0:
+				emitted_event = "attackers retreat"
+			else:
+				emitted_event = "combat resolved"
+		Enums.CombatResult.Exchange:
+			if defending.kind == Enums.Unit.Duke:
+				__on_duke_death(defending.faction)
+			else:
+				died_from_last_combat.append(defending)
+				can_be_allocated.clear()
+				strength_to_allocate = _calculate_effective_defense_strength(defending)
+				for attacker in attacking:
+					if attacker.kind != Enums.Unit.Artillery or not Rules.is_bombardment(attacker, defending):
+						can_be_allocated.append(attacker)
+				emitted_event = "attackers and defender exchange"
+		Enums.CombatResult.DefenderRetreats:
+			var other_live_units: Array[GamePiece] = []
+			for unit in alive:
+				if unit != defending:
+					other_live_units.append(unit)
+			var allowed_retreat_destinations = MapData.map.paths_for_retreat(defending, other_live_units)
+			emitted_event = "defender retreats"
+	%ConfirmCombatResult.visible = true
+
+func __on_view_result_state_exited():
+	%ConfirmCombatResult.visible = false
+	for attacker in attacking:
+		attacker.unselect()
+	defending.unselect()
+	for dead in died_from_last_combat:
+		dead.die()
+		died.append(dead)
+
+func __on_confirm_combat_result_pressed():
+	state_chart.send_event(emitted_event)
+
+func __on_retreat_defender_state_entered():
 	pass
+
+func __on_retreat_attackers_state_entered():
+	pass
+
+func __on_exchange_state_entered():
+	pass
+
