@@ -9,6 +9,7 @@ signal game_over(result: Enums.GameResult, winner: Enums.Faction)
 @onready var tile_layer = Board.get_node("%TileOverlay")
 @onready var unit_layer: UnitLayer = Board.get_node("%UnitLayer")
 @onready var hover_click = Board.get_node("%HoverClick")
+@onready var retreat_ui = Board.get_node("%TileOverlay/RetreatRange")
 
 var _random = RandomNumberGenerator.new()
 
@@ -296,7 +297,7 @@ func __on_choose_attackers_state_entered():
 			and (unit.kind != Enums.Unit.Duke)
 		)
 	for unit in attacking:
-		unit._selected = true
+		unit.select()
 	if current_player.is_computer:
 		__on_end_combat_pressed.call_deferred()
 	else:
@@ -322,7 +323,7 @@ func __on_choose_attackers_state_exited():
 	for unit in alive:
 		unit.selectable = false
 		if unit in attacking:
-			unit._selected = true
+			unit.select()
 
 
 func _calculate_effective_defense_strength(unit: GamePiece):
@@ -352,6 +353,7 @@ func __on_unit_unselected_for_defense(_unit):
 		unit.selectable = true
 	%ConfirmDefender.hide()
 func __on_confirm_defender_pressed():
+	result = null
 	state_chart.send_event.call_deferred("defender confirmed")
 
 func __on_choose_defender_state_entered():
@@ -375,10 +377,10 @@ func __on_choose_defender_state_entered():
 	for unit in alive:
 		if unit == defending:
 			unit.selectable = true
-			unit._selected = true
+			unit.select()
 		elif unit in attacking:
 			unit.selectable = false
-			unit._selected = true
+			unit.select()
 		else:
 			unit.selectable = defending == null and unit in can_defend
 	if defending not in can_defend:
@@ -460,11 +462,13 @@ var to_retreat: Array[GamePiece] = []
 var strength_to_allocate := 0
 var can_be_allocated: Array[GamePiece] = []
 func __on_resolve_combat_state_entered():
-	%SubPhaseInstruction.text = '(Resolving Combat...)'
-	# roll die, determine result
-	assert(len(attacking) > 0, "Must have at least 1 attacker")
 	assert(defending != null, "Must have a defender")
-	result = resolve_combat(attacking, defending)
+	assert(len(attacking) > 0, "Must have at least 1 attacker")
+	# roll die, determine result
+	if result == null:
+		%SubPhaseInstruction.text = '(Resolving Combat...)'
+		result = resolve_combat(attacking, defending)
+		result = Enums.CombatResult.DefenderRetreats
 
 var emitted_event: String
 func __on_view_result_state_entered():
@@ -475,6 +479,10 @@ func __on_view_result_state_entered():
 		attacking.values().reduce(func(accum, a): return accum + a, 0), _calculate_effective_defense_strength(defending)
 	]
 	# 2. set up any connections needed to trigger the outgoing state chart transition
+	died_from_last_combat.clear()
+	to_retreat.clear()
+	strength_to_allocate = 0
+	can_be_allocated.clear()
 	match result:
 		Enums.CombatResult.AttackerEliminated:
 			for attacker in attacking:
@@ -488,7 +496,6 @@ func __on_view_result_state_entered():
 				died_from_last_combat.append(defending)
 				emitted_event = "combat resolved"
 		Enums.CombatResult.AttackersRetreat:
-			to_retreat.clear()
 			for attacker in attacking:
 				if attacker.kind != Enums.Unit.Artillery or not Rules.is_bombardment(attacker, defending):
 					to_retreat.append(attacker)
@@ -508,32 +515,183 @@ func __on_view_result_state_entered():
 						can_be_allocated.append(attacker)
 				emitted_event = "attackers and defender exchange"
 		Enums.CombatResult.DefenderRetreats:
-			var other_live_units: Array[GamePiece] = []
-			for unit in alive:
-				if unit != defending:
-					other_live_units.append(unit)
-			var allowed_retreat_destinations = MapData.map.paths_for_retreat(defending, other_live_units)
 			emitted_event = "defender retreats"
 	%ConfirmCombatResult.visible = true
 
 func __on_view_result_state_exited():
 	%ConfirmCombatResult.visible = false
-	for attacker in attacking:
-		attacker.unselect()
-	defending.unselect()
-	for dead in died_from_last_combat:
-		dead.die()
-		died.append(dead)
 
 func __on_confirm_combat_result_pressed():
-	state_chart.send_event(emitted_event)
+	state_chart.send_event.call_deferred(emitted_event)
 
 func __on_retreat_defender_state_entered():
-	pass
+	assert(defending != null)
+	var other_live_units: Array[GamePiece] = []
+	for unit in alive:
+		if unit != defending:
+			other_live_units.append(unit)
+	var allowed_retreat_destinations = MapData.map.paths_for_retreat(defending, other_live_units)
+	if len(allowed_retreat_destinations) > 0:
+		unit_layer.make_units_selectable([])
+		%SubPhaseInstruction.text = "Choose a tile for the defender to retreat to"
+		Board.report_hover_for_tiles(allowed_retreat_destinations)
+		Board.report_click_for_tiles(allowed_retreat_destinations)
+		Board.hex_clicked.connect(__on_hex_clicked_for_retreat)
+		retreat_ui.retreat_from = defending.tile
+		retreat_ui.destinations = allowed_retreat_destinations
+		retreat_ui.queue_redraw()
+	else:
+		assert(making_way == null, "no valid retreat destinations found after making way for retreating defender")
+		for unit in unit_layer.get_adjacent_allied_neighbors(defending):
+			var others_destinations = MapData.map.paths_for_retreat(unit, unit_layer.get_adjacent_units(unit))
+			if len(others_destinations) > 0:
+				can_make_way[unit] = others_destinations
+		if len(can_make_way) > 0:
+			state_chart.send_event.call_deferred("ally needed to make way")
+		else:
+			if defending.kind == Enums.Unit.Duke:
+				__on_duke_death(defending.faction)
+			else:
+				died_from_last_combat.append(defending)
+				state_chart.send_event.call_deferred("combat resolved")
+
+func __on_hex_clicked_for_retreat(tile, _kind, _zones):
+	pursue_to = defending.tile # save before moving defending/defender
+	for unit in Board.get_units_on(defending.tile):
+		unit_layer.move_unit(unit, unit.tile, tile)
+	retreated.append(defending)
+	can_pursue.clear()
+	for attacker in attacking:
+		if attacker.kind != Enums.Unit.Artillery:
+			can_pursue.append(attacker)
+	state_chart.send_event.call_deferred("defender retreated")  
+
+func __on_retreat_defender_state_exited():
+	Board.report_hover_for_tiles([])
+	Board.report_click_for_tiles([])
+	if Board.hex_clicked.is_connected(__on_hex_clicked_for_retreat):
+		Board.hex_clicked.disconnect(__on_hex_clicked_for_retreat)
+	retreat_ui.destinations.clear()
+	retreat_ui.queue_redraw()
+
 
 func __on_retreat_attackers_state_entered():
-	pass
+	assert(len(to_retreat) > 0)
+
+func __on_choose_retreating_attacker_state_entered():
+	pass # Replace with function body.
+
+func __on_choose_retreating_attacker_state_exited():
+	pass # Replace with function body.
+
+func __on_choose_retreating_attacker_destination_state_entered():
+	pass # Replace with function body.
+
+func __on_choose_retreating_attacker_destination_state_exited():
+	pass # Replace with function body.
+
 
 func __on_exchange_state_entered():
 	pass
 
+var can_make_way := {}
+var making_way: GamePiece
+func __on_make_way_state_entered():
+	assert(len(can_make_way) > 0)
+func __on_make_way_state_exited():
+	can_make_way.clear()
+func __on_choose_ally_to_make_way_state_entered():
+	%SubPhaseInstruction.text = "Choose a unit to make way for the retreating unit"
+	unit_layer.unit_selected.connect(__on_unit_selected_for_making_way)
+	var selectable: Array[GamePiece] = []
+	for unit in can_make_way:
+		selectable.append(unit)
+	unit_layer.make_units_selectable(selectable)
+func __on_choose_ally_to_make_way_state_exited():
+	if unit_layer.unit_selected.is_connected(__on_unit_selected_for_making_way):
+		unit_layer.unit_selected.disconnect(__on_unit_selected_for_making_way)
+func __on_unit_selected_for_making_way(unit: GamePiece):
+	making_way = unit
+	state_chart.send_event.call_deferred("unit chosen to make way")
+func __on_choose_destination_to_make_way_state_entered():
+	assert(making_way != null)
+	%SubPhaseInstruction.text = "Choose a destination for the unit making way"
+	unit_layer.unit_unselected.connect(__on_making_way_unit_choice_canceled)
+	var destinations: Array[Vector2i] = can_make_way[making_way]
+	if current_player.is_computer:
+		pass
+	else:
+		%UnitChosenToMakeWay.show()
+		Board.hex_clicked.connect(__on_destination_chosen_for_making_way)
+		Board.report_hover_for_tiles(destinations)
+		Board.report_click_for_tiles(destinations)
+		retreat_ui.retreat_from = making_way.tile
+		retreat_ui.destinations = destinations
+		retreat_ui.queue_redraw()
+func __on_making_way_unit_choice_canceled():
+	making_way = null
+	state_chart.send_event.call_deferred("unit choice for making way cancelled")
+func __on_destination_chosen_for_making_way(tile: Vector2i, _kind=null, _zones=null):
+	var vacated_tile = making_way.tile
+	unit_layer.move_unit(making_way, vacated_tile, tile)
+	state_chart.send_event.call_deferred("destination chosen")
+func __on_choose_destination_to_make_way_state_exited():
+	if unit_layer.unit_unselected.is_connected(__on_making_way_unit_choice_canceled):
+		unit_layer.unit_unselected.disconnect(__on_making_way_unit_choice_canceled)
+	making_way.unselect()
+	if current_player.is_computer:
+		pass
+	else:
+		%UnitChosenToMakeWay.hide()
+		Board.hex_clicked.disconnect(__on_destination_chosen_for_making_way)
+		Board.report_hover_for_tiles([])
+		Board.report_click_for_tiles([])
+		retreat_ui.destinations = []
+		retreat_ui.queue_redraw()
+
+var pursue_to: Vector2i
+var can_pursue: Array[GamePiece] = []
+func __on_pursue_retreating_defender_state_entered():
+	assert(pursue_to != null)
+	%SubPhaseInstruction.text = "You can choose an attacker to pursue the retreating defender"
+	%CancelPursuit.show()
+	if current_player.is_computer:
+		pass
+	else:
+		unit_layer.unit_selected.connect(__on_pursuer_selected)
+		unit_layer.make_units_selectable(can_pursue)
+
+func __on_pursuit_declined():
+	state_chart.send_event.call_deferred("combat resolved")
+
+func __on_pursuer_selected(unit: GamePiece):
+	assert(unit in can_pursue)
+	unit_layer.move_unit(unit, unit.tile, pursue_to)
+	unit.unselect()
+	state_chart.send_event.call_deferred("combat resolved")
+
+func __on_pursue_retreating_defender_state_exited():
+	%CancelPursuit.hide()
+	unit_layer.make_units_selectable([])
+	if unit_layer.unit_selected.is_connected(__on_pursuer_selected):
+		unit_layer.unit_selected.disconnect(__on_pursuer_selected)
+
+
+func __on_combat_resolution_cleanup_state_entered():
+	for attacker in attacking:
+		attacker.unselect()
+		attacked[attacker] = defending
+	attacking.clear()
+
+	defending.unselect()
+	defended.append(defending)
+	defending = null
+
+	for dead in died_from_last_combat:
+		dead.die()
+		alive.erase(dead)
+		died.append(dead)
+	died_from_last_combat.clear()
+
+	assert(making_way == null, "Check if making_way can be cleared before entering post-combat resolution, else document why it can't and remove this assert")
+	state_chart.send_event.call_deferred("combat resolution cleanup finished")
