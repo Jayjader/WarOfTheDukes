@@ -405,20 +405,20 @@ script = ExtResource("24_uvwcr")
 [node name="choose destination" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/Retreat Attackers/Choose Retreater"]
 script = ExtResource("23_hxj8n")
 to = NodePath("../../Choose Destination")
-event = &"retreater chosen"
+event = &"attacker chosen to retreat"
+
+[node name="to cleanup" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/Retreat Attackers/Choose Retreater"]
+script = ExtResource("23_hxj8n")
+to = NodePath("../../../Combat Resolution Cleanup")
+event = &"combat resolved"
 
 [node name="Choose Destination" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/Retreat Attackers"]
 script = ExtResource("24_uvwcr")
 
-[node name="to cleanup" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/Retreat Attackers/Choose Destination"]
-script = ExtResource("23_hxj8n")
-to = NodePath("../../../Combat Resolution Cleanup")
-event = &"retreat finished"
-
 [node name="choose next retreater" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/Retreat Attackers/Choose Destination"]
 script = ExtResource("23_hxj8n")
 to = NodePath("../../Choose Retreater")
-event = &"combat resolved"
+event = &"attacker retreated"
 
 [node name="to make way" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/Retreat Attackers/Choose Destination"]
 script = ExtResource("23_hxj8n")
@@ -432,6 +432,7 @@ event = &"unit choice for retreat cancelled"
 
 [node name="Resume Retreat" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat"]
 script = ExtResource("25_kms61")
+deep = true
 default_state = NodePath("../Retreat Defender")
 
 [node name="Pursue Retreating Defender?" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat"]
@@ -476,7 +477,7 @@ script = ExtResource("24_uvwcr")
 [node name="resume retreat" type="Node" parent="StateChart/ParallelState/Phase/Combat/Making Way For A Retreat/Choose Destination"]
 script = ExtResource("23_hxj8n")
 to = NodePath("../../../Resolve Combat/Resume Retreat")
-event = &"destination chosen"
+event = &"destination for making way chosen"
 
 [node name="cancel unit choice" type="Node" parent="StateChart/ParallelState/Phase/Combat/Making Way For A Retreat/Choose Destination"]
 script = ExtResource("23_hxj8n")
@@ -496,6 +497,7 @@ initial_node_to_watch = NodePath("../StateChart")
 [connection signal="pressed" from="BottomRightMargin/HBox/Cancel/CancelMoverChoice" to="." method="__on_mover_choice_cancelled"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Cancel/CancelAttack" to="." method="__on_cancel_attack_pressed"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Cancel/ChangeAttackers" to="." method="__on_change_attackers_pressed"]
+[connection signal="pressed" from="BottomRightMargin/HBox/Cancel/ChangeAttackerForRetreat" to="." method="__on_retreating_attacker_choice_cancelled"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Cancel/UnitChosenToMakeWay" to="." method="__on_making_way_unit_choice_canceled"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Cancel/CancelPursuit" to="." method="__on_pursuit_declined"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Confirm/EndMovementPhase" to="." method="__on_end_movement_pressed"]
@@ -535,3 +537,4 @@ initial_node_to_watch = NodePath("../StateChart")
 [connection signal="state_entered" from="StateChart/ParallelState/Phase/Combat/Making Way For A Retreat/Choose Ally" to="." method="__on_choose_ally_to_make_way_state_entered"]
 [connection signal="state_exited" from="StateChart/ParallelState/Phase/Combat/Making Way For A Retreat/Choose Ally" to="." method="__on_choose_ally_to_make_way_state_exited"]
 [connection signal="state_entered" from="StateChart/ParallelState/Phase/Combat/Making Way For A Retreat/Choose Destination" to="." method="__on_choose_destination_to_make_way_state_entered"]
+[connection signal="state_exited" from="StateChart/ParallelState/Phase/Combat/Making Way For A Retreat/Choose Destination" to="." method="__on_choose_destination_to_make_way_state_exited"]
