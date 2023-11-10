@@ -248,7 +248,7 @@ func choose_tile(player: PlayerRs, unit: Enums.Unit, tile: Vector2i):
 	
 	next_game_action.call_deferred()
 
-func ___choose_tile(tile: Vector2i, kind: String, zones: Array):
+func ___choose_tile(tile: Vector2i, kind: String, _zones: Array):
 	#print_debug("choose tile %s for unit %s for player %s" % [ tile, Enums.Unit.find_key(selection), Enums.Faction.find_key(current_player) ])
 	var already_there = units_on(tile)
 	if len(already_there) > 0:
