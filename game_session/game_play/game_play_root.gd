@@ -523,6 +523,9 @@ func __on_view_result_state_exited():
 
 func __on_confirm_combat_result_pressed():
 	state_chart.send_event.call_deferred(emitted_event)
+	defending.unselect()
+	for unit in attacking:
+		unit.unselect()
 
 func __on_retreat_defender_state_entered():
 	assert(defending != null)
@@ -542,10 +545,15 @@ func __on_retreat_defender_state_entered():
 		retreat_ui.queue_redraw()
 	else:
 		assert(making_way == null, "no valid retreat destinations found after making way for retreating defender")
+		var enemy_tiles: Array[Vector2i] = []
+		for unit in alive:
+			if unit.faction != defending.faction:
+				enemy_tiles.append(unit.tile)
 		for unit in unit_layer.get_adjacent_allied_neighbors(defending):
-			var others_destinations = MapData.map.paths_for_retreat(unit, unit_layer.get_adjacent_units(unit))
-			if len(others_destinations) > 0:
-				can_make_way[unit] = others_destinations
+			if not MapData.map.is_in_enemy_zoc(unit.tile, enemy_tiles):
+				var others_destinations = MapData.map.paths_for_retreat(unit, unit_layer.get_adjacent_units(unit))
+				if len(others_destinations) > 0:
+					can_make_way[unit] = others_destinations
 		if len(can_make_way) > 0:
 			state_chart.send_event.call_deferred("ally needed to make way")
 		else:
@@ -628,7 +636,7 @@ func __on_choose_destination_to_make_way_state_entered():
 		retreat_ui.retreat_from = making_way.tile
 		retreat_ui.destinations = destinations
 		retreat_ui.queue_redraw()
-func __on_making_way_unit_choice_canceled():
+func __on_making_way_unit_choice_canceled(_unit=making_way):
 	making_way = null
 	state_chart.send_event.call_deferred("unit choice for making way cancelled")
 func __on_destination_chosen_for_making_way(tile: Vector2i, _kind=null, _zones=null):
