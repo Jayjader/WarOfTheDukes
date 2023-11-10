@@ -14,9 +14,9 @@ func _init():
 func _is_minor_objective(tile: Vector2i, map: HexMapData) -> bool:
 	return map.zones.Kaiserburg.has(tile) or map.zones.BetweenRivers.has(tile)
 
-func choose_next_mover(moved: Array[GamePiece], allies: Array[GamePiece], enemies: Array[GamePiece], map: HexMapData):
-	var occupied_tiles = allies.map(func(u):return u.tile)
-	occupied_tiles.append_array(enemies.map(func(u):return u.tile))
+func choose_next_mover(moved: Array[GamePiece], allies: Array[GamePiece], _enemies: Array[GamePiece], map: HexMapData):
+	#var occupied_tiles = allies.map(func(u):return u.tile)
+	#occupied_tiles.append_array(enemies.map(func(u):return u.tile))
 	for unit in allies:
 		if unit in moved:
 			continue
@@ -27,9 +27,7 @@ func choose_next_mover(moved: Array[GamePiece], allies: Array[GamePiece], enemie
 
 func choose_destination(mover: GamePiece, others: Array[GamePiece], map: HexMapData):
 	var biais = []
-	var occupied_tiles = others.map(func(p): return p.tile)
 	var paths = map.paths_for(mover, others)
-	var choice = mover.tile
 	for tile in paths:
 		if paths[tile].can_stop_here:
 			biais.append([tile,
