@@ -649,7 +649,6 @@ func __on_retreating_attacker_choice_cancelled():
 	retreating = null
 	state_chart.send_event.call_deferred("unit choice for retreat cancelled")
 func __on_hex_clicked_for_attacker_retreat(tile, _kind=null, _zones=null):
-	Board.hex_clicked.disconnect(__on_hex_clicked_for_attacker_retreat)
 	unit_layer.move_unit(retreating, retreating.tile, tile)
 	retreated.append(retreating)
 	retreating.unselect()
@@ -657,6 +656,8 @@ func __on_hex_clicked_for_attacker_retreat(tile, _kind=null, _zones=null):
 	state_chart.send_event.call_deferred("attacker retreated")
 func __on_choose_retreating_attacker_destination_state_exited():
 	%ChangeAttackerForRetreat.hide()
+	if Board.hex_clicked.is_connected(__on_hex_clicked_for_attacker_retreat):
+		Board.hex_clicked.disconnect(__on_hex_clicked_for_attacker_retreat)
 	retreat_ui.destinations.clear()
 	retreat_ui.queue_redraw()
 
