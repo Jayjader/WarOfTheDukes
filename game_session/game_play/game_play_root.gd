@@ -661,6 +661,9 @@ var pursue_to: Vector2i
 var can_pursue: Array[GamePiece] = []
 func __on_pursue_retreating_defender_state_entered():
 	assert(pursue_to != null)
+	if len(can_pursue) == 0:
+		state_chart.send_event.call_deferred("combat resolved")
+		return
 	%SubPhaseInstruction.text = "You can choose an attacker to pursue the retreating defender"
 	%CancelPursuit.show()
 	if current_player.is_computer:
