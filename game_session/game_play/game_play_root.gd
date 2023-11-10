@@ -468,7 +468,6 @@ func __on_resolve_combat_state_entered():
 	if result == null:
 		%SubPhaseInstruction.text = '(Resolving Combat...)'
 		result = resolve_combat(attacking, defending)
-		result = Enums.CombatResult.AttackersRetreat
 
 ## View Result
 var emitted_event: String
@@ -662,8 +661,53 @@ func __on_choose_retreating_attacker_destination_state_exited():
 	retreat_ui.queue_redraw()
 
 ## Exchange
+var allocated: Array[GamePiece] = []
 func __on_exchange_state_entered():
-	pass
+	assert(strength_to_allocate > 0)
+	if len(can_be_allocated) == 0:
+		state_chart.send_event.call_deferred("combat resolved")
+		return
+	%SubPhaseInstruction.text = "Choose an attacker to allocate as loss"
+	%RemainingStrengthToAllocate.text = "Strength to allocate: %d" % max(0, strength_to_allocate)
+	%RemainingStrengthToAllocate.show()
+	%ConfirmLossAllocation.hide()
+	unit_layer.unit_selected.connect(__on_allocate_attacker_for_exchange)
+	unit_layer.unit_unselected.connect(__on_unallocate_attacker_for_exchange)
+	unit_layer.make_units_selectable(can_be_allocated)
+func _allocation_is_valid():
+	return strength_to_allocate <= 0 or can_be_allocated.all(func(unit): return unit in allocated)
+func __on_allocate_attacker_for_exchange(unit: GamePiece):
+	assert(unit not in allocated)
+	assert(unit in can_be_allocated)
+	allocated.append(unit)
+	strength_to_allocate -= attacking[unit]
+	%ConfirmLossAllocation.visible = _allocation_is_valid()
+	%RemainingStrengthToAllocate.text = "Strength to allocate: %d" % max(0, strength_to_allocate)
+func __on_unallocate_attacker_for_exchange(unit: GamePiece):
+	assert(unit in allocated)
+	assert(unit in attacking)
+	strength_to_allocate += attacking[unit]
+	allocated.erase(unit)
+	%ConfirmLossAllocation.visible = _allocation_is_valid()
+	%RemainingStrengthToAllocate.text = "Strength to allocate: %d" % max(0, strength_to_allocate)
+func __on_exchange_loss_allocation_confirmed():
+	assert(strength_to_allocate <= 0 or len(can_be_allocated) <= len(allocated))
+	unit_layer.unit_unselected.disconnect(__on_unallocate_attacker_for_exchange)
+	for unit in allocated:
+		died_from_last_combat.append(unit)
+		unit.unselect()
+	state_chart.send_event.call_deferred("combat resolved")
+func __on_exchange_state_exited():
+	unit_layer.make_units_selectable([])
+	if unit_layer.unit_selected.is_connected(__on_allocate_attacker_for_exchange):
+		unit_layer.unit_selected.disconnect(__on_allocate_attacker_for_exchange)
+	if unit_layer.unit_unselected.is_connected(__on_unallocate_attacker_for_exchange):
+		unit_layer.unit_unselected.disconnect(__on_unallocate_attacker_for_exchange)
+	allocated.clear()
+	strength_to_allocate = 0
+	can_be_allocated.clear()
+	%RemainingStrengthToAllocate.hide()
+	%ConfirmLossAllocation.hide()
 
 
 ## Make Way For Retreat
