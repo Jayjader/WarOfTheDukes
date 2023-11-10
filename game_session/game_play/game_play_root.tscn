@@ -375,7 +375,7 @@ event = &"attackers retreat"
 [node name="exchange" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat/View Result"]
 script = ExtResource("23_hxj8n")
 to = NodePath("../../Exchange")
-event = &"attackers and defenders exchange"
+event = &"attackers and defender exchange"
 
 [node name="Retreat Defender" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat"]
 script = ExtResource("24_uvwcr")
@@ -469,6 +469,7 @@ initial_node_to_watch = NodePath("../StateChart")
 [connection signal="pressed" from="BottomRightMargin/HBox/Confirm/EndCombatPhase" to="." method="__on_end_combat_pressed"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Confirm/ConfirmAttackers" to="." method="__on_confirm_attackers_pressed"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Confirm/ConfirmDefender" to="." method="__on_confirm_defender_pressed"]
+[connection signal="pressed" from="BottomRightMargin/HBox/Confirm/ConfirmCombatResult" to="." method="__on_confirm_combat_result_pressed"]
 [connection signal="state_entered" from="StateChart/ParallelState" to="." method="__on_top_level_state_entered"]
 [connection signal="state_entered" from="StateChart/ParallelState/Player/Player 1" to="." method="__on_player_1_state_entered"]
 [connection signal="state_entered" from="StateChart/ParallelState/Player/Player 2" to="." method="__on_player_2_state_entered"]
@@ -486,3 +487,4 @@ initial_node_to_watch = NodePath("../StateChart")
 [connection signal="state_exited" from="StateChart/ParallelState/Phase/Combat/Choose Defender" to="." method="__on_choose_defender_state_exited"]
 [connection signal="state_entered" from="StateChart/ParallelState/Phase/Combat/Resolve Combat" to="." method="__on_resolve_combat_state_entered"]
 [connection signal="state_entered" from="StateChart/ParallelState/Phase/Combat/Resolve Combat/View Result" to="." method="__on_view_result_state_entered"]
+[connection signal="state_exited" from="StateChart/ParallelState/Phase/Combat/Resolve Combat/View Result" to="." method="__on_view_result_state_exited"]
