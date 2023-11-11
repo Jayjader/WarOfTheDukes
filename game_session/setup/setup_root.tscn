@@ -236,28 +236,28 @@ script = ExtResource("7_xfxhw")
 
 [node name="to start" type="Node" parent="StateChart/Root/Uninitialized"]
 script = ExtResource("8_fq8f0")
-to = NodePath("../../Started/Phase")
+to = NodePath("../../Started/Current Phase")
 event = &"start"
 
 [node name="Started" type="Node" parent="StateChart/Root"]
 script = ExtResource("9_wjebg")
 
-[node name="Phase" type="Node" parent="StateChart/Root/Started"]
+[node name="Current Phase" type="Node" parent="StateChart/Root/Started"]
 script = ExtResource("6_pkpi8")
 initial_state = NodePath("Fill Cities And Forts")
 
-[node name="Fill Cities And Forts" type="Node" parent="StateChart/Root/Started/Phase"]
+[node name="Fill Cities And Forts" type="Node" parent="StateChart/Root/Started/Current Phase"]
 script = ExtResource("7_xfxhw")
 
-[node name="cities and forts filled" type="Node" parent="StateChart/Root/Started/Phase/Fill Cities And Forts"]
+[node name="cities and forts filled" type="Node" parent="StateChart/Root/Started/Current Phase/Fill Cities And Forts"]
 script = ExtResource("8_fq8f0")
 to = NodePath("../../Place Remaining Units In Own Territory")
 event = &"next phase"
 
-[node name="Place Remaining Units In Own Territory" type="Node" parent="StateChart/Root/Started/Phase"]
+[node name="Place Remaining Units In Own Territory" type="Node" parent="StateChart/Root/Started/Current Phase"]
 script = ExtResource("7_xfxhw")
 
-[node name="to finished" type="Node" parent="StateChart/Root/Started/Phase/Place Remaining Units In Own Territory"]
+[node name="to finished" type="Node" parent="StateChart/Root/Started/Current Phase/Place Remaining Units In Own Territory"]
 script = ExtResource("8_fq8f0")
 to = NodePath("../../../../Finished")
 event = &"end setup"
@@ -286,6 +286,7 @@ event = &"next player"
 script = ExtResource("7_xfxhw")
 
 [node name="StateChartDebugger" parent="." instance=ExtResource("4_7ptxt")]
+visible = false
 layout_mode = 1
 offset_top = 494.0
 offset_right = -624.0
@@ -293,7 +294,7 @@ enabled = false
 initial_node_to_watch = NodePath("../StateChart")
 
 [connection signal="pressed" from="MarginContainer/PanelContainer/Margins/HBox/VBox/AutoSetup" to="." method="_on_auto_setup_pressed"]
-[connection signal="state_entered" from="StateChart/Root/Started/Phase/Fill Cities And Forts" to="." method="_on_fill_cities_and_forts_state_entered"]
-[connection signal="state_entered" from="StateChart/Root/Started/Phase/Place Remaining Units In Own Territory" to="." method="_on_place_remaining_units_in_own_territory_state_entered"]
+[connection signal="state_entered" from="StateChart/Root/Started/Current Phase/Fill Cities And Forts" to="." method="_on_fill_cities_and_forts_state_entered"]
+[connection signal="state_entered" from="StateChart/Root/Started/Current Phase/Place Remaining Units In Own Territory" to="." method="_on_place_remaining_units_in_own_territory_state_entered"]
 [connection signal="state_entered" from="StateChart/Root/Started/Current Player/Player 1" to="." method="_on_player_1_state_entered"]
 [connection signal="state_entered" from="StateChart/Root/Started/Current Player/Player 2" to="." method="_on_player_2_state_entered"]

@@ -485,6 +485,7 @@ to = NodePath("../../Choose Ally")
 event = &"unit choice for making way cancelled"
 
 [node name="StateChartDebugger" parent="." instance=ExtResource("26_5lf1w")]
+visible = false
 layout_mode = 1
 anchors_preset = 11
 anchor_left = 1.0

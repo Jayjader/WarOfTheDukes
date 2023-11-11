@@ -23,6 +23,7 @@ func set_phase(value):
 			player_ui.player = current_player
 			placing = get_first_with_remaining(current_player.faction)
 
+@onready var scene_tree_process_frame = get_tree().process_frame
 
 @onready var state_chart: StateChart = $StateChart
 
@@ -106,12 +107,15 @@ func _sync_buttons(player: PlayerRs):
 		if selection_button != null:
 			selection_button.grab_focus()
 			selection_button.set_pressed(true)
-	
+
+var auto_place = false
+func _on_auto_setup_pressed():
+	auto_place = true;
 func query_current_player_for_deployment_tile():
 	var pieces_placed = _pieces_placed_summary()
 	print_debug("querying %s..." % Enums.Faction.find_key(current_player.faction))
 	var choice
-	if current_player.is_computer:
+	if current_player.is_computer or auto_place:
 		var strategy = SetupStrategy.new()
 		var tiles = {}
 		for tile in deployment_tiles_for_player(current_player, phase):
@@ -149,7 +153,7 @@ func query_current_player_for_deployment_tile():
 		Board.report_hover_for_tiles([])
 		Board.report_click_for_tiles([])
 	print_debug("%s chosen." % Enums.Unit.find_key(placing))
-	choose_tile(current_player, placing, choice)
+	scene_tree_process_frame.connect(choose_tile.bind(current_player, placing, choice), CONNECT_ONE_SHOT)
 
 var placed: Dictionary
 
@@ -245,8 +249,7 @@ func choose_tile(player: PlayerRs, unit: Enums.Unit, tile: Vector2i):
 				next_game_action = state_chart.send_event.bind("next player")
 	else:
 		next_game_action = state_chart.send_event.bind("next player")
-	
-	next_game_action.call_deferred()
+	scene_tree_process_frame.connect(next_game_action, CONNECT_ONE_SHOT)
 
 func ___choose_tile(tile: Vector2i, kind: String, _zones: Array):
 	#print_debug("choose tile %s for unit %s for player %s" % [ tile, Enums.Unit.find_key(selection), Enums.Faction.find_key(current_player) ])
@@ -282,20 +285,6 @@ func _ready():
 	
 	start.call_deferred()
 
-func _on_auto_setup_pressed():
-	while placing != null:
-		print_debug("auto_setup loop")
-		var player_territory = "%sTerritory" % Enums.Faction.find_key(current_player.faction)
-		var zone_index = { Enums.Faction.Orfburg: 0, Enums.Faction.Wulfenburg: 0 }
-		var tile
-		if len(empty_cities_and_forts[current_player.faction]) > 0:
-			tile = empty_cities_and_forts[current_player.faction][0]
-		else:
-			tile = MapData.map.zones[player_territory][zone_index[current_player.faction]]
-			while len(units_on(tile)) > 0:
-				zone_index[current_player] += 1
-				tile = MapData.map.zones[player_territory][zone_index[current_player.faction]]
-		choose_tile(current_player, placing, tile)
 
 
 func _on_fill_cities_and_forts_state_entered():
