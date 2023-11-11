@@ -541,6 +541,7 @@ func __on_retreat_defender_state_entered():
 	else:
 		assert(making_way == null, "no valid retreat destinations found after making way for retreating defender")
 		var enemy_tiles: Array[Vector2i] = []
+		can_make_way.clear()
 		for unit in alive:
 			if unit.faction != defending.faction:
 				enemy_tiles.append(unit.tile)
