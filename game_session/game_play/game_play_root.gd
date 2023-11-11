@@ -200,28 +200,20 @@ To fight, attacking units need to be in range of the defender;
 Artillery has a range of 2 whereas the rest (Infantry, Cavalry) have a range of 1.
 In other words:
 	- Infantry and Cavalry can attack enemies that are adjacent to them,
-	- Artillery can attack enemies that have up to 1 tile between them and the
-	attacking artillery.
+	- Artillery can attack enemies that have up to 1 tile between them and the attacking artillery.
 Furthermore, Infantry and Cavalry can not attack across un-bridged rivers.
-Effectively, they can only attack an enemy if they could cross into the enemy's
-tile from theirs as a legal movement.
+Effectively, they can only attack an enemy if they could cross into the enemy's tile from theirs as a legal movement.
 
-Once the attacker(s) and defender have been chosen, the ratio of their combat
-strengths is calculated, and a 6-sided die is rolled.
+Once the attacker(s) and defender have been chosen, the ratio of their combat strengths is calculated, and a 6-sided die is rolled.
 
-Units have a default combat strength, which can then be affected by their
-position on the board:
-	- Cities double a unit's defense (i.e., value for strength used when
-	defending)
+Units have a default combat strength, which can then be affected by their position on the board:
+	- Cities double a unit's defense (i.e., value for strength used when defending)
 	- Fortresses triple a unit's defense
-	- Being 2 or less tiles away from an allied duke doubles a unit's attack
-	and defense
-	- Woods add 2 to the die roll when attacked into (i.e. when occupied by the
-	defender)
+	- Being 2 or less tiles away from an allied duke doubles a unit's attack and defense
+	- Woods add 2 to the die roll when attacked into (i.e. when occupied by the defender)
 	- Cliffs add 1 to the die roll when attacked into
 
-Once the ratio and die result are adjusted accordingly, they are used to lookup
-the combat result from the following table:
+Once the ratio and die result are adjusted accordingly, they are used to lookup the combat result from the following table:
 
 	| 1/5	| 1/4	| 1/3	| 1/2	| 1/1	| 2/1	| 3/1	| 4/1	| 5/1	| 6/1
 ==================================================================================
