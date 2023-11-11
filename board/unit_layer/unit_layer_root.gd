@@ -35,17 +35,22 @@ func get_units(faction: Enums.Faction) -> Array[GamePiece]:
 			units.append(unit)
 	return units
 
-func get_adjacent_units(unit: GamePiece) -> Array[GamePiece]:
+func get_adjacent_units(unit: GamePiece, reachable=true) -> Array[GamePiece]:
 	var adjacent_units: Array[GamePiece] = []
 	var adjacent_tiles = Util.neighbours_to_tile(unit.tile)
 	for other_unit in get_children().filter(func(other_unit): return other_unit != unit):
-		if other_unit.tile in adjacent_tiles:
-			adjacent_units.append(other_unit)
+		if other_unit.tile not in adjacent_tiles:
+			continue
+		if reachable:
+			var border = MapData.map.borders.get(0.5 * Vector2(unit.tile + other_unit.tile))
+			if border == "River":
+				continue
+		adjacent_units.append(other_unit)
 	return adjacent_units
 
-func get_adjacent_allied_neighbors(unit: GamePiece) -> Array[GamePiece]:
+func get_adjacent_allied_neighbors(unit: GamePiece, reachable=true) -> Array[GamePiece]:
 	var adjacent_allied_neighbors: Array[GamePiece] = []
-	for other_unit in get_adjacent_units(unit):
+	for other_unit in get_adjacent_units(unit, reachable):
 		if other_unit.faction == unit.faction:
 			adjacent_allied_neighbors.append(other_unit)
 	return adjacent_allied_neighbors

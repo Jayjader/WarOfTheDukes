@@ -231,7 +231,7 @@ the combat result from the following table:
  4	| AE	| AE	| AR	| AR	| AR	| DR	| DR	| DR	| DR	| DE
  5	| AE	| AE	| AE	| AR	| AR	| AR	| DR	| DR	| DR	| EX
  6	| AE	| AE	| AE	| AR	| AR	| AR	| AR	| EX	| EX	| EX
-	
+
 
 Legend:
 	AR = Attacker(s) Retreat
@@ -244,15 +244,38 @@ The result is finally adjusted according to the following rules:
 	- Artillery are not affected by AR, AE, nor EX results when attacking across
 	an un-bridged river or from 2 tiles away
 	- A unit that must retreat but is blocked from doing so dies instead
-	- A retreating unit that would die from being blocked can instead push aside
-	an adjacent ally (and occupy the newly vacated tile) if that ally itself has
-	an adjacent tile they can occupy
+	- A retreating unit that would die from being blocked can instead push aside an adjacent ally (and occupy the newly vacated tile) if that ally itself has an adjacent tile they can occupy
 """
-	
+
+func _detect_game_result():
+	for capital_faction in [Enums.Faction.Orfburg, Enums.Faction.Wulfenburg]:
+		var capital_tiles = MapData.map.zones[Enums.Faction.find_key(capital_faction)]
+		var hostile_faction = Enums.get_other_faction(capital_faction)
+		var occupants_by_faction =  capital_tiles.reduce(func(accum, tile):
+			var units = Board.get_units_on(tile)
+			for unit in units:
+				accum[unit.faction] += 1
+			return accum
+		, { Enums.Faction.Orfburg: 0, Enums.Faction.Wulfenburg: 0 })
+		if (occupants_by_faction[capital_faction] == 0) and (occupants_by_faction[hostile_faction] > 0):
+			return [Enums.GameResult.TOTAL_VICTORY, hostile_faction]
+
+	var occupants_by_faction = { Enums.Faction.Orfburg: 0, Enums.Faction.Wulfenburg: 0 }
+	for zone in ["BetweenRivers", "Kaiserburg"]:
+		var tiles = MapData.map.zones[zone]
+		for tile in tiles:
+			for unit in Board.get_units_on(tile):
+				occupants_by_faction[unit.faction] += 1
+	if occupants_by_faction[Enums.Faction.Orfburg] > 0 and occupants_by_faction[Enums.Faction.Wulfenburg] == 0:
+		return [Enums.GameResult.MINOR_VICTORY, Enums.Faction.Orfburg]
+	return [Enums.GameResult.MINOR_VICTORY, Enums.Faction.Wulfenburg]
+
 func __on_combat_state_exited():
 	%CombatPhase.hide()
 	%EndCombatPhase.hide()
 	if turn_counter > Rules.MaxTurns:
+		var game_result = _detect_game_result()
+		__on_last_turn_end(game_result[0], game_result[1])
 		pass # todo: detect winner, then __on_last_turn_end(...)
 
 func __on_end_combat_pressed():
@@ -509,7 +532,10 @@ func __on_view_result_state_entered():
 				for attacker in attacking:
 					if attacker.kind != Enums.Unit.Artillery or not Rules.is_bombardment(attacker, defending):
 						can_be_allocated.append(attacker)
-				emitted_event = "attackers and defender exchange"
+				if len(can_be_allocated) > 0:
+					emitted_event = "attackers and defender exchange"
+				else:
+					emitted_event = "combat resolved"
 		Enums.CombatResult.DefenderRetreats:
 			emitted_event = "defender retreats"
 	%ConfirmCombatResult.show()
