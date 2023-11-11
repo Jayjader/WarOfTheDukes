@@ -66,11 +66,10 @@ func paths_for_retreat(unit: GamePiece, others: Array[GamePiece]) -> Array[Vecto
 
 func paths_for(unit: GamePiece, others: Array[GamePiece]) -> Dictionary:
 	var max_cost = unit.movement_points
-	var enemy_tiles = others.reduce(func(array, other_unit):
+	var enemy_tiles: Array[Vector2i] = []
+	for other_unit in others:
 		if other_unit.faction != unit.faction:
-			array.append(other_unit.tile)
-		return array
-	, [] as Array[Vector2i])
+			enemy_tiles.append(other_unit.tile)
 	var allies = others.filter(func(other_unit): return other_unit.faction == unit.faction)
 	var initial_frontier_datum = {
 		tile = unit.tile,
@@ -110,18 +109,20 @@ func paths_for(unit: GamePiece, others: Array[GamePiece]) -> Dictionary:
 				# moving through enemies is forbidden
 				continue
 
-			var is_moving_into_enemy_zoc = is_in_enemy_zoc(to_, enemy_tiles)
-			if next.is_in_enemy_zoc and is_moving_into_enemy_zoc:
-			#	# moving through contiguous enemy zone of control tiles is forbidden
-				continue
-
 			if to_ in reached:
 				if reached[to_].cost_to_reach > movement_cost:
 					# we've found a shorter path than previously recorded to reach `to_`
 					reached[to_].from = next.tile
 					reached[to_].cost_to_reach = movement_cost
 			else:
-				var allies_on_destination = allies.filter(func(a): return a.tile == to_)
+				var is_moving_into_enemy_zoc = is_in_enemy_zoc(to_, enemy_tiles)
+				if next.is_in_enemy_zoc and is_moving_into_enemy_zoc:
+				#	# moving through contiguous enemy zone of control tiles is forbidden
+					continue
+				var allies_on_destination: Array[GamePiece] = []
+				for ally in allies:
+					if ally.tile == to_:
+						allies_on_destination.append(ally)
 				reached[to_] = {
 					from = next.tile,
 					cost_to_reach = movement_cost,
