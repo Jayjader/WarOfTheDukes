@@ -9,6 +9,8 @@ signal game_over(result: Enums.GameResult, winner: Enums.Faction)
 @onready var scene_tree_process_frame = get_tree().process_frame
 func schedule(c):
 	scene_tree_process_frame.connect(c, CONNECT_ONE_SHOT)
+func schedule_event(e):
+	scene_tree_process_frame.connect(func(): state_chart.send_event(e), CONNECT_ONE_SHOT)
 
 @onready var tile_layer = Board.get_node("%TileOverlay")
 @onready var unit_layer: UnitLayer = Board.get_node("%UnitLayer")
@@ -72,13 +74,13 @@ func __on_movement_state_exited():
 	%MovementPhase.hide()
 
 func __on_end_movement_pressed():
-	schedule(func(): state_chart.send_event("movement ended"))
+	schedule_event("movement ended")
 
 ### Choose Mover
 var mover
 func __on_unit_selected_for_move(unit):
 	mover = unit
-	schedule(func(): state_chart.send_event("mover chosen"))
+	schedule_event("mover chosen")
 
 func _get_ai_movement_choice():
 	var strategy = MovementStrategy.new()
@@ -114,11 +116,11 @@ func __on_choose_mover_state_exited():
 
 ### Choose Destination
 func __on_mover_choice_cancelled(_unit=null):
-	schedule(func(): state_chart.send_event("mover choice canceled"))
+	schedule_event("mover choice canceled")
 func __on_tile_chosen_as_destination(tile: Vector2i, _kind=null, _zones=null):
 	unit_layer.move_unit(mover, mover.tile, tile)
 	moved.append(mover)
-	schedule(func(): state_chart.send_event("unit moved"))
+	schedule_event("unit moved")
 
 func __on_choose_destination_state_entered():
 	%SubPhaseInstruction.text = "Choose the destination for the selected unit"
@@ -271,7 +273,7 @@ func __on_combat_state_exited():
 		pass # todo: detect winner, then __on_last_turn_end(...)
 
 func __on_end_combat_pressed():
-	schedule(func(): state_chart.send_event("combat ended"))
+	schedule_event("combat ended")
 
 func _calculate_effective_attack_strength(unit: GamePiece):
 	var strength = Rules.AttackStrength[unit.kind]
@@ -296,7 +298,7 @@ func __on_unit_unselected_for_attack(unit):
 		%ConfirmAttackers.hide()
 		%EndCombatPhase.show()
 func __on_confirm_attackers_pressed():
-	schedule(func(): state_chart.send_event("attackers confirmed"))
+	schedule_event("attackers confirmed")
 
 func __on_choose_attackers_state_entered():
 	_cache_duke_tiles()
@@ -351,7 +353,7 @@ var defending # : GamePiece
 var can_defend: Array[GamePiece] = []
 func __on_change_attackers_pressed():
 	defending = null
-	schedule(func(): state_chart.send_event("change attackers"))
+	schedule_event("change attackers")
 func __on_unit_selected_for_defense(unit):
 	defending = unit
 	for other_unit in can_defend:
@@ -365,7 +367,7 @@ func __on_unit_unselected_for_defense(_unit):
 	%ConfirmDefender.hide()
 func __on_confirm_defender_pressed():
 	result = null
-	schedule(func(): state_chart.send_event("defender confirmed"))
+	schedule_event("defender confirmed")
 
 func __on_choose_defender_state_entered():
 	can_defend.clear()
@@ -532,7 +534,7 @@ func __on_view_result_state_entered():
 			emitted_event = "defender retreats"
 	%ConfirmCombatResult.show()
 func __on_confirm_combat_result_pressed():
-	schedule(func(): state_chart.send_event(emitted_event))
+	schedule_event(emitted_event)
 	defending.unselect()
 	for unit in attacking:
 		unit.unselect()
@@ -569,13 +571,13 @@ func __on_retreat_defender_state_entered():
 				if len(others_destinations) > 0:
 					can_make_way[unit] = others_destinations
 		if len(can_make_way) > 0:
-			schedule(func(): state_chart.send_event("ally needed to make way"))
+			schedule_event("ally needed to make way")
 		else:
 			if defending.kind == Enums.Unit.Duke:
 				__on_duke_death(defending.faction)
 			else:
 				died_from_last_combat.append(defending)
-				schedule(func(): state_chart.send_event("combat resolved"))
+				schedule_event("combat resolved")
 func __on_hex_clicked_for_retreat(tile, _kind, _zones):
 	pursue_to = defending.tile # save before moving defending/defender
 	for unit in Board.get_units_on(defending.tile):
@@ -585,7 +587,7 @@ func __on_hex_clicked_for_retreat(tile, _kind, _zones):
 	for attacker in attacking:
 		if attacker.kind != Enums.Unit.Artillery:
 			can_pursue.append(attacker)
-	schedule(func(): state_chart.send_event("defender retreated"))
+	schedule_event("defender retreated")
 func __on_retreat_defender_state_exited():
 	Board.report_hover_for_tiles([])
 	Board.report_click_for_tiles([])
@@ -601,7 +603,7 @@ func __on_retreat_attackers_state_entered():
 	pass
 func __on_choose_retreating_attacker_state_entered():
 	if len(to_retreat) == 0:
-		schedule(func(): state_chart.send_event("combat resolved"))
+		schedule_event("combat resolved")
 		return
 	%SubPhaseInstruction.text = "Choose a unit among the attackers to retreat"
 	unit_layer.unit_selected.connect(__on_attacker_selected_for_retreat)
@@ -614,7 +616,7 @@ func __on_attacker_selected_for_retreat(unit: GamePiece):
 	assert(unit in attacking)
 	to_retreat.erase(unit)
 	retreating = unit
-	schedule(func(): state_chart.send_event("attacker chosen to retreat"))
+	schedule_event("attacker chosen to retreat")
 func __on_choose_retreating_attacker_state_exited():
 	unit_layer.make_units_selectable([])
 	if unit_layer.unit_selected.is_connected(__on_attacker_selected_for_retreat):
@@ -650,24 +652,24 @@ func __on_choose_retreating_attacker_destination_state_entered():
 					can_make_way[unit] = others_destinations
 		if len(can_make_way) > 0:
 			retreating.unselect()
-			schedule(func(): state_chart.send_event("ally needed to make way"))
+			schedule_event("ally needed to make way")
 		else:
 			if retreating.kind == Enums.Unit.Duke:
 				__on_duke_death(defending.faction)
 			else:
 				died_from_last_combat.append(retreating)
-				schedule(func(): state_chart.send_event("attacker retreated"))
+				schedule_event("attacker retreated")
 func __on_retreating_attacker_choice_cancelled():
 	to_retreat.append(retreating)
 	retreating.unselect()
 	retreating = null
-	schedule(func(): state_chart.send_event("unit choice for retreat cancelled"))
+	schedule_event("unit choice for retreat cancelled")
 func __on_hex_clicked_for_attacker_retreat(tile, _kind=null, _zones=null):
 	unit_layer.move_unit(retreating, retreating.tile, tile)
 	retreated.append(retreating)
 	retreating.unselect()
 	retreating = null
-	schedule(func(): state_chart.send_event("attacker retreated"))
+	schedule_event("attacker retreated")
 func __on_choose_retreating_attacker_destination_state_exited():
 	%ChangeAttackerForRetreat.hide()
 	if Board.hex_clicked.is_connected(__on_hex_clicked_for_attacker_retreat):
@@ -680,7 +682,7 @@ var allocated: Array[GamePiece] = []
 func __on_exchange_state_entered():
 	assert(strength_to_allocate > 0)
 	if len(can_be_allocated) == 0:
-		schedule(func(): state_chart.send_event("combat resolved"))
+		schedule_event("combat resolved")
 		return
 	%SubPhaseInstruction.text = "Choose an attacker to allocate as loss"
 	%RemainingStrengthToAllocate.text = "Strength to allocate: %d" % max(0, strength_to_allocate)
@@ -711,7 +713,7 @@ func __on_exchange_loss_allocation_confirmed():
 	for unit in allocated:
 		died_from_last_combat.append(unit)
 		unit.unselect()
-	schedule(func(): state_chart.send_event("combat resolved"))
+	schedule_event("combat resolved")
 func __on_exchange_state_exited():
 	unit_layer.make_units_selectable([])
 	if unit_layer.unit_selected.is_connected(__on_allocate_attacker_for_exchange):
@@ -743,7 +745,7 @@ func __on_choose_ally_to_make_way_state_entered():
 	unit_layer.make_units_selectable(selectable)
 func __on_unit_selected_for_making_way(unit: GamePiece):
 	making_way = unit
-	schedule(func(): state_chart.send_event("unit chosen to make way"))
+	schedule_event("unit chosen to make way")
 func __on_choose_ally_to_make_way_state_exited():
 	if unit_layer.unit_selected.is_connected(__on_unit_selected_for_making_way):
 		unit_layer.unit_selected.disconnect(__on_unit_selected_for_making_way)
@@ -770,13 +772,13 @@ func __on_choose_destination_to_make_way_state_entered():
 		retreat_ui.destinations = destinations
 		retreat_ui.queue_redraw()
 func __on_making_way_unit_choice_canceled(_unit=making_way):
-	schedule(func(): state_chart.send_event("unit choice for making way cancelled"))
+	schedule_event("unit choice for making way cancelled")
 func __on_destination_chosen_for_making_way(tile: Vector2i, _kind=null, _zones=null):
 	var vacated_tile = making_way.tile
 	if unit_layer.unit_unselected.is_connected(__on_making_way_unit_choice_canceled):
 		unit_layer.unit_unselected.disconnect(__on_making_way_unit_choice_canceled)
 	unit_layer.move_unit(making_way, vacated_tile, tile)
-	schedule(func(): state_chart.send_event("destination for making way chosen"))
+	schedule_event("destination for making way chosen")
 func __on_choose_destination_to_make_way_state_exited():
 	if unit_layer.unit_unselected.is_connected(__on_making_way_unit_choice_canceled):
 		unit_layer.unit_unselected.disconnect(__on_making_way_unit_choice_canceled)
@@ -798,7 +800,7 @@ var can_pursue: Array[GamePiece] = []
 func __on_pursue_retreating_defender_state_entered():
 	assert(pursue_to != null)
 	if len(can_pursue) == 0:
-		schedule(func(): state_chart.send_event("combat resolved"))
+		schedule_event("combat resolved")
 		return
 	%SubPhaseInstruction.text = "You can choose an attacker to pursue the retreating defender"
 	%CancelPursuit.show()
@@ -809,13 +811,13 @@ func __on_pursue_retreating_defender_state_entered():
 		unit_layer.make_units_selectable(can_pursue)
 
 func __on_pursuit_declined():
-	schedule(func(): state_chart.send_event("combat resolved"))
+	schedule_event("combat resolved")
 
 func __on_pursuer_selected(unit: GamePiece):
 	assert(unit in can_pursue)
 	unit_layer.move_unit(unit, unit.tile, pursue_to)
 	unit.unselect()
-	schedule(func(): state_chart.send_event("combat resolved"))
+	schedule_event("combat resolved")
 
 func __on_pursue_retreating_defender_state_exited():
 	%CancelPursuit.hide()
@@ -841,4 +843,4 @@ func __on_combat_resolution_cleanup_state_entered():
 	died_from_last_combat.clear()
 
 	assert(making_way == null, "Check if making_way can be cleared before entering post-combat resolution, else document why it can't and remove this assert")
-	schedule(func(): state_chart.send_event("combat resolution cleanup finished"))
+	schedule_event("combat resolution cleanup finished")
