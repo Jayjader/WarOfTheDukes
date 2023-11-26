@@ -312,7 +312,22 @@ func __on_choose_attackers_state_entered():
 	for unit in attacking:
 		unit.select()
 	if current_player.is_computer:
-		schedule(__on_end_combat_pressed)
+		var strategy = CombatStrategy.new()
+		var allies = {}
+		var enemies = {}
+		for unit in alive:
+			if unit.faction == current_player.faction:
+				allies[unit] = _calculate_effective_attack_strength(unit)
+			else:
+				enemies[unit] = _calculate_effective_defense_strength(unit)
+		var choice = strategy.get_attackers_choice(allies, enemies, attacking, attacked, defended)
+		if choice == null:
+			schedule(__on_end_combat_pressed)
+		else:
+			for unit in choice.attackers:
+				attacking[unit] = _calculate_effective_attack_strength(unit)
+			defending = choice.defender
+			schedule(__on_confirm_attackers_pressed)
 	else:
 		if len(attacking) == 0:
 			%EndCombatPhase.show()
@@ -399,7 +414,9 @@ func __on_choose_defender_state_entered():
 	if defending not in can_defend:
 		defending = null
 	if current_player.is_computer:
-		pass
+		assert(defending != null, "computer player should not be able to enter 'choose defender' state without the defender already being cached from the strategy used to find combats")
+		schedule(__on_confirm_defender_pressed)
+
 	else:
 		%ChangeAttackers.show()
 		if defending != null:
