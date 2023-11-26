@@ -1,5 +1,5 @@
-extends Node2D
 class_name GamePiece
+extends Node2D
 
 const Textures = {
 	Enums.Unit.Infantry: preload("res://board/unit_layer/infantry.png"),
@@ -32,10 +32,11 @@ const Textures = {
 
 func _set_label_text_outline():
 	if _selected:
-		modulate = Color.GOLD
+		modulate = Color.WHITE
 		$Label.add_theme_color_override("font_outline_color", Color.GOLD)
 	elif selectable:
 		modulate = Color.WHITE
+		modulate.a *= 0.8
 		$Label.add_theme_color_override("font_outline_color", Color.LIGHT_SALMON)
 	else:
 		modulate = Color.SLATE_GRAY
@@ -49,13 +50,10 @@ func _set_label_text_outline():
 signal selected(value: bool)
 var _selected: bool = false:
 	set(value):
-#		if _selected != value:
 		_selected = value
 		_set_label_text_outline()
-#			selected.emit(_selected)
 
 func die():
-	#queue_free()
 	unit_layer.move_unit(self, self.tile, unit_layer.graveyard)
 	self.visible = false
 
