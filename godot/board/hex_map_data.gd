@@ -73,11 +73,12 @@ func paths_for(unit: GamePiece, others: Array[GamePiece]) -> Dictionary:
 	var allies = others.filter(func(other_unit): return other_unit.faction == unit.faction)
 	var initial_frontier_datum = {
 		tile = unit.tile,
-		priority = 0,
-		cost_to_reach = 0,
+		priority = 0.,
+		cost_to_reach = 0.,
 		is_in_enemy_zoc = is_in_enemy_zoc(unit.tile, enemy_tiles),
 	}
-	var frontier = PriorityQueue.new();
+	var frontier = PriorityQueueGDExt.new()
+	
 	frontier.insert(initial_frontier_datum)
 	var reached = {unit.tile: {
 		from = unit.tile,
@@ -86,8 +87,8 @@ func paths_for(unit: GamePiece, others: Array[GamePiece]) -> Dictionary:
 		can_stop_here = true
 	}}
 
-	while frontier.size > 0:
-		var next = frontier.extract_max()
+	while frontier.len() > 0:
+		var next = frontier.pop()
 		var next_cube = Util.axial_to_cube(next.tile)
 		for direction in Util.cube_directions:
 			var to_ = Vector2i(Util.cube_to_axial(next_cube + Vector3(direction)))
