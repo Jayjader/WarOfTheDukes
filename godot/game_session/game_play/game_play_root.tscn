@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://dn24y8eq6bsf"]
+[gd_scene load_steps=8 format=3 uid="uid://dn24y8eq6bsf"]
 
 [ext_resource type="Script" path="res://game_session/game_play/game_play_root.gd" id="1_kicvc"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="20_qywoi"]
@@ -7,7 +7,6 @@
 [ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="23_hxj8n"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="24_uvwcr"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/history_state.gd" id="25_kms61"]
-[ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="26_5lf1w"]
 
 [node name="GamePlayRoot" type="Control" node_paths=PackedStringArray("state_chart")]
 layout_mode = 3
@@ -262,6 +261,7 @@ text = "Confirm Loss Allocation"
 
 [node name="StateChart" type="Node" parent="."]
 script = ExtResource("20_qywoi")
+track_in_editor = true
 
 [node name="ParallelState" type="Node" parent="StateChart"]
 script = ExtResource("21_i6w5i")
@@ -483,16 +483,6 @@ event = &"destination for making way chosen"
 script = ExtResource("23_hxj8n")
 to = NodePath("../../Choose Ally")
 event = &"unit choice for making way cancelled"
-
-[node name="StateChartDebugger" parent="." instance=ExtResource("26_5lf1w")]
-visible = false
-layout_mode = 1
-anchors_preset = 11
-anchor_left = 1.0
-offset_left = -505.0
-offset_bottom = -129.0
-grow_horizontal = 0
-initial_node_to_watch = NodePath("../StateChart")
 
 [connection signal="toggled" from="BottomLeftMargin/HBoxContainer/VBox/ToggleInstructions" to="BottomLeftMargin/HBoxContainer/VBox/Panel" method="set_visible"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Cancel/CancelMoverChoice" to="." method="__on_mover_choice_cancelled"]

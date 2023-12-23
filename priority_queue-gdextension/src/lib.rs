@@ -62,7 +62,6 @@ impl PriorityQueueGDExt {
         });
         // dbg!(&self.heap);
     }
-    /*
     #[func]
     pub fn insert_as_multiple(
         &mut self,
@@ -79,7 +78,6 @@ impl PriorityQueueGDExt {
         })
     }
 
-     */
     #[func]
     pub fn len(&self) -> u8 {
         self.heap.len() as u8

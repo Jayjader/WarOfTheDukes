@@ -5,6 +5,12 @@
 class_name CompoundState
 extends State
 
+## Called when a child state is entered.
+signal child_state_entered()
+
+## Called when a child state is exited.
+signal child_state_exited()
+
 ## The initial state which should be activated when this state is activated.
 @export_node_path("State") var initial_state:NodePath:
 	get:
@@ -41,7 +47,8 @@ func _state_init():
 		if child is State:
 			var child_as_state:State = child as State
 			child_as_state._state_init()
-
+			child_as_state.state_entered.connect(func(): child_state_entered.emit())
+			child_as_state.state_exited.connect(func(): child_state_exited.emit())
 
 func _state_enter(expect_transition:bool = false):
 	super._state_enter()
@@ -53,6 +60,10 @@ func _state_enter(expect_transition:bool = false):
 		else:
 			push_error("No initial state set for state '" + name + "'.")
 
+func _state_step():
+	super._state_step()
+	if _active_state != null:
+		_active_state._state_step()
 
 func _state_save(saved_state:SavedState, child_levels:int = -1):
 	super._state_save(saved_state, child_levels)
@@ -174,7 +185,7 @@ func _handle_transition(transition:Transition, source:State):
 	if self.is_ancestor_of(target):
 		# find the child which is the ancestor of the new target.
 		for child in get_children():
-			if child.is_ancestor_of(target):
+			if child is State and child.is_ancestor_of(target):
 				# found it. 
 				# change active state if necessary
 				if _active_state != child:
@@ -196,9 +207,30 @@ func _handle_transition(transition:Transition, source:State):
 	get_parent()._handle_transition(transition, source)
 
 
+func add_child(node:Node, force_readable_name:bool = false, internal:InternalMode = INTERNAL_MODE_DISABLED) -> void:
+	super.add_child(node, force_readable_name, internal)
+	# when a child is added in the editor and the child is a state
+	# and we don't have an initial state yet, set the initial state 
+	# to the newly added child
+	if Engine.is_editor_hint() and node is State:
+		if initial_state.is_empty():
+			# the newly added node may have a random name now, 
+			# so we need to defer the call to build a node path
+			# to the next frame, so the editor has time to rename
+			# the node to its final name
+			(func(): initial_state = get_path_to(node)).call_deferred()
+			
+
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings = super._get_configuration_warnings()
-	if get_child_count() == 0:
+	
+	# count the amount of child states
+	var child_count = 0
+	for child in get_children():
+		if child is State:
+			child_count += 1
+
+	if child_count == 0:
 		warnings.append("Compound states should have at least one child state.")
 		
 	var the_initial_state = get_node_or_null(initial_state)

@@ -18,11 +18,18 @@ signal state_processing(delta:float)
 ## Called when the state is physics processing.
 signal state_physics_processing(delta:float)
 
+## Called when the state chart step function is called.
+signal state_stepped()
+
 ## Called when the state is receiving input.
 signal state_input(event:InputEvent)
 
 ## Called when the state is receiving unhandled input.
 signal state_unhandled_input(event:InputEvent)
+
+## Called every frame while a delayed transition is pending for this state.
+## Returns the initial delay and the remaining delay of the transition.
+signal transition_pending(initial_delay:float, remaining_delay:float)
 
 
 ## Whether the state is currently active (internal flag, use active).
@@ -32,7 +39,6 @@ var _state_active = false
 var active:bool:
 	get: return _state_active
 	
-
 ## The currently active pending transition.
 var _pending_transition:Transition = null
 
@@ -42,9 +48,16 @@ var _pending_transition_time:float = 0
 ## The transitions of this state.
 var _transitions:Array[Transition] = []
 
-
 ## The state chart that owns this state.
-@onready var _chart = _find_chart(get_parent())
+var _chart:StateChart
+
+func _ready():
+	# don't run in the editor
+	if Engine.is_editor_hint():
+		return
+		
+	_chart = _find_chart(get_parent())
+		
 
 ## Finds the owning state chart by moving upwards.
 func _find_chart(parent:Node):
@@ -192,12 +205,16 @@ func _state_restore(saved_state:SavedState, child_levels:int = -1):
 func _process(delta:float):
 	if Engine.is_editor_hint():
 		return
-		
+
 	# emit the processing signal
 	state_processing.emit(delta)
 	# check if there is a pending transition
 	if _pending_transition != null:
 		_pending_transition_time -= delta
+		
+		# Notify interested parties that currently a transition is pending.
+		transition_pending.emit(_pending_transition.delay_seconds, max(0, _pending_transition_time))
+		
 		# if the transition is ready, trigger it
 		# and clear it.
 		if _pending_transition_time <= 0:
@@ -218,6 +235,9 @@ func _physics_process(delta:float):
 		return
 	state_physics_processing.emit(delta)
 
+## Called when the state chart step function is called.
+func _state_step():
+	state_stepped.emit()
 
 func _input(event:InputEvent):
 	state_input.emit(event)

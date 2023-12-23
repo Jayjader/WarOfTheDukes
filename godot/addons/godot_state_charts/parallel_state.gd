@@ -52,7 +52,7 @@ func _handle_transition(transition:Transition, source:State):
 	if self.is_ancestor_of(target):
 		# find the child which is the ancestor of the new target.
 		for child in get_children():
-			if child.is_ancestor_of(target):
+			if child is State and child.is_ancestor_of(target):
 				# ask child to handle the transition
 				child._handle_transition(transition, source)
 				return
@@ -73,7 +73,11 @@ func _state_exit():
 		child._state_exit()
 	
 	super._state_exit()
-	
+
+func _state_step():
+	super._state_step()
+	for child in _sub_states:
+		child._state_step()
 
 func _state_event(event:StringName) -> bool:
 	if not active:
