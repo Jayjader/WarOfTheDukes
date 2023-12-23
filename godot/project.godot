@@ -12,7 +12,7 @@ config_version=5
 
 config/name="War of the Dukes"
 run/main_scene="res://main_game_scene.tscn"
-config/features=PackedStringArray("4.1")
+config/features=PackedStringArray("4.2")
 config/icon="res://icon.png"
 
 [autoload]
