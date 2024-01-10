@@ -230,7 +230,7 @@ func choose_tile(player: PlayerRs, unit: Enums.Unit, tile: Vector2i):
 		placed[player.faction][unit] = tile
 	else:
 		placed[player.faction][unit].append(tile)
-	unit_layer._place_piece(tile, unit, player.faction)
+	unit_layer._place_piece(tile, unit, player)
 	
 	display_remaining_counts()
 	

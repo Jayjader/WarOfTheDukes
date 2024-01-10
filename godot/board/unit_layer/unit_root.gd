@@ -17,7 +17,7 @@ const Textures = {
 		self.position = Util.hex_coords_to_pixel(value, MapData.map.hex_size_in_pixels)
 @export var kind: Enums.Unit:
 	set(value):
-		$Label.set_text(Enums.Unit.find_key(value))
+		#$Label.set_text(Enums.Unit.find_key(value))
 		movement_points = Rules.MovementPoints[value]
 		kind = value
 @export var faction: Enums.Faction:
@@ -26,6 +26,12 @@ const Textures = {
 		faction = value
 		# todo: set theme according to faction
 @export var movement_points: int
+
+@export var player: PlayerRs:
+	set(value):
+		faction = value.faction
+		player = value
+
 
 @onready var _original_outline: Color = $Label.get_theme_color("font_outline_color")
 @onready var unit_layer: UnitLayer = Board.get_node("%UnitLayer")

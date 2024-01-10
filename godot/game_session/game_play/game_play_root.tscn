@@ -139,6 +139,7 @@ horizontal_scroll_mode = 0
 
 [node name="PhaseInstruction" type="Label" parent="BottomLeftMargin/HBoxContainer/VBox/Panel/Margin/VBox/ScrollContainer"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 6
