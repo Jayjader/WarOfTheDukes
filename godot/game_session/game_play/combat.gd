@@ -560,7 +560,12 @@ func __on_exchange_state_entered():
 	if len(can_be_allocated) == 0:
 		schedule_event("combat resolved")
 		return
-	if not current_player.is_computer:
+	if current_player.is_computer:
+		var to_allocate = can_be_allocated.slice(0)
+		while strength_to_allocate > 0 and len(to_allocate) > 0:
+			__on_allocate_attacker_for_exchange(to_allocate.pop_front())
+			__on_exchange_loss_allocation_confirmed()
+	else:
 		%SubPhaseInstruction.text = "Choose an attacker to allocate as loss"
 		%RemainingStrengthToAllocate.text = "Strength to allocate: %d" % max(0, strength_to_allocate)
 		%RemainingStrengthToAllocate.show()
