@@ -288,12 +288,12 @@ func resolve_combat(attackers: Dictionary, defender: GamePiece):
 	var numerator
 	var denominator
 	var ratio = float(total_attack_strength) / float(defender_effective_strength)
-	if ratio > 1:
-		numerator = min(6, floori(ratio))
-		denominator = 1
-	else:
+	if ratio < 1:
 		numerator = 1
 		denominator = min(5, floori(1 / ratio))
+	else:
+		numerator = min(6, floori(ratio))
+		denominator = 1
 	print_debug("Effective Ratio: %d to %d" % [numerator, denominator])
 	var result_spread = COMBAT_RESULTs[Vector2i(numerator, denominator)]
 	var die_roll = _sample_random(0, 5)
