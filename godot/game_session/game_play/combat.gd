@@ -573,8 +573,8 @@ func _allocation_is_valid():
 func __on_allocate_attacker_for_exchange(unit: GamePiece):
 	assert(unit not in allocated)
 	assert(unit in can_be_allocated)
-	retreating.get_node("Label").text = "Allocated"
-	retreating.get_node("Label").show()
+	unit.get_node("Label").text = "Allocated"
+	unit.get_node("Label").show()
 	allocated.append(unit)
 	strength_to_allocate -= attacking[unit]
 	if not current_player.is_computer:
@@ -583,7 +583,7 @@ func __on_allocate_attacker_for_exchange(unit: GamePiece):
 func __on_unallocate_attacker_for_exchange(unit: GamePiece):
 	assert(unit in allocated)
 	assert(unit in attacking)
-	retreating.get_node("Label").hide()
+	unit.get_node("Label").hide()
 	strength_to_allocate += attacking[unit]
 	allocated.erase(unit)
 	if not current_player.is_computer:
@@ -594,7 +594,7 @@ func __on_exchange_loss_allocation_confirmed():
 	if not current_player.is_computer:
 		unit_layer.unit_unselected.disconnect(__on_unallocate_attacker_for_exchange)
 	for unit in allocated:
-		retreating.get_node("Label").hide()
+		unit.get_node("Label").hide()
 		died_from_last_combat.append(unit)
 		unit.unselect()
 	schedule_event("combat resolved")
