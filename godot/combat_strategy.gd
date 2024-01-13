@@ -10,6 +10,7 @@ func get_attackers_choice(allies, enemies, attacking, attacked, defended):
 		if enemy.kind == Enums.Unit.Duke and len(Board.get_units_on(enemy.tile)) > 1: continue
 		var can_attack = []
 		for ally in allies:
+			if ally.kind == Enums.Unit.Duke: continue
 			if ally in attacked: continue
 			if not Rules.is_in_range(ally, enemy): continue
 			if ally.kind != Enums.Unit.Artillery and MapData.map.borders.get(0.5 * (ally.tile + enemy.tile)) == "River": continue
