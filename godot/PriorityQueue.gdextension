@@ -9,5 +9,5 @@ linux.release.x86_64 = "res://../priority_queue-gdextension/target/debug/libprio
 #windows.release.x86_64 = "../priority_queue-gdextension/target/debug/libpriority_queue_for_war_of_the_dukes.dll"
 #macos.debug = "../priority_queue-gdextension/target/debug/libpriority_queue_for_war_of_the_dukes.dylib"
 #macos.release = "../priority_queue-gdextension/target/debug/libpriority_queue_for_war_of_the_dukes.dylib"
-#macos.debug.arm64 = "../priority_queue-gdextension/target/debug/libpriority_queue_for_war_of_the_dukes.dylib"
+macos.debug.arm64 = "../priority_queue-gdextension/target/debug/libpriority_queue_for_war_of_the_dukes.dylib"
 #macos.release.arm64 = "../priority_queue-gdextension/target/debug/libpriority_queue_for_war_of_the_dukes.dylib"
