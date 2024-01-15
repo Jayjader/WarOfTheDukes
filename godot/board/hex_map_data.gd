@@ -115,6 +115,12 @@ func paths_for(unit: GamePiece, others: Array[GamePiece]) -> Dictionary:
 					# we've found a shorter path than previously recorded to reach `to_`
 					reached[to_].from = next.tile
 					reached[to_].cost_to_reach = movement_cost
+					frontier.insert({
+						tile = to_,
+						priority = movement_cost,
+						cost_to_reach = movement_cost,
+						is_in_enemy_zoc = is_in_enemy_zoc(to_, enemy_tiles)
+					})
 			else:
 				var is_moving_into_enemy_zoc = is_in_enemy_zoc(to_, enemy_tiles)
 				if next.is_in_enemy_zoc and is_moving_into_enemy_zoc:
