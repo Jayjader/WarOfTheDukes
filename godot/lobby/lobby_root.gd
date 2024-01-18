@@ -9,3 +9,6 @@ signal lobby_ready(orf_is_computer: bool, wulf_is_computer: bool)
 
 func _on_confirm_pressed():
 	lobby_ready.emit(orf.is_pressed(), wulf.is_pressed())
+
+func _ready():
+	$HFlowContainer/PanelContainer2/Margins/VBox/Confirm.grab_focus()
