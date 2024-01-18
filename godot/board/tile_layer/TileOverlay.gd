@@ -172,8 +172,6 @@ func load_calibration_data():
 	if data == null:
 		return { mode = Enums.TileOverlayCalibration.UNCALIBRATED }
 	return data
-
-
 func paint_tile(position_in_axial: Vector2i, kind: String):
 	if kind == "EraseTile":
 		MapData.map.tiles.erase(position_in_axial)
