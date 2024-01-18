@@ -488,9 +488,9 @@ func __on_attacker_selected_for_retreat(unit: GamePiece):
 	retreating = unit
 	schedule_event("attacker chosen to retreat")
 func __on_choose_retreating_attacker_state_exited():
-	unit_layer.make_units_selectable([])
 	if unit_layer.unit_selected.is_connected(__on_attacker_selected_for_retreat):
 		unit_layer.unit_selected.disconnect(__on_attacker_selected_for_retreat)
+	unit_layer.make_units_selectable([])
 func __on_choose_retreating_attacker_destination_state_entered():
 	var other_live_units: Array[GamePiece] = []
 	for unit in alive:
