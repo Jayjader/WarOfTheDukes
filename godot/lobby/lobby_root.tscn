@@ -112,6 +112,7 @@ theme_override_constants/margin_bottom = 10
 layout_mode = 2
 
 [node name="victory explanation" type="Label" parent="HFlowContainer/PanelContainer/inner padding/vbox"]
+custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "There are 2 contested zones on the board, 1 in each faction's territory: the river-island city of Kaiserberg and the land between the two river tributaries further south."
 autowrap_mode = 3
@@ -169,6 +170,7 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_mwo1j")
 text = "Wulfenburg"
 
 [node name="wulf minor" type="Label" parent="HFlowContainer/PanelContainer/inner padding/vbox/GridContainer"]
+custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_styles/normal = SubResource("StyleBoxFlat_snrw6")
