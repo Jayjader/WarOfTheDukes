@@ -198,8 +198,9 @@ func _calculate_effective_defense_strength(unit: GamePiece):
 var defending # : GamePiece
 var can_defend: Array[GamePiece] = []
 func __on_change_attackers_pressed():
-	defending.get_node("Label").hide()
-	defending = null
+	if defending != null:
+		defending.get_node("Label").hide()
+		defending = null
 	schedule_event("change attackers")
 func __on_unit_selected_for_defense(unit):
 	defending = unit
