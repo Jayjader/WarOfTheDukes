@@ -388,6 +388,7 @@ func __on_view_result_state_entered():
 		Enums.CombatResult.DefenderRetreats:
 			emitted_event = "defender retreats"
 	%ConfirmCombatResult.show()
+	%ConfirmCombatResult.grab_focus.call_deferred()
 func __on_confirm_combat_result_pressed():
 	schedule_event(emitted_event)
 	defending.unselect()
