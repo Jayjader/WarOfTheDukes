@@ -1,4 +1,4 @@
-extends Node2D
+extends Control
 
 @onready var font = get_window().get_theme_default_font()
 
@@ -12,6 +12,7 @@ signal tile_hovered(tile: Vector2i)
 	set(value):
 		if draw_hover != value:
 			queue_redraw()
+		grab_focus()
 		draw_hover = value
 
 #@export var capture_click: bool = false
@@ -30,7 +31,7 @@ func _unhandled_input(event):
 				tile_hovered.emit(hovered_tile)
 
 func _draw() -> void:
-	if draw_hover and hovered_tile != null:
+	if has_focus() and hovered_tile != null:
 		var hex_size = MapData.map.hex_size_in_pixels
 		var hovered_center_in_pix = Util.hex_coords_to_pixel(hovered_tile, hex_size)
 		Drawing.draw_hex(self, hovered_center_in_pix, hex_size, Color.LIGHT_SALMON)

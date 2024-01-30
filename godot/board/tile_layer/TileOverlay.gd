@@ -13,14 +13,16 @@ signal br_set(position)
 signal tr_set(position)
 signal tl_set(position)
 
+@onready var cursor = %PlayerCursor
+
 @export var report_hovered_hex: bool = false:
 	get:
 		if self.is_node_ready():
-			return %HoverClick.capture_hover
+			return cursor.capture_hover
 		return false
 	set(value):
 		if self.is_node_ready():
-			%HoverClick.capture_hover = value
+			cursor.capture_hover = value
 			if not value:
 				state.erase("hover")
 				queue_redraw()

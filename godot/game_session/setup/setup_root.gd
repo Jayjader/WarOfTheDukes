@@ -29,6 +29,7 @@ func set_phase(value):
 
 @onready var unit_layer = Board.get_node("%UnitLayer")
 @onready var deployment_ui = Board.get_node("%TileOverlay/DeploymentZone")
+@onready var cursor = Board.get_node("%PlayerCursor")
 
 var phase
 
@@ -288,6 +289,7 @@ func _ready():
 
 
 func _on_fill_cities_and_forts_state_entered():
+	cursor.grab_focus()
 	set_phase(Enums.SetupPhase.FILL_CITIES_FORTS)
 
 

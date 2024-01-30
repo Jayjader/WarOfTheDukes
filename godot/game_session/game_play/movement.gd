@@ -2,7 +2,7 @@ extends Node
 
 @onready var unit_layer: UnitLayer = Board.get_node("%UnitLayer")
 @onready var tile_layer = Board.get_node("%TileOverlay")
-@onready var hover_click = Board.get_node("%HoverClick")
+@onready var cursor = Board.get_node("%PlayerCursor")
 @onready var scene_tree_process_frame = get_tree().process_frame
 func schedule(c):
 	scene_tree_process_frame.connect(c, CONNECT_ONE_SHOT)
@@ -108,7 +108,7 @@ func __on_choose_destination_state_entered():
 			if destinations[tile].can_stop_here:
 				can_stop.append(tile)
 		can_stop.erase(mover.tile)
-		hover_click.show()
+		cursor.show()
 		Board.report_hover_for_tiles(can_cross)
 		Board.report_click_for_tiles(can_stop)
 		Board.hex_clicked.connect(__on_tile_chosen_as_destination, CONNECT_ONE_SHOT)
@@ -126,7 +126,7 @@ func __on_choose_destination_state_exited():
 			Board.hex_clicked.disconnect(__on_tile_chosen_as_destination)
 		Board.report_hover_for_tiles([])
 		Board.report_click_for_tiles([])
-		hover_click.hide()
+		cursor.hide()
 		tile_layer.clear_destinations()
 
 

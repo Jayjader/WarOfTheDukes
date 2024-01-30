@@ -22,6 +22,8 @@ var report_click_tiles: Array[Vector2i] = []
 
 			%Background.set_self_modulate(Color.WHITE if editing else Color.TRANSPARENT)
 
+@onready var cursor = %PlayerCursor
+
 func _ready():
 	# resolve @tool and autoload clash
 	#if Engine.is_editor_hint() and get_viewport() is Window:

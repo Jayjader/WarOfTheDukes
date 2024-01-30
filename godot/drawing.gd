@@ -1,7 +1,7 @@
 extends Object
 class_name Drawing
 
-static func draw_hex(node: Node2D, center: Vector2i, hex_size: float, color:Color=Color.RED, angle_offset:float=0):
+static func draw_hex(node: CanvasItem, center: Vector2i, hex_size: float, color:Color=Color.RED, angle_offset:float=0):
 	for i in range(6):
 		node.draw_line(
 			Util.hex_corner_trig(center, hex_size, i, angle_offset),
