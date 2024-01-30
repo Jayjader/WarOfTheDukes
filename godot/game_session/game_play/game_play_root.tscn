@@ -1,15 +1,36 @@
-[gd_scene load_steps=11 format=3 uid="uid://dn24y8eq6bsf"]
+[gd_scene load_steps=14 format=3 uid="uid://dn24y8eq6bsf"]
 
 [ext_resource type="Script" path="res://game_session/game_play/game_play_root.gd" id="1_kicvc"]
 [ext_resource type="Script" path="res://game_session/game_play/combat.gd" id="3_3xcs7"]
 [ext_resource type="Script" path="res://game_session/game_play/movement.gd" id="8_w53gd"]
 [ext_resource type="StyleBox" uid="uid://bfoveihuvrux5" path="res://kenney_ui_rpg/stone_panel_stylebox.tres" id="10_y5nfl"]
+[ext_resource type="Texture2D" uid="uid://cssg6vlttu5fj" path="res://kenney_ui_rpg/uipack_rpg_vector.svg" id="11_kee8j"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="20_qywoi"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/parallel_state.gd" id="21_i6w5i"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="22_07qe0"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="23_hxj8n"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="24_uvwcr"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/history_state.gd" id="25_kms61"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_kkb1u"]
+texture = ExtResource("11_kee8j")
+texture_margin_left = 7.0
+texture_margin_top = 7.0
+texture_margin_right = 7.0
+texture_margin_bottom = 11.0
+axis_stretch_horizontal = 2
+axis_stretch_vertical = 2
+region_rect = Rect2(358, 61, 190, 49)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_iaqtm"]
+texture = ExtResource("11_kee8j")
+texture_margin_left = 7.0
+texture_margin_top = 7.0
+texture_margin_right = 7.0
+texture_margin_bottom = 7.0
+axis_stretch_horizontal = 2
+axis_stretch_vertical = 2
+region_rect = Rect2(568, 65, 190, 45)
 
 [node name="GamePlayRoot" type="Control" node_paths=PackedStringArray("state_chart")]
 layout_mode = 3
@@ -395,6 +416,8 @@ autowrap_mode = 3
 
 [node name="ToggleInstructions" type="Button" parent="BottomLeftMargin/HBoxContainer/VBox"]
 layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_kkb1u")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_iaqtm")
 toggle_mode = true
 button_pressed = true
 text = "View Instructions"
