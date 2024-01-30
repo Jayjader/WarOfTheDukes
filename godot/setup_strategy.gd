@@ -41,9 +41,9 @@ func choose_piece_to_place(
 	biais.sort_custom(by_biais)
 	var placed = _count_pieces(pieces)
 	var choice: Enums.Unit = [Enums.Unit.Infantry, Enums.Unit.Cavalry, Enums.Unit.Artillery, Enums.Unit.Duke].reduce(
-		func (choice, next_unit):
-			if placed[true][choice] < Enums.MaxUnitCount[choice]:
-				return choice
+		func (choice_, next_unit):
+			if placed[true][choice_] < Enums.MaxUnitCount[choice_]:
+				return choice_
 			else:
 				return next_unit
 			,
