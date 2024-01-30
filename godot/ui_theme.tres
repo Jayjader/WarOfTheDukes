@@ -1,0 +1,56 @@
+[gd_resource type="Theme" load_steps=8 format=3 uid="uid://b5uxy11v3bpmy"]
+
+[ext_resource type="Texture2D" uid="uid://cssg6vlttu5fj" path="res://kenney_ui_rpg/uipack_rpg_vector.svg" id="1_gaj3n"]
+[ext_resource type="StyleBox" uid="uid://ba246j6074a4c" path="res://kenney_ui_rpg/wood_panel_stylebox.tres" id="2_8hhbv"]
+[ext_resource type="StyleBox" uid="uid://bfoveihuvrux5" path="res://kenney_ui_rpg/stone_panel_stylebox.tres" id="2_g2bht"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_jomms"]
+texture = ExtResource("1_gaj3n")
+texture_margin_left = 7.0
+texture_margin_top = 7.0
+texture_margin_right = 7.0
+texture_margin_bottom = 11.0
+axis_stretch_horizontal = 2
+axis_stretch_vertical = 2
+region_rect = Rect2(358, 1, 190, 49)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_14ixp"]
+texture = ExtResource("1_gaj3n")
+texture_margin_left = 7.0
+texture_margin_top = 7.0
+texture_margin_right = 7.0
+texture_margin_bottom = 11.0
+axis_stretch_horizontal = 2
+axis_stretch_vertical = 2
+region_rect = Rect2(358, 181, 190, 49)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_rl7kr"]
+texture = ExtResource("1_gaj3n")
+texture_margin_left = 7.0
+texture_margin_top = 7.0
+texture_margin_right = 7.0
+texture_margin_bottom = 11.0
+axis_stretch_horizontal = 2
+axis_stretch_vertical = 2
+region_rect = Rect2(358, 1, 190, 49)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_8vmhc"]
+texture = ExtResource("1_gaj3n")
+texture_margin_left = 7.0
+texture_margin_top = 7.0
+texture_margin_right = 7.0
+texture_margin_bottom = 7.0
+axis_stretch_horizontal = 2
+axis_stretch_vertical = 2
+region_rect = Rect2(568, 5, 190, 45)
+
+[resource]
+Button/colors/font_hover_color = Color(0.270588, 0.282353, 0.34902, 1)
+Button/styles/disabled = SubResource("StyleBoxTexture_jomms")
+Button/styles/hover = SubResource("StyleBoxTexture_14ixp")
+Button/styles/normal = SubResource("StyleBoxTexture_rl7kr")
+Button/styles/pressed = SubResource("StyleBoxTexture_8vmhc")
+Panel/styles/panel = ExtResource("2_8hhbv")
+PanelContainer/styles/panel = ExtResource("2_8hhbv")
+TabContainer/styles/panel = ExtResource("2_g2bht")
+Tree/styles/panel = ExtResource("2_g2bht")

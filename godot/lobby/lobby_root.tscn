@@ -1,6 +1,7 @@
-[gd_scene load_steps=11 format=3 uid="uid://b13hl7reavp6q"]
+[gd_scene load_steps=12 format=3 uid="uid://b13hl7reavp6q"]
 
 [ext_resource type="Script" path="res://lobby/lobby_root.gd" id="1_lrfw5"]
+[ext_resource type="StyleBox" uid="uid://bfoveihuvrux5" path="res://kenney_ui_rpg/stone_panel_stylebox.tres" id="2_bcaf5"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_juxf0"]
 content_margin_left = 10.0
@@ -100,6 +101,7 @@ alignment = 1
 [node name="PanelContainer" type="PanelContainer" parent="HFlowContainer"]
 custom_minimum_size = Vector2(860, 0)
 layout_mode = 2
+theme_override_styles/panel = ExtResource("2_bcaf5")
 
 [node name="inner padding" type="MarginContainer" parent="HFlowContainer/PanelContainer"]
 layout_mode = 2

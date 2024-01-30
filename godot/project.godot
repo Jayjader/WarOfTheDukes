@@ -38,6 +38,7 @@ enabled=PackedStringArray("res://addons/godot_state_charts/plugin.cfg")
 [gui]
 
 theme/default_theme_scale=2.0
+theme/custom="res://ui_theme.tres"
 
 [importer_defaults]
 

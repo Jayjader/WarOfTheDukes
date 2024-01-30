@@ -1,8 +1,9 @@
-[gd_scene load_steps=10 format=3 uid="uid://dn24y8eq6bsf"]
+[gd_scene load_steps=11 format=3 uid="uid://dn24y8eq6bsf"]
 
 [ext_resource type="Script" path="res://game_session/game_play/game_play_root.gd" id="1_kicvc"]
 [ext_resource type="Script" path="res://game_session/game_play/combat.gd" id="3_3xcs7"]
 [ext_resource type="Script" path="res://game_session/game_play/movement.gd" id="8_w53gd"]
+[ext_resource type="StyleBox" uid="uid://bfoveihuvrux5" path="res://kenney_ui_rpg/stone_panel_stylebox.tres" id="10_y5nfl"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="20_qywoi"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/parallel_state.gd" id="21_i6w5i"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="22_07qe0"]
@@ -200,7 +201,6 @@ event = &"unit choice for retreat cancelled"
 
 [node name="Resume Retreat" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat"]
 script = ExtResource("25_kms61")
-deep = true
 default_state = NodePath("../Retreat Defender")
 
 [node name="Pursue Retreating Defender?" type="Node" parent="StateChart/ParallelState/Phase/Combat/Resolve Combat"]
@@ -266,6 +266,7 @@ theme_override_constants/margin_top = 20
 [node name="Panel" type="PanelContainer" parent="TopMargin"]
 layout_mode = 2
 size_flags_vertical = 0
+theme_override_styles/panel = ExtResource("10_y5nfl")
 
 [node name="Margins" type="MarginContainer" parent="TopMargin/Panel"]
 layout_mode = 2
