@@ -109,9 +109,11 @@ func _sync_buttons(player: PlayerRs):
 			selection_button.grab_focus()
 			selection_button.set_pressed(true)
 
+@onready var auto_setup = %AutoSetup
 var auto_place = false
 func _on_auto_setup_pressed():
 	auto_place = true;
+	auto_setup.disabled = true
 func query_current_player_for_deployment_tile():
 	var pieces_placed = _pieces_placed_summary()
 	print_debug("querying %s..." % Enums.Faction.find_key(current_player.faction))
@@ -137,6 +139,8 @@ func query_current_player_for_deployment_tile():
 		var choices = strategy.choose_piece_to_place(pieces_placed, tiles)
 		placing = get_first_with_remaining(current_player.faction) # choices[0]
 		choice = choices[1]
+		print_debug("%s chosen." % Enums.Unit.find_key(placing))
+		scene_tree_process_frame.connect(choose_tile.bind(current_player, placing, choice), CONNECT_ONE_SHOT)
 	else:
 		_sync_buttons(current_player)
 		var occupied_tiles = pieces_placed.map(func(p): return p.tile)
@@ -144,17 +148,22 @@ func query_current_player_for_deployment_tile():
 		for tile in deployment_tiles_for_player(current_player, phase):
 			if tile not in occupied_tiles:
 				current_tiles.append(tile)
-		Board.report_hover_for_tiles(current_tiles)
-		Board.report_click_for_tiles(current_tiles)
+		cursor.choose_tile(current_tiles)
+		#Board.report_hover_for_tiles(current_tiles)
+		#Board.report_click_for_tiles(current_tiles)
 		deployment_ui.tiles = current_tiles
 		deployment_ui.queue_redraw()
-		choice = (await Board.hex_clicked)[0]
+		cursor.tile_clicked.connect(__on_player_tile_click_for_deployment, CONNECT_ONE_SHOT)
+
+func __on_player_tile_click_for_deployment(tile: Vector2i):
+		#choice = (await Board.hex_clicked)[0]
+		var choice = tile
 		deployment_ui.tiles.clear()
 		deployment_ui.queue_redraw()
-		Board.report_hover_for_tiles([])
-		Board.report_click_for_tiles([])
-	print_debug("%s chosen." % Enums.Unit.find_key(placing))
-	scene_tree_process_frame.connect(choose_tile.bind(current_player, placing, choice), CONNECT_ONE_SHOT)
+		#Board.report_hover_for_tiles([])
+		#Board.report_click_for_tiles([])
+		print_debug("%s chosen." % Enums.Unit.find_key(placing))
+		scene_tree_process_frame.connect(choose_tile.bind(current_player, placing, choice), CONNECT_ONE_SHOT)
 
 var placed: Dictionary
 

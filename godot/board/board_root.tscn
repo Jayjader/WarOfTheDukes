@@ -5,12 +5,12 @@
 [ext_resource type="Texture2D" uid="uid://dgr4iw8ue00sq" path="res://docs/La guerre des ducs - Encart.jpg" id="3_o7vri"]
 [ext_resource type="Script" path="res://board/unit_layer/unit_layer_root.gd" id="4_3bm0a"]
 [ext_resource type="Script" path="res://board/tile_layer/movement_range.gd" id="4_6mrs1"]
-[ext_resource type="Script" path="res://board/tile_layer/player_cursor.gd" id="4_7yuta"]
 [ext_resource type="Script" path="res://board/tile_layer/deployment_zone.gd" id="4_dn2ii"]
 [ext_resource type="Script" path="res://game_session/OverBoardCamera.gd" id="5_eokpn"]
 [ext_resource type="Script" path="res://board/tile_layer/retreat_range.gd" id="5_otyml"]
 [ext_resource type="Script" path="res://board/Direct.gd" id="6_s8gsq"]
 [ext_resource type="Script" path="res://board/Palette.gd" id="7_6tn5h"]
+[ext_resource type="PackedScene" uid="uid://g7pncedb7y4v" path="res://board/cursor/player_cursor.tscn" id="7_q4yks"]
 [ext_resource type="ButtonGroup" uid="uid://c0b178urbj1gl" path="res://board/editing_palette_selection_button_group.tres" id="8_6v8i5"]
 
 [node name="BoardRoot" type="Control"]
@@ -65,17 +65,13 @@ script = ExtResource("4_6mrs1")
 [node name="RetreatRange" type="Node2D" parent="ViewportContainer/SubViewport/TileOverlay"]
 script = ExtResource("5_otyml")
 
-[node name="PlayerCursor" type="Control" parent="ViewportContainer/SubViewport/TileOverlay"]
-unique_name_in_owner = true
-layout_mode = 3
-anchors_preset = 0
-focus_mode = 2
-script = ExtResource("4_7yuta")
-
 [node name="UnitLayer" type="Node2D" parent="ViewportContainer/SubViewport"]
 unique_name_in_owner = true
 script = ExtResource("4_3bm0a")
 graveyard = Vector2i(-1, -1)
+
+[node name="PlayerCursor" parent="ViewportContainer/SubViewport" instance=ExtResource("7_q4yks")]
+unique_name_in_owner = true
 
 [node name="OverBoardCamera" type="Camera2D" parent="ViewportContainer/SubViewport"]
 editor_draw_limits = true
@@ -324,6 +320,7 @@ text = "Erase Zone"
 layout_mode = 2
 columns = 2
 
+[connection signal="focus_entered" from="." to="." method="__on_focus_entered"]
 [connection signal="toggled_editing" from="." to="ViewportContainer/SubViewport/TileOverlay" method="toggle_editing"]
 [connection signal="bl_set" from="ViewportContainer/SubViewport/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_bl_set"]
 [connection signal="br_set" from="ViewportContainer/SubViewport/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_br_set"]
@@ -333,9 +330,6 @@ columns = 2
 [connection signal="hex_hovered" from="ViewportContainer/SubViewport/TileOverlay" to="." method="_on_tile_overlay_hex_hovered"]
 [connection signal="tl_set" from="ViewportContainer/SubViewport/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_tl_set"]
 [connection signal="tr_set" from="ViewportContainer/SubViewport/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_tr_set"]
-[connection signal="tile_hovered" from="ViewportContainer/SubViewport/TileOverlay/PlayerCursor" to="ViewportContainer/SubViewport/TileOverlay" method="_on_hex_hovered"]
-[connection signal="tile_hovered" from="ViewportContainer/SubViewport/TileOverlay/PlayerCursor" to="ViewportContainer/SubViewport/TileOverlay/MovementRange" method="_on_tile_hovered"]
-[connection signal="tile_hovered" from="ViewportContainer/SubViewport/TileOverlay/PlayerCursor" to="ViewportContainer/SubViewport/TileOverlay/RetreatRange" method="__on_tile_hovered"]
 [connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/RestartCalibration" to="ViewportContainer/SubViewport/TileOverlay" method="start_calibration"]
 [connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/ChangeCalibrationStep/Previous" to="ViewportContainer/SubViewport/TileOverlay" method="previous_calibration_step"]
 [connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/ChangeCalibrationStep/Next" to="ViewportContainer/SubViewport/TileOverlay" method="next_calibration_step"]

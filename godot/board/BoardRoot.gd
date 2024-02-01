@@ -23,6 +23,8 @@ var report_click_tiles: Array[Vector2i] = []
 			%Background.set_self_modulate(Color.WHITE if editing else Color.TRANSPARENT)
 
 @onready var cursor = %PlayerCursor
+func __on_focus_entered():
+	cursor.grab_focus()
 
 func _ready():
 	# resolve @tool and autoload clash
@@ -88,3 +90,4 @@ func _on_setup_root_unit_placed(tile, kind, faction):
 
 func wipe_units_off():
 	%UnitLayer._remove_all_pieces()
+

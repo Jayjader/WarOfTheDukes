@@ -1,0 +1,85 @@
+[gd_scene load_steps=7 format=3 uid="uid://g7pncedb7y4v"]
+
+[ext_resource type="Script" path="res://board/tile_layer/player_cursor.gd" id="1_ts2ek"]
+[ext_resource type="Texture2D" uid="uid://bg6axyqmjj4ov" path="res://kenney_ui_rpg/cursor.tres" id="2_6lahy"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="3_agdh4"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="4_wx2lj"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="5_wnm0a"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="6_d07cb"]
+
+[node name="PlayerCursor" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+focus_mode = 2
+mouse_filter = 1
+script = ExtResource("1_ts2ek")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("2_6lahy")
+stretch_mode = 5
+
+[node name="coords" type="Label" parent="."]
+layout_mode = 0
+offset_top = 42.0
+offset_right = 40.0
+offset_bottom = 87.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+
+[node name="StateChart" type="Node" parent="."]
+script = ExtResource("3_agdh4")
+track_in_editor = true
+
+[node name="cursor state" type="Node" parent="StateChart"]
+script = ExtResource("4_wx2lj")
+initial_state = NodePath("read only")
+
+[node name="read only" type="Node" parent="StateChart/cursor state"]
+script = ExtResource("5_wnm0a")
+
+[node name="to inspect" type="Node" parent="StateChart/cursor state/read only"]
+script = ExtResource("6_d07cb")
+to = NodePath("../../inspect")
+event = &"inspect"
+
+[node name="to choose tile" type="Node" parent="StateChart/cursor state/read only"]
+script = ExtResource("6_d07cb")
+to = NodePath("../../choose tile")
+event = &"choose tile"
+
+[node name="to choose unit" type="Node" parent="StateChart/cursor state/read only"]
+script = ExtResource("6_d07cb")
+to = NodePath("../../choose unit")
+event = &"choose unit"
+
+[node name="inspect" type="Node" parent="StateChart/cursor state"]
+script = ExtResource("5_wnm0a")
+
+[node name="to read only" type="Node" parent="StateChart/cursor state/inspect"]
+script = ExtResource("6_d07cb")
+to = NodePath("../../read only")
+event = &"stop inspecting"
+
+[node name="choose tile" type="Node" parent="StateChart/cursor state"]
+script = ExtResource("5_wnm0a")
+
+[node name="to read only" type="Node" parent="StateChart/cursor state/choose tile"]
+script = ExtResource("6_d07cb")
+to = NodePath("../../read only")
+event = &"stop choosing tile"
+
+[node name="choose unit" type="Node" parent="StateChart/cursor state"]
+script = ExtResource("5_wnm0a")
+
+[node name="to read only" type="Node" parent="StateChart/cursor state/choose unit"]
+script = ExtResource("6_d07cb")
+to = NodePath("../../read only")
+event = &"stop choosing unit"
+
+[connection signal="state_entered" from="StateChart/cursor state/read only" to="." method="__on_read_only_state_entered"]
+[connection signal="state_entered" from="StateChart/cursor state/inspect" to="." method="__on_inspect_state_entered"]
+[connection signal="state_entered" from="StateChart/cursor state/choose tile" to="." method="__on_choose_tile_state_entered"]
+[connection signal="state_entered" from="StateChart/cursor state/choose unit" to="." method="__on_choose_unit_state_entered"]

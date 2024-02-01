@@ -85,7 +85,9 @@ text = "Orfburg (Computer)"
 script = ExtResource("2_eoobw")
 
 [node name="AutoSetup" type="Button" parent="MarginContainer/PanelContainer/Margins/HBox/VBox"]
+unique_name_in_owner = true
 layout_mode = 2
+toggle_mode = true
 text = "Auto Setup Remaining"
 
 [node name="VSeparator" type="VSeparator" parent="MarginContainer/PanelContainer/Margins/HBox"]

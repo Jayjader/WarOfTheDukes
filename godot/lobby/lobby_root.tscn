@@ -246,6 +246,7 @@ text = "(Orfburg goes first)"
 horizontal_alignment = 1
 
 [node name="Confirm" type="Button" parent="HFlowContainer/PanelContainer2/Margins/VBox"]
+unique_name_in_owner = true
 layout_mode = 2
 focus_neighbor_top = NodePath("../Players/WulfIsComputer")
 focus_next = NodePath("../Players/OrfIsComputer")

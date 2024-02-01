@@ -78,14 +78,14 @@ func _ready():
 	sprite.scale *= (1.25 * MapData.map.hex_size_in_pixels / sprite.texture.get_width())
 	sprite.self_modulate = Drawing.faction_colors[faction]
 
-func _unhandled_input(event):
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
-		if selectable:
-			var hex_size = MapData.map.hex_size_in_pixels
-			var clicked_tile = Util.nearest_hex_in_axial(get_viewport_transform().affine_inverse() * event.position, Vector2i(0, 0), hex_size)
-			if clicked_tile == self.tile:
-				get_viewport().set_input_as_handled()
-				if _selected:
-					unselect()
-				else:
-					select()
+#func _unhandled_input(event):
+#	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
+#		if selectable:
+#			var hex_size = MapData.map.hex_size_in_pixels
+#			var clicked_tile = Util.nearest_hex_in_axial(get_viewport_transform().affine_inverse() * event.position, Vector2i(0, 0), h#ex_size)
+#			if clicked_tile == self.tile:
+#				get_viewport().set_input_as_handled()
+#				if _selected:
+#					unselect()
+#				else:
+#					select()

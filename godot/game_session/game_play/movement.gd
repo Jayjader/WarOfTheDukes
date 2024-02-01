@@ -73,14 +73,22 @@ func __on_choose_mover_state_entered():
 	else:
 		%EndMovementPhase.show()
 		mover = null
+		var can_choose : Array[GamePiece] = []
 		for unit in alive:
-			unit.selectable = unit.faction == current_player.faction and unit not in moved
+			if unit.faction == current_player.faction and unit not in moved:
+				unit.selectable = true
+				can_choose.append(unit)
+			else:
+				unit.selectable = false
 		unit_layer.unit_selected.connect(__on_unit_selected_for_move)
+		cursor.choose_unit(can_choose)
+
 func __on_choose_mover_state_exited():
 	%EndMovementPhase.hide()
 	if not current_player.is_computer:
 		unit_layer.make_units_selectable([])
 		unit_layer.unit_selected.disconnect(__on_unit_selected_for_move)
+		cursor.stop_choosing_unit()
 
 
 ### Choose Destination
@@ -102,16 +110,14 @@ func __on_choose_destination_state_entered():
 		var destinations = Board.paths_for(mover)
 		tile_layer.set_destinations(destinations)
 		var can_cross: Array[Vector2i] = []
-		var can_stop: Array[Vector2i] = []
+		var can_stop: Array[Vector2i] = [mover.tile]
 		for tile in destinations.keys():
 			can_cross.append(tile)
 			if destinations[tile].can_stop_here:
 				can_stop.append(tile)
 		can_stop.erase(mover.tile)
-		cursor.show()
-		Board.report_hover_for_tiles(can_cross)
-		Board.report_click_for_tiles(can_stop)
-		Board.hex_clicked.connect(__on_tile_chosen_as_destination, CONNECT_ONE_SHOT)
+		cursor.choose_tile(can_stop)
+		cursor.tile_clicked.connect(__on_tile_chosen_as_destination, CONNECT_ONE_SHOT)
 
 func __on_choose_destination_state_exited():
 	if current_player.is_computer:
@@ -122,11 +128,9 @@ func __on_choose_destination_state_exited():
 		mover.unselect()
 		mover.selectable = false
 		%CancelMoverChoice.hide()
-		if Board.hex_clicked.is_connected(__on_tile_chosen_as_destination):
-			Board.hex_clicked.disconnect(__on_tile_chosen_as_destination)
-		Board.report_hover_for_tiles([])
-		Board.report_click_for_tiles([])
-		cursor.hide()
+		cursor.stop_choosing_tile()
+		if cursor.tile_clicked.is_connected(__on_tile_chosen_as_destination):
+			cursor.tile_clicked.disconnect(__on_tile_chosen_as_destination)
 		tile_layer.clear_destinations()
 
 

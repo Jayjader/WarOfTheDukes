@@ -1,0 +1,7 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://ehksmscygyph"]
+
+[ext_resource type="Texture2D" uid="uid://cssg6vlttu5fj" path="res://kenney_ui_rpg/uipack_rpg_vector.svg" id="1_n67s3"]
+
+[resource]
+atlas = ExtResource("1_n67s3")
+region = Rect2(306, 248, 31, 29)
