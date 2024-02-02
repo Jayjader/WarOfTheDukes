@@ -149,21 +149,15 @@ func query_current_player_for_deployment_tile():
 			if tile not in occupied_tiles:
 				current_tiles.append(tile)
 		cursor.choose_tile(current_tiles)
-		#Board.report_hover_for_tiles(current_tiles)
-		#Board.report_click_for_tiles(current_tiles)
 		deployment_ui.tiles = current_tiles
 		deployment_ui.queue_redraw()
 		cursor.tile_clicked.connect(__on_player_tile_click_for_deployment, CONNECT_ONE_SHOT)
 
 func __on_player_tile_click_for_deployment(tile: Vector2i):
-		#choice = (await Board.hex_clicked)[0]
-		var choice = tile
 		deployment_ui.tiles.clear()
 		deployment_ui.queue_redraw()
-		#Board.report_hover_for_tiles([])
-		#Board.report_click_for_tiles([])
 		print_debug("%s chosen." % Enums.Unit.find_key(placing))
-		scene_tree_process_frame.connect(choose_tile.bind(current_player, placing, choice), CONNECT_ONE_SHOT)
+		scene_tree_process_frame.connect(choose_tile.bind(current_player, placing, tile), CONNECT_ONE_SHOT)
 
 var placed: Dictionary
 
