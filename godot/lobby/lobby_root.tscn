@@ -215,20 +215,19 @@ columns = 2
 layout_mode = 2
 text = "Orfburg:"
 
-[node name="OrfIsComputer" type="CheckButton" parent="HFlowContainer/PanelContainer2/Margins/VBox/Players"]
+[node name="OrfIsComputer" type="CheckBox" parent="HFlowContainer/PanelContainer2/Margins/VBox/Players"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
 focus_neighbor_bottom = NodePath("../WulfIsComputer")
 focus_next = NodePath("../WulfIsComputer")
-action_mode = 0
 text = "Computer"
 
 [node name="wulfenburg label" type="Label" parent="HFlowContainer/PanelContainer2/Margins/VBox/Players"]
 layout_mode = 2
 text = "Wulfenburg:"
 
-[node name="WulfIsComputer" type="CheckButton" parent="HFlowContainer/PanelContainer2/Margins/VBox/Players"]
+[node name="WulfIsComputer" type="CheckBox" parent="HFlowContainer/PanelContainer2/Margins/VBox/Players"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
@@ -237,7 +236,6 @@ focus_neighbor_bottom = NodePath("../../Confirm")
 focus_next = NodePath("../../Confirm")
 focus_previous = NodePath("../OrfIsComputer")
 button_pressed = true
-action_mode = 0
 text = "Computer"
 
 [node name="Hint" type="Label" parent="HFlowContainer/PanelContainer2/Margins/VBox"]
