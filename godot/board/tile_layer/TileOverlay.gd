@@ -261,18 +261,6 @@ func _unhandled_input(event):
 		var origin = tiles_origin
 		match current_mode:
 			Enums.TileOverlayMode.READ_ONLY:
-				if report_clicked_hex:
-					print_debug("hex clicked at pix %s" % integer_pix)
-					var tile = Util.nearest_hex_in_axial(integer_pix, origin, MapData.map.hex_size_in_pixels)
-					var tile_kind = MapData.map.tiles.get(tile)
-					if tile_kind == null:
-						return
-					get_viewport().set_input_as_handled()
-					var zones = []
-					for zone in MapData.map.zones:
-						if MapData.map.zones[zone].has(tile):
-							zones.append(zone)
-					hex_clicked.emit(tile, tile_kind, zones)
 					return
 			Enums.TileOverlayMode.CALIBRATING:
 				match calibration.mode:

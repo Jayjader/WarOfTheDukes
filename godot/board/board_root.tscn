@@ -326,8 +326,6 @@ columns = 2
 [connection signal="br_set" from="ViewportContainer/SubViewport/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_br_set"]
 [connection signal="calibration_step_changed" from="ViewportContainer/SubViewport/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/CalibrationMode" method="set_text"]
 [connection signal="display_mode_changed" from="ViewportContainer/SubViewport/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/CalibrationMode" method="set_text"]
-[connection signal="hex_clicked" from="ViewportContainer/SubViewport/TileOverlay" to="." method="_on_tile_overlay_hex_clicked"]
-[connection signal="hex_hovered" from="ViewportContainer/SubViewport/TileOverlay" to="." method="_on_tile_overlay_hex_hovered"]
 [connection signal="tl_set" from="ViewportContainer/SubViewport/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_tl_set"]
 [connection signal="tr_set" from="ViewportContainer/SubViewport/TileOverlay" to="UIRoot/Calibration/EditControls/OriginControls/Direct" method="on_tr_set"]
 [connection signal="pressed" from="UIRoot/Calibration/EditControls/OriginControls/Direct/RestartCalibration" to="ViewportContainer/SubViewport/TileOverlay" method="start_calibration"]

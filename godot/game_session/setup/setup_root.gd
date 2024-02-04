@@ -255,20 +255,6 @@ func choose_tile(player: PlayerRs, unit: Enums.Unit, tile: Vector2i):
 		next_game_action = state_chart.send_event.bind("next player")
 	scene_tree_process_frame.connect(next_game_action, CONNECT_ONE_SHOT)
 
-func ___choose_tile(tile: Vector2i, kind: String, _zones: Array):
-	#print_debug("choose tile %s for unit %s for player %s" % [ tile, Enums.Unit.find_key(selection), Enums.Faction.find_key(current_player) ])
-	var already_there = units_on(tile)
-	if len(already_there) > 0:
-		if len(already_there) > 1:
-			return
-		var unit_faction_tuple = already_there[0]
-		if kind != "City" and kind != "Fortress":
-			return
-		if unit_faction_tuple[1] != current_player:
-			return
-		if unit_faction_tuple[0] != Enums.Unit.Duke and placing != Enums.Unit.Duke:
-			return
-
 func deployment_tiles_for_player(player: PlayerRs, current_phase: Enums.SetupPhase) -> Array[Vector2i]:
 	var tiles: Array[Vector2i] = []
 	for tile in MapData.map.tiles:
