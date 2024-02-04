@@ -35,9 +35,9 @@ class ChooseTile extends CursorState:
 class ChooseUnit extends CursorState:
 	var among : Array[GamePiece]
 
-func tile_contains_unit(tile: Vector2i, units: Array[GamePiece]) -> bool:
+func tile_contains_unit(tile_: Vector2i, units: Array[GamePiece]) -> bool:
 	for unit in units:
-		if unit.tile == tile:
+		if unit.tile == tile_:
 			return true
 	return false
 
