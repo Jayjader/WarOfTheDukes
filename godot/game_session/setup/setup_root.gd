@@ -148,12 +148,13 @@ func query_current_player_for_deployment_tile():
 		for tile in deployment_tiles_for_player(current_player, phase):
 			if tile not in occupied_tiles:
 				current_tiles.append(tile)
+		cursor.tile_clicked.connect(__on_player_tile_click_for_deployment, CONNECT_ONE_SHOT)
 		cursor.choose_tile(current_tiles)
 		deployment_ui.tiles = current_tiles
 		deployment_ui.queue_redraw()
-		cursor.tile_clicked.connect(__on_player_tile_click_for_deployment, CONNECT_ONE_SHOT)
 
 func __on_player_tile_click_for_deployment(tile: Vector2i):
+		cursor.stop_choosing_tile()
 		deployment_ui.tiles.clear()
 		deployment_ui.queue_redraw()
 		print_debug("%s chosen." % Enums.Unit.find_key(placing))

@@ -105,7 +105,6 @@ func _unhandled_input(event):
 			if tile in state.among:
 				get_viewport().set_input_as_handled()
 				tile_clicked.emit(tile)
-				stop_choosing_tile()
 	elif state is ChooseUnit:
 		if event.is_action_released("Move board cursor to next focus"):
 			get_viewport().set_input_as_handled()
@@ -131,8 +130,10 @@ func _unhandled_input(event):
 			get_viewport().set_input_as_handled()
 			for unit in state.among:
 				if unit.tile == tile:
-					unit.select()
-					stop_choosing_unit()
+					if unit._selected:
+						unit.unselect()
+					else:
+						unit.select()
 					break
 	if not state is Readonly and event is InputEventMouseMotion:
 		tile = Util.nearest_hex_in_axial(
