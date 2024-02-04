@@ -108,27 +108,32 @@ func _calculate_effective_attack_strength(unit: GamePiece):
 
 ### Choose Attackers
 var attacking := {}
-func __on_cancel_attack_pressed():
-	while len(attacking) > 0:
-		attacking.keys().front().unselect()
-func __on_unit_selected_for_attack(unit):
+func select_for_attack(unit: GamePiece):
 	attacking[unit] = _calculate_effective_attack_strength(unit)
-	unit.get_node("Label").text = "Attacking"
-	unit.get_node("Label").show()
+	unit.select("Attacking")
 	%EndCombatPhase.hide()
 	if not unit.player.is_computer:
 		%CancelAttack.show()
 		%ConfirmAttackers.show()
-func __on_unit_unselected_for_attack(unit):
+func unselect_for_attack(unit: GamePiece):
 	attacking.erase(unit)
-	unit.get_node("Label").hide()
+	unit.unselect()
 	if len(attacking) == 0:
 		%CancelAttack.hide()
 		%ConfirmAttackers.hide()
 		if not unit.player.is_computer:
 			%EndCombatPhase.show()
+
+func __on_cancel_attack_pressed():
+	for attacker in attacking.keys():
+		unselect_for_attack(attacker)
 func __on_confirm_attackers_pressed():
 	schedule_event("attackers confirmed")
+func __on_unit_clicked_during_selection_for_attack(unit: GamePiece):
+	if unit in attacking:
+		unselect_for_attack(unit)
+	else:
+		select_for_attack(unit)
 
 func __on_choose_attackers_state_entered():
 	_cache_duke_tiles()
@@ -143,7 +148,6 @@ func __on_choose_attackers_state_entered():
 		if unit.selectable:
 			chooseable.append(unit)
 	for unit in attacking:
-		unit.select()
 		if unit not in chooseable:
 			chooseable.push_front(unit)
 	if current_player.is_computer:
@@ -160,9 +164,8 @@ func __on_choose_attackers_state_entered():
 			schedule(__on_end_combat_pressed)
 		else:
 			for unit in choice.attackers:
-				attacking[unit] = _calculate_effective_attack_strength(unit)
-				unit.get_node("Label").text = "Attacking"
-				unit.get_node("Label").show()
+				select_for_attack(unit)
+			# todo: select_for_defense(choice.defender)
 			defending = choice.defender
 			defending.get_node("Label").text = "Defending"
 			defending.get_node("Label").show()
@@ -173,23 +176,17 @@ func __on_choose_attackers_state_entered():
 		else:
 			%CancelAttack.show()
 			%ConfirmAttackers.show()
-		unit_layer.unit_selected.connect(__on_unit_selected_for_attack)
-		unit_layer.unit_unselected.connect(__on_unit_unselected_for_attack)
+		cursor.unit_clicked.connect(__on_unit_clicked_during_selection_for_attack)
 		cursor.choose_unit(chooseable)
-
 func __on_choose_attackers_state_exited():
 	%CancelAttack.hide()
 	%ConfirmAttackers.hide()
 	%EndCombatPhase.hide()
 	cursor.stop_choosing_unit()
-	if unit_layer.unit_selected.is_connected(__on_unit_selected_for_attack):
-		unit_layer.unit_selected.disconnect(__on_unit_selected_for_attack)
-	if unit_layer.unit_unselected.is_connected(__on_unit_unselected_for_attack):
-		unit_layer.unit_unselected.disconnect(__on_unit_unselected_for_attack)
+	if cursor.unit_clicked.is_connected(__on_unit_clicked_during_selection_for_attack):
+		cursor.unit_clicked.disconnect(__on_unit_clicked_during_selection_for_attack)
 	for unit in alive:
 		unit.selectable = false
-		if unit in attacking:
-			unit.select()
 
 
 func _calculate_effective_defense_strength(unit: GamePiece):
