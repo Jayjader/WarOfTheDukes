@@ -133,14 +133,19 @@ func __on_confirm_attackers_pressed():
 func __on_choose_attackers_state_entered():
 	_cache_duke_tiles()
 	%SubPhaseInstruction.text = "Choose a unit to attack with"
+	var chooseable : Array[GamePiece] = []
 	for unit in alive:
 		unit.selectable = (
 			(unit.faction == current_player.faction)
 			and (unit not in attacked)
 			and (unit.kind != Enums.Unit.Duke)
 		)
+		if unit.selectable:
+			chooseable.append(unit)
 	for unit in attacking:
 		unit.select()
+		if unit not in chooseable:
+			chooseable.push_front(unit)
 	if current_player.is_computer:
 		var strategy = CombatStrategy.new()
 		var allies = {}
@@ -170,11 +175,13 @@ func __on_choose_attackers_state_entered():
 			%ConfirmAttackers.show()
 		unit_layer.unit_selected.connect(__on_unit_selected_for_attack)
 		unit_layer.unit_unselected.connect(__on_unit_unselected_for_attack)
+		cursor.choose_unit(chooseable)
 
 func __on_choose_attackers_state_exited():
 	%CancelAttack.hide()
 	%ConfirmAttackers.hide()
 	%EndCombatPhase.hide()
+	cursor.stop_choosing_unit()
 	if unit_layer.unit_selected.is_connected(__on_unit_selected_for_attack):
 		unit_layer.unit_selected.disconnect(__on_unit_selected_for_attack)
 	if unit_layer.unit_unselected.is_connected(__on_unit_unselected_for_attack):
