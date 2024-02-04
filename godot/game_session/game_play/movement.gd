@@ -49,6 +49,7 @@ func __on_end_movement_pressed():
 var mover
 func __on_unit_selected_for_move(unit):
 	mover = unit
+	mover.select("Moving")
 	schedule_event("mover chosen")
 
 func _get_ai_movement_choice():
@@ -80,14 +81,14 @@ func __on_choose_mover_state_entered():
 				can_choose.append(unit)
 			else:
 				unit.selectable = false
-		unit_layer.unit_selected.connect(__on_unit_selected_for_move)
+		cursor.unit_clicked.connect(__on_unit_selected_for_move)
 		cursor.choose_unit(can_choose)
 
 func __on_choose_mover_state_exited():
 	%EndMovementPhase.hide()
 	if not current_player.is_computer:
 		unit_layer.make_units_selectable([])
-		unit_layer.unit_selected.disconnect(__on_unit_selected_for_move)
+		cursor.unit_clicked.disconnect(__on_unit_selected_for_move)
 		cursor.stop_choosing_unit()
 
 
@@ -96,6 +97,7 @@ func __on_mover_choice_cancelled(_unit=null):
 	schedule_event("mover choice canceled")
 func __on_tile_chosen_as_destination(tile: Vector2i, _kind=null, _zones=null):
 	unit_layer.move_unit(mover, mover.tile, tile)
+	mover.unselect()
 	moved.append(mover)
 	schedule_event("unit moved")
 

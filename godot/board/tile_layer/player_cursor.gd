@@ -75,6 +75,7 @@ func stop_choosing_unit():
 	state_chart.send_event("stop choosing unit")
 
 signal tile_clicked(tile: Vector2i)
+signal unit_clicked(unit: GamePiece)
 
 @export var tile: Vector2i:
 	get:
@@ -130,10 +131,11 @@ func _unhandled_input(event):
 			get_viewport().set_input_as_handled()
 			for unit in state.among:
 				if unit.tile == tile:
-					if unit._selected:
-						unit.unselect()
-					else:
-						unit.select()
+					unit_clicked.emit(unit)
+					#if unit._selected:
+						#unit.unselect()
+					#else:
+						#unit.select()
 					break
 	if not state is Readonly and event is InputEventMouseMotion:
 		tile = Util.nearest_hex_in_axial(

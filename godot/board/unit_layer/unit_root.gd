@@ -63,14 +63,17 @@ func die():
 	unit_layer.move_unit(self, self.tile, unit_layer.graveyard)
 	self.visible = false
 
-func select():
+func select(for_:="Selected"):
 	if not _selected:
 		_selected = true
+		$Label.text = for_
+		$Label.show()
 		selected.emit(true)
 
 func unselect():
 	if _selected:
 		_selected = false
+		$Label.hide()
 		selected.emit(false)
 
 func _ready():
