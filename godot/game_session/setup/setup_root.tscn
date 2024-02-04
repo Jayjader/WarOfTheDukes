@@ -87,6 +87,7 @@ script = ExtResource("2_eoobw")
 [node name="AutoSetup" type="Button" parent="MarginContainer/PanelContainer/Margins/HBox/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
+focus_mode = 1
 toggle_mode = true
 text = "Auto Setup Remaining"
 
@@ -110,6 +111,7 @@ alignment = 1
 [node name="Infantry" type="Button" parent="MarginContainer/PanelContainer/Margins/HBox/Selection/Buttons"]
 layout_mode = 2
 size_flags_horizontal = 3
+focus_mode = 1
 toggle_mode = true
 button_pressed = true
 button_group = ExtResource("3_fneyt")
@@ -118,6 +120,7 @@ text = "Infantry"
 [node name="Cavalry" type="Button" parent="MarginContainer/PanelContainer/Margins/HBox/Selection/Buttons"]
 layout_mode = 2
 size_flags_horizontal = 3
+focus_mode = 1
 toggle_mode = true
 button_group = ExtResource("3_fneyt")
 text = "Cavalry"
@@ -125,6 +128,7 @@ text = "Cavalry"
 [node name="Artillery" type="Button" parent="MarginContainer/PanelContainer/Margins/HBox/Selection/Buttons"]
 layout_mode = 2
 size_flags_horizontal = 3
+focus_mode = 1
 toggle_mode = true
 button_group = ExtResource("3_fneyt")
 text = "Artillery"
@@ -132,6 +136,7 @@ text = "Artillery"
 [node name="Duke" type="Button" parent="MarginContainer/PanelContainer/Margins/HBox/Selection/Buttons"]
 layout_mode = 2
 size_flags_horizontal = 3
+focus_mode = 1
 toggle_mode = true
 button_group = ExtResource("3_fneyt")
 text = "Duke"

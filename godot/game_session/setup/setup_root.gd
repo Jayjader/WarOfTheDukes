@@ -196,9 +196,23 @@ func display_remaining_counts():
 			remaining_counts[faction][unit_kind].set_text(str(pieces_remaining(faction, unit_kind)))
 
 var placing
+const placement_order = [Enums.Unit.Infantry, Enums.Unit.Cavalry, Enums.Unit.Artillery, Enums.Unit.Duke]
+func _unhandled_input(event):
+	if event.is_action_released("Toggle auto placement during setup"):
+		_on_auto_setup_pressed()
+	if event.is_action_released("Switch to next available unit type for setup"):
+		var current_index = placement_order.find(placing)
+		var next_index = (current_index + 1) % len(placement_order)
+		change_selection(placement_order[next_index])
+	if event.is_action_released("Switch to previous available unit type for setup"):
+		var current_index = placement_order.find(placing)
+		var previous_index = (current_index - 1) % len(placement_order)
+		change_selection(placement_order[previous_index])
+		
 
 func change_selection(new_value):
 	placing = new_value
+	_sync_buttons(current_player)
 
 func get_first_with_remaining(faction: Enums.Faction):
 	if pieces_remaining(faction, Enums.Unit.Infantry) > 0:
