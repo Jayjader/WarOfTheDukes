@@ -80,10 +80,11 @@ signal tile_clicked(tile: Vector2i)
 	get:
 		return Util.nearest_hex_in_axial(self.position, Vector2i(0, 0), MapData.map.hex_size_in_pixels)
 	set(value):
-		self.position = Util.hex_coords_to_pixel(value, MapData.map.hex_size_in_pixels)
-		$coords.text = "%s" % value
-		var can_click = state is ChooseTile and value in state.among or state is ChooseUnit and tile_contains_unit(value, state.among)
-		$TextureRect.texture = preload("res://kenney_ui_rpg/cursor_click.tres") if can_click else preload("res://kenney_ui_rpg/cursor.tres")
+		if value != tile:
+			self.position = Util.hex_coords_to_pixel(value, MapData.map.hex_size_in_pixels)
+			$coords.text = "%s" % value
+			var can_click = state is ChooseTile and value in state.among or state is ChooseUnit and tile_contains_unit(value, state.among)
+			$TextureRect.texture = preload("res://kenney_ui_rpg/cursor_click.tres") if can_click else preload("res://kenney_ui_rpg/cursor.tres")
 
 func _unhandled_input(event):
 	if state is Inspect:
