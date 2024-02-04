@@ -140,16 +140,12 @@ func __on_choose_attackers_state_entered():
 	%SubPhaseInstruction.text = "Choose a unit to attack with"
 	var chooseable : Array[GamePiece] = []
 	for unit in alive:
-		unit.selectable = (
+		if (
 			(unit.faction == current_player.faction)
 			and (unit not in attacked)
 			and (unit.kind != Enums.Unit.Duke)
-		)
-		if unit.selectable:
+		):
 			chooseable.append(unit)
-	for unit in attacking:
-		if unit not in chooseable:
-			chooseable.push_front(unit)
 	if current_player.is_computer:
 		var strategy = CombatStrategy.new()
 		var allies = {}
@@ -165,10 +161,7 @@ func __on_choose_attackers_state_entered():
 		else:
 			for unit in choice.attackers:
 				select_for_attack(unit)
-			# todo: select_for_defense(choice.defender)
-			defending = choice.defender
-			defending.get_node("Label").text = "Defending"
-			defending.get_node("Label").show()
+			select_for_defense(choice.defender)
 			schedule(__on_confirm_attackers_pressed)
 	else:
 		if len(attacking) == 0:
@@ -177,6 +170,8 @@ func __on_choose_attackers_state_entered():
 			%CancelAttack.show()
 			%ConfirmAttackers.show()
 		cursor.unit_clicked.connect(__on_unit_clicked_during_selection_for_attack)
+		for unit in chooseable:
+			unit.selectable = true
 		cursor.choose_unit(chooseable)
 func __on_choose_attackers_state_exited():
 	%CancelAttack.hide()
@@ -201,32 +196,38 @@ func _calculate_effective_defense_strength(unit: GamePiece):
 ### Choose Defender
 var defending # : GamePiece
 var can_defend: Array[GamePiece] = []
-func __on_change_attackers_pressed():
-	if defending != null:
-		defending.get_node("Label").hide()
-		defending = null
-	schedule_event("change attackers")
-func __on_unit_selected_for_defense(unit):
+func select_for_defense(unit):
 	defending = unit
-	unit.get_node("Label").text = "Defending"
-	unit.get_node("Label").show()
+	unit.select("Defending")
 	for other_unit in can_defend:
 		if other_unit != defending:
 			other_unit.selectable = false
 	if not current_player.is_computer:
 		%ConfirmDefender.show()
-func __on_unit_unselected_for_defense(unit):
-	unit.get_node("Label").hide()
+func unselect_for_defense():
+	defending.unselect()
 	defending = null
 	for other_unit in can_defend:
 		other_unit.selectable = true
 	%ConfirmDefender.hide()
+
+func __on_unit_clicked_during_selection_for_defense(unit: GamePiece):
+	if unit._selected:
+		unselect_for_defense()
+	else:
+		select_for_defense(unit)
+func __on_change_attackers_pressed():
+	if defending != null:
+		defending.get_node("Label").hide()
+		defending = null
+	schedule_event("change attackers")
 func __on_confirm_defender_pressed():
 	result = null
 	schedule_event("defender confirmed")
 
 func __on_choose_defender_state_entered():
 	can_defend.clear()
+	%SubPhaseInstruction.text = "Choose a target unit for the attack"
 	for unit in alive:
 		if (
 			unit.faction != current_player.faction and
@@ -261,16 +262,14 @@ func __on_choose_defender_state_entered():
 		%ChangeAttackers.show()
 		if defending != null:
 			%ConfirmDefender.show()
-		unit_layer.unit_selected.connect(__on_unit_selected_for_defense)
-		unit_layer.unit_unselected.connect(__on_unit_unselected_for_defense)
+		cursor.unit_clicked.connect(__on_unit_clicked_during_selection_for_defense)
+		cursor.choose_unit(can_defend)
 
 func __on_choose_defender_state_exited():
 	%ChangeAttackers.hide()
 	%ConfirmDefender.hide()
-	if unit_layer.unit_selected.is_connected(__on_unit_selected_for_defense):
-		unit_layer.unit_selected.disconnect(__on_unit_selected_for_defense)
-	if 	unit_layer.unit_unselected.is_connected(__on_unit_unselected_for_defense):
-		unit_layer.unit_unselected.disconnect(__on_unit_unselected_for_defense)
+	if cursor.unit_clicked.is_connected(__on_unit_clicked_during_selection_for_defense):
+		cursor.unit_clicked.disconnect(__on_unit_clicked_during_selection_for_defense)
 	if current_player.is_computer:
 		pass
 	else:
