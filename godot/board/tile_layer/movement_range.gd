@@ -4,7 +4,7 @@ extends Node2D
 
 var hovered_tile = null
 
-func _on_tile_hovered(tile: Vector2i):
+func __on_tile_hovered(tile: Vector2i):
 	if tile != hovered_tile:
 		if tile in destinations:
 			hovered_tile = tile

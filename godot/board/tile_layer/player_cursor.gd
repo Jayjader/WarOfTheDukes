@@ -77,6 +77,8 @@ func stop_choosing_unit():
 signal tile_clicked(tile: Vector2i)
 signal unit_clicked(unit: GamePiece)
 
+signal tile_changed(tile: Vector2i)
+
 @export var tile: Vector2i:
 	get:
 		return Util.nearest_hex_in_axial(self.position, Vector2i(0, 0), MapData.map.hex_size_in_pixels)
@@ -86,6 +88,7 @@ signal unit_clicked(unit: GamePiece)
 			$coords.text = "%s" % value
 			var can_click = state is ChooseTile and value in state.among or state is ChooseUnit and tile_contains_unit(value, state.among)
 			$TextureRect.texture = preload("res://kenney_ui_rpg/cursor_click.tres") if can_click else preload("res://kenney_ui_rpg/cursor.tres")
+			tile_changed.emit(value)
 
 func _unhandled_input(event):
 	if state is Inspect:
