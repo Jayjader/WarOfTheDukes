@@ -24,9 +24,9 @@ func make_faction_selectable(faction: Enums.Faction, preserve=[]) -> void:
 		if not preserve.has(unit):
 			unit.selectable = unit.faction == faction
 
-func make_units_selectable(units: Array[GamePiece], preserve_others=false) -> void:
+func make_units_selectable(units: Array[GamePiece]) -> void:
 	for unit in get_children():
-		unit.selectable = units.has(unit) or (preserve_others and unit.selectable)
+		unit.selectable = units.has(unit)
 
 func get_units(faction: Enums.Faction) -> Array[GamePiece]:
 	var units: Array[GamePiece] = []

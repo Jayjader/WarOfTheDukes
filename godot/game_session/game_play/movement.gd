@@ -77,10 +77,7 @@ func __on_choose_mover_state_entered():
 		var can_choose : Array[GamePiece] = []
 		for unit in alive:
 			if unit.faction == current_player.faction and unit not in moved:
-				unit.selectable = true
 				can_choose.append(unit)
-			else:
-				unit.selectable = false
 		cursor.unit_clicked.connect(__on_unit_selected_for_move)
 		cursor.choose_unit(can_choose)
 
@@ -96,9 +93,10 @@ func __on_choose_mover_state_exited():
 func __on_mover_choice_cancelled(_unit=null):
 	schedule_event("mover choice canceled")
 func __on_tile_chosen_as_destination(tile: Vector2i, _kind=null, _zones=null):
-	unit_layer.move_unit(mover, mover.tile, tile)
 	mover.unselect()
-	moved.append(mover)
+	if tile != mover.tile:
+		unit_layer.move_unit(mover, mover.tile, tile)
+		moved.append(mover)
 	schedule_event("unit moved")
 
 func __on_choose_destination_state_entered():
@@ -108,7 +106,6 @@ func __on_choose_destination_state_entered():
 	else:
 		%CancelMoverChoice.show()
 		mover.selectable = true
-		unit_layer.unit_unselected.connect(__on_mover_choice_cancelled, CONNECT_ONE_SHOT)
 		var destinations = Board.paths_for(mover)
 		tile_layer.set_destinations(destinations)
 		var can_cross: Array[Vector2i] = []

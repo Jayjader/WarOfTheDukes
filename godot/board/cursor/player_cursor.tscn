@@ -83,3 +83,5 @@ event = &"stop choosing unit"
 [connection signal="state_entered" from="StateChart/cursor state/inspect" to="." method="__on_inspect_state_entered"]
 [connection signal="state_entered" from="StateChart/cursor state/choose tile" to="." method="__on_choose_tile_state_entered"]
 [connection signal="state_entered" from="StateChart/cursor state/choose unit" to="." method="__on_choose_unit_state_entered"]
+[connection signal="state_exited" from="StateChart/cursor state/choose unit" to="." method="__on_choose_unit_state_exited"]
+[connection signal="taken" from="StateChart/cursor state/choose unit/to read only" to="." method="__on_to_read_only_from_choose_unit_taken"]

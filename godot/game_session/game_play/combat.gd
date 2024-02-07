@@ -418,7 +418,6 @@ func __on_retreat_defender_state_entered():
 		if defending.player.is_computer:
 			__on_hex_clicked_for_retreat(allowed_retreat_destinations[0])
 		else:
-			unit_layer.make_units_selectable([])
 			%SubPhaseInstruction.text = "Choose a tile for the defender to retreat to"
 			Board.report_hover_for_tiles(allowed_retreat_destinations)
 			Board.report_click_for_tiles(allowed_retreat_destinations)

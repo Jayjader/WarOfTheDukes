@@ -71,7 +71,6 @@ func choose_unit(units: Array[GamePiece]):
 	state_chart.send_event("choose unit")
 
 func stop_choosing_unit():
-	state = Readonly.new()
 	state_chart.send_event("stop choosing unit")
 
 signal tile_clicked(tile: Vector2i)
@@ -151,23 +150,28 @@ func _unhandled_input(event):
 
 func __on_read_only_state_entered():
 	hide()
-	#Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func __on_inspect_state_entered():
 	show()
-	#Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
 	if tile not in state.focus_allowed:
 		tile = state.focus_allowed[0]
 
 func __on_choose_tile_state_entered():
 	show()
-	#Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
 	if tile not in state.among:
 		tile = state.among[0]
 
-
 func __on_choose_unit_state_entered():
 	show()
-	#Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
 	if tile_contains_unit(tile, state.among):
 		tile = state.among[0].tile
+	for unit in state.among:
+		unit.selectable = true
+
+func __on_choose_unit_state_exited():
+	state = Readonly.new()
+
+func __on_to_read_only_from_choose_unit_taken():
+	for unit in state.among:
+		unit.selectable = false
+
