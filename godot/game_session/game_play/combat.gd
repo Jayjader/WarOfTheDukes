@@ -218,7 +218,7 @@ func __on_unit_clicked_during_selection_for_defense(unit: GamePiece):
 		select_for_defense(unit)
 func __on_change_attackers_pressed():
 	if defending != null:
-		defending.get_node("Label").hide()
+		defending.unselect()
 		defending = null
 	schedule_event("change attackers")
 func __on_confirm_defender_pressed():
@@ -246,11 +246,9 @@ func __on_choose_defender_state_entered():
 			can_defend.append(unit)
 	for unit in alive:
 		if unit == defending:
-			unit.selectable = true
-			unit.select()
+			unit.select("Defending")
 		elif unit in attacking:
-			unit.selectable = false
-			unit.select()
+			unit.select("Attacking")
 		else:
 			unit.selectable = defending == null and unit in can_defend
 	if defending not in can_defend:
@@ -400,9 +398,6 @@ func __on_confirm_combat_result_pressed():
 		unit.unselect()
 func __on_view_result_state_exited():
 	%ConfirmCombatResult.hide()
-	for unit in attacking:
-		unit.get_node("Label").hide()
-	defending.get_node("Label").hide()
 
 ## Retreat Defender
 func __on_retreat_defender_state_entered():
@@ -413,15 +408,13 @@ func __on_retreat_defender_state_entered():
 			other_live_units.append(unit)
 	var allowed_retreat_destinations = MapData.map.paths_for_retreat(defending, other_live_units)
 	if len(allowed_retreat_destinations) > 0:
-		defending.get_node("Label").text = "Retreating"
-		defending.get_node("Label").show()
+		defending.select("Defending")
 		if defending.player.is_computer:
-			__on_hex_clicked_for_retreat(allowed_retreat_destinations[0])
+			__on_hex_clicked_for_defender_retreat(allowed_retreat_destinations[0])
 		else:
 			%SubPhaseInstruction.text = "Choose a tile for the defender to retreat to"
-			Board.report_hover_for_tiles(allowed_retreat_destinations)
-			Board.report_click_for_tiles(allowed_retreat_destinations)
-			Board.hex_clicked.connect(__on_hex_clicked_for_retreat)
+			cursor.tile_clicked.connect(__on_hex_clicked_for_defender_retreat, CONNECT_ONE_SHOT)
+			cursor.choose_tile(allowed_retreat_destinations)
 			retreat_ui.retreat_from = defending.tile
 			retreat_ui.destinations = allowed_retreat_destinations
 			retreat_ui.queue_redraw()
@@ -445,8 +438,8 @@ func __on_retreat_defender_state_entered():
 			else:
 				died_from_last_combat.append(defending)
 				schedule_event("combat resolved")
-func __on_hex_clicked_for_retreat(tile, _kind=null, _zones=null):
-	defending.get_node("Label").hide()
+func __on_hex_clicked_for_defender_retreat(tile: Vector2i):
+	defending.unselect()
 	pursue_to = defending.tile # save before moving defending/defender
 	for unit in Board.get_units_on(defending.tile):
 		unit_layer.move_unit(unit, unit.tile, tile)
@@ -457,10 +450,9 @@ func __on_hex_clicked_for_retreat(tile, _kind=null, _zones=null):
 			can_pursue.append(attacker)
 	schedule_event("defender retreated")
 func __on_retreat_defender_state_exited():
-	Board.report_hover_for_tiles([])
-	Board.report_click_for_tiles([])
-	if Board.hex_clicked.is_connected(__on_hex_clicked_for_retreat):
-		Board.hex_clicked.disconnect(__on_hex_clicked_for_retreat)
+	cursor.stop_choosing_tile()
+	if cursor.tile_clicked.is_connected(__on_hex_clicked_for_defender_retreat):
+		cursor.tile_clicked.disconnect(__on_hex_clicked_for_defender_retreat)
 	retreat_ui.destinations.clear()
 	retreat_ui.queue_redraw()
 
@@ -474,26 +466,27 @@ func __on_choose_retreating_attacker_state_entered():
 		schedule_event("combat resolved")
 		return
 	for unit in to_retreat:
-		unit.get_node("Label").text = "Must Retreat"
-		unit.get_node("Label").show()
+		unit.select("Must Retreat")
 	%SubPhaseInstruction.text = "Choose a unit among the attackers to retreat"
 	if current_player.is_computer:
 		__on_attacker_selected_for_retreat(to_retreat[0])
 	elif len(to_retreat) == 1:
 		__on_attacker_selected_for_retreat(to_retreat[0])
 	else:
-		unit_layer.unit_selected.connect(__on_attacker_selected_for_retreat)
-		unit_layer.make_units_selectable(to_retreat)
+		cursor.unit_clicked.connect(__on_attacker_selected_for_retreat)
+		cursor.choose_unit(to_retreat)
 func __on_attacker_selected_for_retreat(unit: GamePiece):
 	assert(unit in attacking)
-	unit.get_node("Label").text = "Retreating"
-	unit.get_node("Label").show()
+	if cursor.unit_clicked.is_connected(__on_attacker_selected_for_retreat):
+		cursor.unit_clicked.disconnect(__on_attacker_selected_for_retreat)
+	unit.select("Retreating")
 	to_retreat.erase(unit)
+	for other_unit in to_retreat:
+		unit.unselect()
+	cursor.stop_choosing_unit()
 	retreating = unit
 	schedule_event("attacker chosen to retreat")
 func __on_choose_retreating_attacker_state_exited():
-	if unit_layer.unit_selected.is_connected(__on_attacker_selected_for_retreat):
-		unit_layer.unit_selected.disconnect(__on_attacker_selected_for_retreat)
 	unit_layer.make_units_selectable([])
 func __on_choose_retreating_attacker_destination_state_entered():
 	var other_live_units: Array[GamePiece] = []
@@ -510,9 +503,7 @@ func __on_choose_retreating_attacker_destination_state_entered():
 		else:
 			%SubPhaseInstruction.text = "Choose a tile for the attacker to retreat to"
 			%ChangeAttackerForRetreat.show()
-			Board.report_hover_for_tiles(allowed_retreat_destinations)
-			Board.report_click_for_tiles(allowed_retreat_destinations)
-			Board.hex_clicked.connect(__on_hex_clicked_for_attacker_retreat)
+			cursor.tile_clicked.connect(__on_hex_clicked_for_attacker_retreat)
 			retreat_ui.retreat_from = retreating.tile
 			retreat_ui.destinations = allowed_retreat_destinations
 			retreat_ui.queue_redraw()
@@ -538,16 +529,13 @@ func __on_choose_retreating_attacker_destination_state_entered():
 				schedule_event("attacker retreated")
 func __on_retreating_attacker_choice_cancelled():
 	to_retreat.append(retreating)
-	#retreating.get_node("Label").text = "Must Retreat"
-	#retreating.get_node("Label").hide()
 	retreating.unselect()
 	retreating = null
 	schedule_event("unit choice for retreat cancelled")
-func __on_hex_clicked_for_attacker_retreat(tile, _kind=null, _zones=null):
+func __on_hex_clicked_for_attacker_retreat(tile: Vector2i):
 	unit_layer.move_unit(retreating, retreating.tile, tile)
-	retreating.get_node("Label").hide()
-	retreated.append(retreating)
 	retreating.unselect()
+	retreated.append(retreating)
 	retreating = null
 	schedule_event("attacker retreated")
 func __on_choose_retreating_attacker_destination_state_exited():
@@ -704,8 +692,8 @@ func __on_pursue_retreating_defender_state_entered():
 	if current_player.is_computer:
 		__on_pursuit_declined()
 	else:
-		unit_layer.unit_selected.connect(__on_pursuer_selected)
-		unit_layer.make_units_selectable(can_pursue)
+		cursor.unit_clicked.connect(__on_pursuer_selected)
+		cursor.choose_unit(can_pursue)
 
 func __on_pursuit_declined():
 	schedule_event("combat resolved")
@@ -719,8 +707,9 @@ func __on_pursuer_selected(unit: GamePiece):
 func __on_pursue_retreating_defender_state_exited():
 	%CancelPursuit.hide()
 	unit_layer.make_units_selectable([])
-	if unit_layer.unit_selected.is_connected(__on_pursuer_selected):
-		unit_layer.unit_selected.disconnect(__on_pursuer_selected)
+	cursor.stop_choosing_unit()
+	if cursor.unit_clicked.is_connected(__on_pursuer_selected):
+		cursor.unit_clicked.disconnect(__on_pursuer_selected)
 
 
 func __on_combat_resolution_cleanup_state_entered():
