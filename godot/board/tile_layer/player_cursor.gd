@@ -34,6 +34,7 @@ class ChooseTile extends CursorState:
 
 class ChooseUnit extends CursorState:
 	var among : Array[GamePiece]
+	var reason : String
 
 func tile_contains_unit(tile_: Vector2i, units: Array[GamePiece]) -> bool:
 	for unit in units:
@@ -64,10 +65,11 @@ func stop_choosing_tile():
 	state = Readonly.new()
 	state_chart.send_event("stop choosing tile")
 
-func choose_unit(units: Array[GamePiece]):
+func choose_unit(units: Array[GamePiece], for_:="Choosing unit"):
 	assert(len(units) > 0)
 	state = ChooseUnit.new()
 	state.among.append_array(units)
+	state.reason = for_
 	state_chart.send_event("choose unit")
 
 func stop_choosing_unit():
@@ -166,12 +168,12 @@ func __on_choose_unit_state_entered():
 	if tile_contains_unit(tile, state.among):
 		tile = state.among[0].tile
 	for unit in state.among:
-		unit.selectable = true
+		unit.selectable(state.reason)
 
 func __on_choose_unit_state_exited():
 	state = Readonly.new()
 
 func __on_to_read_only_from_choose_unit_taken():
 	for unit in state.among:
-		unit.selectable = false
+		unit.unselectable()
 

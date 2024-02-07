@@ -170,9 +170,7 @@ func __on_choose_attackers_state_entered():
 			%CancelAttack.show()
 			%ConfirmAttackers.show()
 		cursor.unit_clicked.connect(__on_unit_clicked_during_selection_for_attack)
-		for unit in chooseable:
-			unit.selectable = true
-		cursor.choose_unit(chooseable)
+		cursor.choose_unit(chooseable, "Can attack")
 func __on_choose_attackers_state_exited():
 	%CancelAttack.hide()
 	%ConfirmAttackers.hide()
@@ -181,7 +179,7 @@ func __on_choose_attackers_state_exited():
 	if cursor.unit_clicked.is_connected(__on_unit_clicked_during_selection_for_attack):
 		cursor.unit_clicked.disconnect(__on_unit_clicked_during_selection_for_attack)
 	for unit in alive:
-		unit.selectable = false
+		unit.unselectable()
 
 
 func _calculate_effective_defense_strength(unit: GamePiece):
@@ -201,14 +199,14 @@ func select_for_defense(unit):
 	unit.select("Defending")
 	for other_unit in can_defend:
 		if other_unit != defending:
-			other_unit.selectable = false
+			other_unit.unselectable()
 	if not current_player.is_computer:
 		%ConfirmDefender.show()
 func unselect_for_defense():
 	defending.unselect()
 	defending = null
 	for other_unit in can_defend:
-		other_unit.selectable = true
+		other_unit.selectable("Can be attacked")
 	%ConfirmDefender.hide()
 
 func __on_unit_clicked_during_selection_for_defense(unit: GamePiece):
@@ -249,8 +247,10 @@ func __on_choose_defender_state_entered():
 			unit.select("Defending")
 		elif unit in attacking:
 			unit.select("Attacking")
+		elif defending == null and unit in can_defend:
+			unit.selectable("Can defend")
 		else:
-			unit.selectable = defending == null and unit in can_defend
+			unit.unselectable()
 	if defending not in can_defend:
 		defending = null
 	if current_player.is_computer:
@@ -261,7 +261,7 @@ func __on_choose_defender_state_entered():
 		if defending != null:
 			%ConfirmDefender.show()
 		cursor.unit_clicked.connect(__on_unit_clicked_during_selection_for_defense)
-		cursor.choose_unit(can_defend)
+		cursor.choose_unit(can_defend, "Can defend")
 
 func __on_choose_defender_state_exited():
 	%ChangeAttackers.hide()
@@ -273,7 +273,7 @@ func __on_choose_defender_state_exited():
 	else:
 		for unit in alive:
 			if unit not in attacking:
-				unit.selectable = false
+				unit.unselectable()
 
 ## Combat Resolution
 var _random = RandomNumberGenerator.new()

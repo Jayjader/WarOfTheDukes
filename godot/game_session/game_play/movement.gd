@@ -79,12 +79,11 @@ func __on_choose_mover_state_entered():
 			if unit.faction == current_player.faction and unit not in moved:
 				can_choose.append(unit)
 		cursor.unit_clicked.connect(__on_unit_selected_for_move)
-		cursor.choose_unit(can_choose)
+		cursor.choose_unit(can_choose, "Can move")
 
 func __on_choose_mover_state_exited():
 	%EndMovementPhase.hide()
 	if not current_player.is_computer:
-		unit_layer.make_units_selectable([])
 		cursor.unit_clicked.disconnect(__on_unit_selected_for_move)
 		cursor.stop_choosing_unit()
 
@@ -105,7 +104,6 @@ func __on_choose_destination_state_entered():
 		schedule(_get_ai_movement_destination)
 	else:
 		%CancelMoverChoice.show()
-		mover.selectable = true
 		var destinations = Board.paths_for(mover)
 		tile_layer.set_destinations(destinations)
 		var can_cross: Array[Vector2i] = []
@@ -125,7 +123,6 @@ func __on_choose_destination_state_exited():
 		if unit_layer.unit_unselected.is_connected(__on_mover_choice_cancelled):
 			unit_layer.unit_unselected.disconnect(__on_mover_choice_cancelled)
 		mover.unselect()
-		mover.selectable = false
 		%CancelMoverChoice.hide()
 		cursor.stop_choosing_tile()
 		if cursor.tile_clicked.is_connected(__on_tile_chosen_as_destination):

@@ -40,7 +40,7 @@ func _set_label_text_outline():
 	if _selected:
 		modulate = Color.WHITE
 		$Label.add_theme_color_override("font_outline_color", Color.GOLD)
-	elif selectable:
+	elif _selectable:
 		modulate = Color.WHITE
 		modulate.a *= 0.8
 		$Label.add_theme_color_override("font_outline_color", Color.LIGHT_SALMON)
@@ -48,10 +48,21 @@ func _set_label_text_outline():
 		modulate = Color.SLATE_GRAY
 		$Label.add_theme_color_override("font_outline_color", _original_outline)
 
-@export var selectable: bool = false:
+var _selectable: bool = false:
 	set(value):
-		selectable = value
+		_selectable = value
 		_set_label_text_outline()
+
+func selectable(for_:="Selectable"):
+	$Label.text = for_
+	$Label.show()
+	if not _selectable:
+		_selectable = true
+
+func unselectable():
+	$Label.hide()
+	if _selectable:
+		_selectable = false
 
 signal selected(value: bool)
 var _selected: bool = false:
@@ -64,16 +75,16 @@ func die():
 	self.visible = false
 
 func select(for_:="Selected"):
+	$Label.text = for_
+	$Label.show()
 	if not _selected:
 		_selected = true
-		$Label.text = for_
-		$Label.show()
 		selected.emit(true)
 
 func unselect():
+	$Label.hide()
 	if _selected:
 		_selected = false
-		$Label.hide()
 		selected.emit(false)
 
 func _ready():
