@@ -47,6 +47,7 @@ func __on_top_level_state_entered():
 
 
 func _detect_game_result():
+	# if a player has managed to capture the opposing player's capital, we know its a major victory for them
 	for capital_faction in [Enums.Faction.Orfburg, Enums.Faction.Wulfenburg]:
 		var capital_tiles = MapData.map.zones[Enums.Faction.find_key(capital_faction)]
 		var hostile_faction = Enums.get_other_faction(capital_faction)
@@ -59,6 +60,7 @@ func _detect_game_result():
 		if (capital_occupants_by_faction[capital_faction] == 0) and (capital_occupants_by_faction[hostile_faction] > 0):
 			return [Enums.GameResult.TOTAL_VICTORY, hostile_faction]
 
+# otherwise determine who gets the minor victory
 	var occupants_by_faction = { Enums.Faction.Orfburg: 0, Enums.Faction.Wulfenburg: 0 }
 	for zone in ["BetweenRivers", "Kaiserburg"]:
 		var tiles = MapData.map.zones[zone]

@@ -96,6 +96,7 @@ The result is finally adjusted according to the following rules:
 func __on_combat_state_exited():
 	%CombatPhase.hide()
 	%EndCombatPhase.hide()
+	%PhaseInstruction.text = ""
 
 func __on_end_combat_pressed():
 	schedule_event("combat ended")
@@ -195,6 +196,8 @@ func _calculate_effective_defense_strength(unit: GamePiece):
 var defending # : GamePiece
 var can_defend: Array[GamePiece] = []
 func select_for_defense(unit):
+	if defending != null:
+		defending.unselect()
 	defending = unit
 	unit.select("Defending")
 	for other_unit in can_defend:
@@ -210,7 +213,7 @@ func unselect_for_defense():
 	%ConfirmDefender.hide()
 
 func __on_unit_clicked_during_selection_for_defense(unit: GamePiece):
-	if unit._selected:
+	if defending == unit:
 		unselect_for_defense()
 	else:
 		select_for_defense(unit)
@@ -487,7 +490,8 @@ func __on_attacker_selected_for_retreat(unit: GamePiece):
 	retreating = unit
 	schedule_event("attacker chosen to retreat")
 func __on_choose_retreating_attacker_state_exited():
-	unit_layer.make_units_selectable([])
+	for unit in to_retreat:
+		unit.unselectable()
 func __on_choose_retreating_attacker_destination_state_entered():
 	var other_live_units: Array[GamePiece] = []
 	for unit in alive:
@@ -504,6 +508,7 @@ func __on_choose_retreating_attacker_destination_state_entered():
 			%SubPhaseInstruction.text = "Choose a tile for the attacker to retreat to"
 			%ChangeAttackerForRetreat.show()
 			cursor.tile_clicked.connect(__on_hex_clicked_for_attacker_retreat)
+			cursor.choose_tile(allowed_retreat_destinations)
 			retreat_ui.retreat_from = retreating.tile
 			retreat_ui.destinations = allowed_retreat_destinations
 			retreat_ui.queue_redraw()
@@ -730,3 +735,7 @@ func __on_combat_resolution_cleanup_state_entered():
 
 	assert(making_way == null, "Check if making_way can be cleared before entering post-combat resolution, else document why it can't and remove this assert")
 	schedule_event("combat resolution cleanup finished")
+
+
+func __on_change_retreater_choice_taken():
+	pass # Replace with function body.

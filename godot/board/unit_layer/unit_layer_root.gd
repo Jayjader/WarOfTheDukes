@@ -17,16 +17,17 @@ func _place_piece(tile: Vector2i, kind: Enums.Unit, player: PlayerRs):
 	new_unit.tile = tile
 	#new_unit.selected.connect(__on_unit_selected_toggle.bind(new_unit))
 	add_child(new_unit)
+	new_unit.unselectable()
 
 
-func make_faction_selectable(faction: Enums.Faction, preserve=[]) -> void:
-	for unit in get_children():
-		if not preserve.has(unit):
-			unit.selectable = unit.faction == faction
+#func make_faction_selectable(faction: Enums.Faction, preserve=[]) -> void:
+#	for unit in get_children():
+#		if not preserve.has(unit):
+#			unit.selectable = unit.faction == faction
 
-func make_units_selectable(units: Array[GamePiece]) -> void:
-	for unit in get_children():
-		unit.selectable = units.has(unit)
+#func make_units_selectable(units: Array[GamePiece]) -> void:
+#	for unit in get_children():
+#		unit.selectable = units.has(unit)
 
 func get_units(faction: Enums.Faction) -> Array[GamePiece]:
 	var units: Array[GamePiece] = []
