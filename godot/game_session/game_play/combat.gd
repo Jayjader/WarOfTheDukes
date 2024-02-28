@@ -711,7 +711,6 @@ func __on_pursuer_selected(unit: GamePiece):
 
 func __on_pursue_retreating_defender_state_exited():
 	%CancelPursuit.hide()
-	unit_layer.make_units_selectable([])
 	cursor.stop_choosing_unit()
 	if cursor.unit_clicked.is_connected(__on_pursuer_selected):
 		cursor.unit_clicked.disconnect(__on_pursuer_selected)
