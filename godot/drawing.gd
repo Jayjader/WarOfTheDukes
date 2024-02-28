@@ -23,7 +23,10 @@ const tile_colors = {
 const tile_sprites = {
 	Plains=preload("res://board/tile_layer/plains.png"),
 	Forest=preload("res://board/tile_layer/forest.png"),
-	Cliff=preload("res://board/tile_layer/cliffs.png")
+	Cliff=preload("res://board/tile_layer/cliffs.png"),
+	Lake=preload("res://board/tile_layer/lake.png"),
+	City=preload("res://board/tile_layer/city.png"),
+	Fortress=preload("res://board/tile_layer/fortress.png")
 }
 const faction_colors = {
 	Enums.Faction.Orfburg: Color.ROYAL_BLUE,
