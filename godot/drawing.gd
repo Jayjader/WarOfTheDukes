@@ -64,14 +64,14 @@ static func draw_grid(node: Node2D, top_left: Vector2, bottom_right: Vector2, or
 		for r in range(-q/2, -q/2 + grid_height_hex_count):
 			draw_hex(node, origin + Util.hex_coords_to_pixel(Vector2i(q, r), hex_size), hex_size)
 
-static func fill_hex(node: Node2D, center: Vector2i, hex_size: float, kind: String, angle_offset:float=0):
+static func fill_hex(node: Node2D, center: Vector2i, hex_size: float, kind: String):
 	var points = PackedVector2Array()
 	var min_x = 1e12 # very big
 	var min_y = 1e12
 	var max_x = -1e12
 	var max_y = -1e12
 	for i in range(6):
-		var next_point = Util.hex_corner_trig(center, hex_size, i, angle_offset)
+		var next_point = Util.hex_corner_trig(center, hex_size, i, 0)
 		points.append(next_point)
 		min_x = min(next_point.x, min_x)
 		min_y = min(next_point.y, min_y)
