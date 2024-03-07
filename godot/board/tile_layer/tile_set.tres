@@ -1,0 +1,79 @@
+[gd_resource type="TileSet" load_steps=13 format=3 uid="uid://c1y0tuytd6kgu"]
+
+[ext_resource type="Texture2D" uid="uid://02pdrfm3lpua" path="res://board/tile_layer/city.png" id="1_kyta4"]
+[ext_resource type="Texture2D" uid="uid://cplk3t27l26t1" path="res://board/tile_layer/cliffs.png" id="2_lqey7"]
+[ext_resource type="Texture2D" uid="uid://bi1v4oys18x7o" path="res://board/tile_layer/forest.png" id="3_0gyr1"]
+[ext_resource type="Texture2D" uid="uid://bk20ylnaooycm" path="res://board/tile_layer/fortress.png" id="4_eau10"]
+[ext_resource type="Texture2D" uid="uid://nvqarruccc7k" path="res://board/tile_layer/lake.png" id="5_glu2o"]
+[ext_resource type="Texture2D" uid="uid://c3dre6wdg6ovp" path="res://board/tile_layer/plains.png" id="6_k5mq3"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_w1ycg"]
+resource_name = "City"
+texture = ExtResource("1_kyta4")
+texture_region_size = Vector2i(254, 220)
+0:0/0 = 0
+0:0/0/terrain_set = 0
+0:0/0/terrain = 0
+1:0/0 = 0
+2:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cbc5a"]
+resource_name = "Cliffs"
+texture = ExtResource("2_lqey7")
+texture_region_size = Vector2i(254, 220)
+0:0/0 = 0
+0:0/0/terrain_set = 0
+0:0/0/terrain = 1
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_pw0m3"]
+resource_name = "Forest"
+texture = ExtResource("3_0gyr1")
+texture_region_size = Vector2i(254, 220)
+0:0/0 = 0
+0:0/0/terrain_set = 0
+0:0/0/terrain = 2
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1y1f5"]
+resource_name = "Fortress"
+texture = ExtResource("4_eau10")
+texture_region_size = Vector2i(254, 220)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_el02x"]
+resource_name = "Lake"
+texture = ExtResource("5_glu2o")
+texture_region_size = Vector2i(254, 220)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_isvxy"]
+resource_name = "Plains"
+texture = ExtResource("6_k5mq3")
+texture_region_size = Vector2i(254, 220)
+0:0/0 = 0
+
+[resource]
+tile_shape = 3
+tile_layout = 3
+tile_offset_axis = 1
+tile_size = Vector2i(250, 216)
+terrain_set_0/mode = 2
+terrain_set_0/terrain_0/name = "City"
+terrain_set_0/terrain_0/color = Color(0.494118, 0.517647, 0.529412, 1)
+terrain_set_0/terrain_1/name = "Cliffs"
+terrain_set_0/terrain_1/color = Color(0.454902, 0.254902, 0.0117647, 1)
+terrain_set_0/terrain_2/name = "Forest"
+terrain_set_0/terrain_2/color = Color(0.46875, 0.5, 0.25, 1)
+terrain_set_0/terrain_3/name = "Terrain 3"
+terrain_set_0/terrain_3/color = Color(0.375, 0.5, 0.25, 1)
+sources/0 = SubResource("TileSetAtlasSource_w1ycg")
+sources/1 = SubResource("TileSetAtlasSource_cbc5a")
+sources/2 = SubResource("TileSetAtlasSource_pw0m3")
+sources/3 = SubResource("TileSetAtlasSource_1y1f5")
+sources/4 = SubResource("TileSetAtlasSource_el02x")
+sources/5 = SubResource("TileSetAtlasSource_isvxy")
