@@ -2,25 +2,11 @@ extends Control
 
 var EditingGroup: StringName = &"map-edit-ui"
 
-signal toggled_editing(bool)
-
 signal hex_hovered(tile: Vector2i)
 signal hex_clicked(tile: Vector2i, kind, zones)
 
 var report_hover_tiles: Array[Vector2i] = []
 var report_click_tiles: Array[Vector2i] = []
-
-
-@export var editing: bool = false:
-	set(value):
-		print_debug("toggling editing to %s" % value)
-		editing = value
-		toggled_editing.emit(value)
-		if self.is_node_ready():
-			for ui in get_tree().get_nodes_in_group(EditingGroup):
-				ui.set_visible(editing)
-
-			%Background.set_self_modulate(Color.WHITE if editing else Color.TRANSPARENT)
 
 @onready var cursor = %PlayerCursor
 func __on_focus_entered():
@@ -31,12 +17,6 @@ func _ready():
 	#if Engine.is_editor_hint() and get_viewport() is Window:
 	#	get_parent().remove_child(self)
 	MapData.load_data()
-
-
-func _unhandled_input(event):
-#	if not Engine.is_editor_hint():
-		if event.is_action_pressed("Edit Map Data"):
-			editing = !editing
 
 func report_click_for_tiles(tiles: Array[Vector2i]):
 	report_click_tiles = tiles

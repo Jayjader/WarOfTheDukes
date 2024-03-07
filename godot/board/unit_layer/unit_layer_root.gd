@@ -3,6 +3,8 @@ extends Node2D
 
 const Unit = preload("res://board/unit_layer/unit_root.tscn")
 
+@onready var tile_map = $"../TileOverlay/TileMap"
+
 @export var graveyard: Vector2i
 
 signal unit_selected(unit: GamePiece)
@@ -14,6 +16,7 @@ func _place_piece(tile: Vector2i, kind: Enums.Unit, player: PlayerRs):
 	new_unit.name = "Unit%s-%s-%s" % [get_child_count(), Enums.Faction.find_key(player.faction), Enums.Unit.find_key(kind)]
 	new_unit.kind = kind
 	new_unit.player = player
+	new_unit.tile_map = tile_map
 	new_unit.tile = tile
 	#new_unit.selected.connect(__on_unit_selected_toggle.bind(new_unit))
 	add_child(new_unit)

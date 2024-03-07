@@ -2,6 +2,7 @@ extends Control
 
 @onready var font = get_window().get_theme_default_font()
 
+@onready var tile_map: TileMap = $"../TileOverlay/TileMap"
 
 
 	# focus determines which tiles the cursor can navigate *to* by game actions
@@ -82,10 +83,10 @@ signal tile_changed(tile: Vector2i)
 
 @export var tile: Vector2i:
 	get:
-		return Util.nearest_hex_in_axial(self.position, Vector2i(0, 0), MapData.map.hex_size_in_pixels)
+		return tile_map.local_to_map(position)
 	set(value):
 		if value != tile:
-			self.position = Util.hex_coords_to_pixel(value, MapData.map.hex_size_in_pixels)
+			position = tile_map.map_to_local(value)
 			$coords.text = "%s" % value
 			var can_click = state is ChooseTile and value in state.among or state is ChooseUnit and tile_contains_unit(value, state.among)
 			$TextureRect.texture = preload("res://kenney_ui_rpg/cursor_click.tres") if can_click else preload("res://kenney_ui_rpg/cursor.tres")
@@ -136,17 +137,9 @@ func _unhandled_input(event):
 			for unit in state.among:
 				if unit.tile == tile:
 					unit_clicked.emit(unit)
-					#if unit._selected:
-						#unit.unselect()
-					#else:
-						#unit.select()
 					break
 	if not state is Readonly and event is InputEventMouseMotion:
-		tile = Util.nearest_hex_in_axial(
-			Vector2i(get_viewport_transform().affine_inverse() * event.position),
-			Vector2i(0, 0),
-			MapData.map.hex_size_in_pixels
-		)
+		tile = tile_map.local_to_map(get_viewport_transform().affine_inverse() * event.position)
 
 
 

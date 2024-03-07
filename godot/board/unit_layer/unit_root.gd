@@ -10,11 +10,14 @@ const Textures = {
 
 @onready var sprite: Sprite2D = $Sprite
 
+@export var tile_map : TileMap
 @export var tile: Vector2i:
 	get:
-		return Util.nearest_hex_in_axial(self.position, Vector2i(0, 0), MapData.map.hex_size_in_pixels)
+		return tile_map.local_to_map(position)
+		#return Util.nearest_hex_in_axial(self.position, Vector2i(0, 0), tile_map.tile_set.tile_size.y / sqrt(3))
 	set(value):
-		self.position = Util.hex_coords_to_pixel(value, MapData.map.hex_size_in_pixels)
+		#self.position = Util.hex_coords_to_pixel(value, tile_map.tile_set.tile_size.y / sqrt(3))
+		position = tile_map.map_to_local(value)
 @export var kind: Enums.Unit:
 	set(value):
 		#$Label.set_text(Enums.Unit.find_key(value))
@@ -89,5 +92,5 @@ func unselect():
 
 func _ready():
 	sprite.texture = Textures[kind]
-	sprite.scale *= (1.25 * MapData.map.hex_size_in_pixels / sprite.texture.get_width())
+	sprite.scale *= (1.25 * tile_map.tile_set.tile_size.y / sqrt(3) / sprite.texture.get_width())
 	sprite.self_modulate = Drawing.faction_colors[faction]

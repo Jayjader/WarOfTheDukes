@@ -20,7 +20,6 @@ func _is_city_or_fort(tile):
 	return CITY_OR_FORTRESS.has(MapData.map.tiles[tile])
 
 func _ready():
-	Board.toggled_editing.connect(self._on_board_root_toggled_editing)
 	setup = $SetupRoot
 	setup.empty_cities_and_forts[Enums.Faction.Orfburg] = MapData.map.zones.OrfburgTerritory.reduce(func(accu, next):
 		if _is_city_or_fort(next) and next not in accu:
@@ -57,6 +56,3 @@ func end_game(result: Enums.GameResult, winner=null):
 	game_over.new_lobby_created.connect(func(): new_lobby_started.emit())
 	game_over.session_closed.connect(func(): session_closed.emit())
 
-
-func _on_board_root_toggled_editing(editing: bool):
-	get_child(0).set_visible(not editing)

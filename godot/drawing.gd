@@ -115,32 +115,6 @@ static func draw_border(node: Node2D, kind, border_center, hex_size, origin):
 		node.draw_line(origin + second_normal_in_pix + bridge_offset_basis, origin + border_center_in_pix + bridge_offset_basis, tile_colors[kind], 10)
 		node.draw_line(origin + second_normal_in_pix - bridge_offset_basis, origin + border_center_in_pix - bridge_offset_basis, tile_colors[kind], 10)
 
-static func draw_hover(node: Node2D, mode, hovered, origin, hex_size):
-	var nearest_in_axial = Util.nearest_hex_in_axial(hovered, origin, hex_size)
-	var nearest_in_pix = Util.hex_coords_to_pixel(nearest_in_axial, hex_size) + Vector2(origin)
-	var is_origin = nearest_in_axial == Vector2i(0, 0)
-	var font = node.get_window().get_theme_default_font()
-
-	match mode:
-		Enums.TileOverlayMode.PAINTING_BORDERS:
-			var relative_to_center_in_axial = Vector2(nearest_in_axial) - Util.pixel_coords_to_hex(Vector2(hovered) - origin, hex_size)
-			var in_cube = Util.axial_to_cube(relative_to_center_in_axial)
-			var direction_to_nearest_center = Util.direction_to_center_in_cube(in_cube)
-			var border_center_in_axial = Vector2(nearest_in_axial) + Util.cube_to_axial(direction_to_nearest_center) / 2
-			node.draw_circle(Util.hex_coords_to_pixel(border_center_in_axial, hex_size) + origin, 20, Color.DEEP_PINK)
-			var normals = Util.derive_border_normals_in_cube(Util.axial_to_cube(border_center_in_axial))
-			node.draw_line(
-				Util.hex_coords_to_pixel(border_center_in_axial + Util.cube_to_axial(Vector3(normals[0]))/2, hex_size) + origin,
-				Util.hex_coords_to_pixel(border_center_in_axial + Util.cube_to_axial(Vector3(normals[1]))/2, hex_size) + origin,
-				Color.GREEN, 10)
-			node.draw_string_outline(font, nearest_in_pix, "%s"%border_center_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK)
-			node.draw_string(font, nearest_in_pix, "%s"%border_center_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE)
-
-		Enums.TileOverlayMode.READ_ONLY, Enums.TileOverlayMode.PAINTING_TILES, Enums.TileOverlayMode.EDITING_BASE:
-			draw_hex(node, nearest_in_pix, hex_size, Color.REBECCA_PURPLE if is_origin else Color.LIGHT_SALMON)
-			node.draw_string_outline(font, nearest_in_pix, "%s"%nearest_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK)
-			node.draw_string(font, nearest_in_pix, "%s"%nearest_in_axial, HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE)
-
 static func draw_unit_name(node: Node2D, unit: Enums.Unit, faction: Enums.Faction, hex: Vector2i, hex_size:float=60):
 	node.draw_string_outline(
 		node.get_window().get_theme_default_font(),
