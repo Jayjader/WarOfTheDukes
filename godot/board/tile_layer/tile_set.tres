@@ -14,14 +14,6 @@ texture_region_size = Vector2i(254, 220)
 0:0/0 = 0
 0:0/0/terrain_set = 0
 0:0/0/terrain = 0
-1:0/0 = 0
-2:0/0 = 0
-0:1/0 = 0
-1:1/0 = 0
-2:1/0 = 0
-0:2/0 = 0
-1:2/0 = 0
-2:2/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cbc5a"]
 resource_name = "Cliffs"
