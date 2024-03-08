@@ -120,6 +120,8 @@ func __on_choose_tile_taken():
 	if _destination != mover.tile:
 		unit_layer.move_unit(mover, mover.tile, _destination)
 		moved.append(mover)
+	elif current_player.is_computer:
+		moved.append(mover)
 
 func __on_choose_destination_state_exited():
 	mover.unselect()
