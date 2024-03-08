@@ -39,17 +39,17 @@ render_target_update_mode = 4
 unique_name_in_owner = true
 script = ExtResource("2_g1bmc")
 
-[node name="TileMap" parent="ViewportContainer/SubViewport/TileOverlay" instance=ExtResource("4_yw38a")]
+[node name="TileMap2" parent="ViewportContainer/SubViewport/TileOverlay" instance=ExtResource("4_yw38a")]
 
-[node name="DeploymentZone" type="Node2D" parent="ViewportContainer/SubViewport/TileOverlay/TileMap"]
+[node name="DeploymentZone" type="Node2D" parent="ViewportContainer/SubViewport/TileOverlay/TileMap2"]
 unique_name_in_owner = true
 script = ExtResource("4_dn2ii")
 
-[node name="MovementRange" type="Node2D" parent="ViewportContainer/SubViewport/TileOverlay/TileMap"]
+[node name="MovementRange" type="Node2D" parent="ViewportContainer/SubViewport/TileOverlay/TileMap2"]
 unique_name_in_owner = true
 script = ExtResource("4_6mrs1")
 
-[node name="RetreatRange" type="Node2D" parent="ViewportContainer/SubViewport/TileOverlay/TileMap"]
+[node name="RetreatRange" type="Node2D" parent="ViewportContainer/SubViewport/TileOverlay/TileMap2"]
 unique_name_in_owner = true
 script = ExtResource("5_otyml")
 

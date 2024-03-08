@@ -14,7 +14,7 @@ func schedule_event(e):
 
 @onready var tile_layer = Board.get_node("%TileOverlay")
 @onready var unit_layer: UnitLayer = Board.get_node("%UnitLayer")
-@onready var retreat_ui = Board.get_node("%TileOverlay/RetreatRange")
+@onready var retreat_ui = Board.get_node("%RetreatRange")
 
 func __on_duke_death(faction: Enums.Faction):
 	game_over.emit(Enums.GameResult.TOTAL_VICTORY, Enums.get_other_faction(faction))
@@ -47,7 +47,7 @@ func __on_top_level_state_entered():
 
 
 func _detect_game_result():
-	# if a player has managed to capture the opposing player's capital, we know its a major victory for them
+	# if a player has managed to capture the opposing player's capital, they score a major victory
 	for capital_faction in [Enums.Faction.Orfburg, Enums.Faction.Wulfenburg]:
 		var capital_tiles = MapData.map.zones[Enums.Faction.find_key(capital_faction)]
 		var hostile_faction = Enums.get_other_faction(capital_faction)
@@ -75,4 +75,3 @@ func __on_combat_state_exited():
 	if turn_counter > Rules.MaxTurns:
 		var game_result = _detect_game_result()
 		__on_last_turn_end(game_result[0], game_result[1])
-		pass # todo: detect winner, then __on_last_turn_end(...)
