@@ -10,7 +10,7 @@ func schedule_event(e):
 
 @onready var tile_layer = Board.get_node("%TileOverlay")
 @onready var unit_layer: UnitLayer = Board.get_node("%UnitLayer")
-@onready var retreat_ui = Board.get_node("%TileOverlay/RetreatRange")
+@onready var retreat_ui = Board.get_node("%RetreatRange")
 @onready var cursor = Board.cursor
 
 var current_player

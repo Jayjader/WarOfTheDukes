@@ -3,9 +3,7 @@ extends Node2D
 @export var retreat_from: Vector2i
 @export var destinations: Array[Vector2i] = []
 
-@onready var tile_map: TileMap = $"../TileMap"
-@onready var hex_size := tile_map.tile_set.tile_size.x * 0.5
-@onready var hex_diff := 0.5 * sqrt(3) * (tile_map.tile_set.tile_size.x - tile_map.tile_set.tile_size.y)
+@onready var tile_map: TileMap = $".."
 
 var hovered_tile = null
 
@@ -15,8 +13,7 @@ func _draw():
 			self,
 			"Retreat Range",
 			destinations,
-			hex_size,
-			position + Vector2(hex_size, hex_size - hex_diff)
+			tile_map
 		)
 		if hovered_tile != null:
 			self.draw_line(

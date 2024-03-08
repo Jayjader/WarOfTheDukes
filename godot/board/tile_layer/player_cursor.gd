@@ -2,7 +2,7 @@ extends Control
 
 @onready var font = get_window().get_theme_default_font()
 
-@onready var tile_map: TileMap = $"../TileOverlay/TileMap"
+@onready var tile_map: TileMap = $"%TileOverlay/TileMap"
 
 
 	# focus determines which tiles the cursor can navigate *to* by game actions

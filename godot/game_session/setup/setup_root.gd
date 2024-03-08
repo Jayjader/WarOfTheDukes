@@ -28,7 +28,7 @@ func set_phase(value):
 @onready var state_chart: StateChart = $StateChart
 
 @onready var unit_layer = Board.get_node("%UnitLayer")
-@onready var deployment_ui = Board.get_node("%TileOverlay/DeploymentZone")
+@onready var deployment_ui = Board.get_node("%DeploymentZone")
 @onready var cursor = Board.get_node("%PlayerCursor")
 
 var phase

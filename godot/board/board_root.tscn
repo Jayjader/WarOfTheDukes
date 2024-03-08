@@ -41,14 +41,16 @@ script = ExtResource("2_g1bmc")
 
 [node name="TileMap" parent="ViewportContainer/SubViewport/TileOverlay" instance=ExtResource("4_yw38a")]
 
-[node name="DeploymentZone" type="Node2D" parent="ViewportContainer/SubViewport/TileOverlay"]
+[node name="DeploymentZone" type="Node2D" parent="ViewportContainer/SubViewport/TileOverlay/TileMap"]
+unique_name_in_owner = true
 script = ExtResource("4_dn2ii")
 
-[node name="MovementRange" type="Node2D" parent="ViewportContainer/SubViewport/TileOverlay"]
+[node name="MovementRange" type="Node2D" parent="ViewportContainer/SubViewport/TileOverlay/TileMap"]
 unique_name_in_owner = true
 script = ExtResource("4_6mrs1")
 
-[node name="RetreatRange" type="Node2D" parent="ViewportContainer/SubViewport/TileOverlay"]
+[node name="RetreatRange" type="Node2D" parent="ViewportContainer/SubViewport/TileOverlay/TileMap"]
+unique_name_in_owner = true
 script = ExtResource("5_otyml")
 
 [node name="UnitLayer" type="Node2D" parent="ViewportContainer/SubViewport"]

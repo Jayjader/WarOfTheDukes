@@ -1,7 +1,9 @@
 extends Node2D
 
-@onready var hex_size = $"..".tile_set.tile_size.x / 2
-@onready var hex_diff: int = $"..".tile_set.tile_size.x - $"..".tile_set.tile_size.y
+@onready var tile_map: TileMap = $".."
+
+@onready var hex_size := tile_map.tile_set.tile_size.x / 2
+@onready var hex_diff := tile_map.tile_set.tile_size.x - tile_map.tile_set.tile_size.y
 
 func _draw():
 	for border_center in MapData.map.borders:

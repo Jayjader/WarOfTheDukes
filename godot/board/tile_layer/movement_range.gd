@@ -2,9 +2,7 @@ extends Node2D
 
 @export var destinations: Dictionary = {}
 
-@onready var tile_map: TileMap = $"../TileMap"
-@onready var hex_size := tile_map.tile_set.tile_size.x * 0.5
-@onready var hex_diff := 0.5 * sqrt(3) * (tile_map.tile_set.tile_size.x - tile_map.tile_set.tile_size.y)
+@onready var tile_map: TileMap = $".."
 
 var hovered_tile = null
 
@@ -23,21 +21,20 @@ func _draw():
 		self,
 		"Movement Range",
 		destinations.keys().filter(func(d): return destinations[d].can_stop_here),
-		hex_size,
-		position + Vector2(hex_size, hex_size - hex_diff)
+		tile_map
 	)
 
 	for destination_tile in destinations:
 		var cost_to_reach = "%s" % destinations[destination_tile].cost_to_reach
 		self.draw_string_outline(
 			self.get_window().get_theme_default_font(),
-			Util.hex_coords_to_pixel(destination_tile, hex_size),
+			tile_map.map_to_local(destination_tile),
 			cost_to_reach,
 			HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK
 		)
 		self.draw_string(
 			self.get_window().get_theme_default_font(),
-			Util.hex_coords_to_pixel(destination_tile, hex_size),
+			tile_map.map_to_local(destination_tile),
 			cost_to_reach,
 			HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE
 		)
