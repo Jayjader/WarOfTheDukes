@@ -1,8 +1,12 @@
-[gd_scene load_steps=2 format=3 uid="uid://b67vykg1enpfk"]
+[gd_scene load_steps=6 format=3 uid="uid://b67vykg1enpfk"]
 
 [ext_resource type="Script" path="res://main_game_scene.gd" id="1_10cqv"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="2_qvn5q"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="3_oum4h"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="4_hly2p"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="5_7ykwg"]
 
-[node name="MainGameScene" type="Control"]
+[node name="MainGameScene" type="Control" node_paths=PackedStringArray("state_chart")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,3 +15,45 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_10cqv")
+state_chart = NodePath("StateChart")
+
+[node name="StateChart" type="Node" parent="."]
+script = ExtResource("2_qvn5q")
+
+[node name="main state" type="Node" parent="StateChart"]
+script = ExtResource("3_oum4h")
+initial_state = NodePath("Main Menu")
+
+[node name="Main Menu" type="Node" parent="StateChart/main state"]
+script = ExtResource("4_hly2p")
+
+[node name="to lobby" type="Node" parent="StateChart/main state/Main Menu"]
+script = ExtResource("5_7ykwg")
+to = NodePath("../../New Game Lobby")
+event = &"game requested"
+
+[node name="New Game Lobby" type="Node" parent="StateChart/main state"]
+script = ExtResource("4_hly2p")
+
+[node name="to game" type="Node" parent="StateChart/main state/New Game Lobby"]
+script = ExtResource("5_7ykwg")
+to = NodePath("../../In-Game")
+event = &"lobby confirmed"
+
+[node name="In-Game" type="Node" parent="StateChart/main state"]
+script = ExtResource("4_hly2p")
+
+[node name="to menu" type="Node" parent="StateChart/main state/In-Game"]
+script = ExtResource("5_7ykwg")
+to = NodePath("../../Main Menu")
+event = &"game exited"
+
+[node name="to new lobby" type="Node" parent="StateChart/main state/In-Game"]
+script = ExtResource("5_7ykwg")
+to = NodePath("../../New Game Lobby")
+event = &"new game requested"
+
+[connection signal="child_state_exited" from="StateChart/main state" to="." method="__on_main_state_child_state_exited"]
+[connection signal="state_entered" from="StateChart/main state/Main Menu" to="." method="__on_main_menu_state_entered"]
+[connection signal="taken" from="StateChart/main state/Main Menu/to lobby" to="." method="__on_to_lobby_taken"]
+[connection signal="taken" from="StateChart/main state/New Game Lobby/to game" to="." method="__on_to_game_taken"]

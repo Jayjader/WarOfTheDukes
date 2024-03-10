@@ -1,30 +1,6 @@
 extends Node
 class_name Enums
 
-enum TileOverlayCalibration {
-	UNCALIBRATED,
-	CALIBRATING_BL,
-	CALIBRATING_BR,
-	CALIBRATING_TR,
-	CALIBRATING_TL,
-	CALIBRATING_SIZE,
-	CHOOSING_ORIGIN,
-	CALIBRATED,
-}
-static func calibration_step_name(step: TileOverlayCalibration):
-	return TileOverlayCalibration.find_key(step)
-
-enum TileOverlayMode {
-	READ_ONLY,
-	CALIBRATING,
-	EDITING_BASE,
-	PAINTING_TILES,
-	PAINTING_BORDERS,
-	PAINTING_ZONES,
-}
-
-enum TileOverlayPaletteItem { TILE, BORDER, ZONE }
-
 enum Faction { Orfburg, Wulfenburg }
 
 static func get_other_faction(faction: Faction):
@@ -63,7 +39,5 @@ enum CombatResult {
 	DefenderRetreats,
 	DefenderEliminated,
 }
-
-enum MainMode { MainMenu, NewGameLobby, InGame }
 
 enum GameResult { MINOR_VICTORY, TOTAL_VICTORY }
