@@ -25,9 +25,9 @@ func choose_next_mover(moved: Array[GamePiece], allies: Array[GamePiece], _enemi
 		return unit
 	return null
 
-func choose_destination(mover: GamePiece, others: Array[GamePiece], map: HexMapData):
+func choose_destination(mover: GamePiece, map: HexMapData):
 	var biais = []
-	var paths = map.paths_for(mover, others)
+	var paths = Board.paths_for(mover)
 	for tile in paths:
 		if paths[tile].can_stop_here:
 			biais.append([tile,

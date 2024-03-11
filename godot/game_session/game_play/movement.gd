@@ -141,9 +141,5 @@ func __on_tile_chosen_as_destination(tile: Vector2i, _kind=null, _zones=null):
 
 
 func _get_ai_movement_destination():
-	var others: Array[GamePiece] = []
-	for unit in alive:
-		if unit != mover:
-			others.append(unit)
 	var strategy = MovementStrategy.new()
-	__on_tile_chosen_as_destination(strategy.choose_destination(mover, others, MapData.map))
+	__on_tile_chosen_as_destination(strategy.choose_destination(mover, MapData.map))
