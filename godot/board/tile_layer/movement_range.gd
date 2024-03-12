@@ -40,10 +40,12 @@ func _draw():
 		)
 
 	var current_tile = hovered_tile
-	while current_tile != null and current_tile in destinations:
+	while current_tile in destinations:
 		var from_ = destinations[current_tile]
+		if from_.from == null:
+			break
 		self.draw_line(
 			tile_map.map_to_local(current_tile),
-			tile_map.map_to_local(destinations[current_tile].from),
+			tile_map.map_to_local(from_.from),
 			Color.RED, 8, true)
-		current_tile = from_.from if from_.cost_to_reach > 0 else null
+		current_tile = from_.from
