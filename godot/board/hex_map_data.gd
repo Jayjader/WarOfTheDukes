@@ -13,9 +13,6 @@ class_name HexMapData
 	WulfenburgTerritory = []
 }
 
-@export_group("Map Properties")
-@export var hex_size_in_pixels: float = 60
-
 func neighbors_to(tile: Vector2i):
 	var neighbors = {}
 	for direction in Util.cube_directions:
