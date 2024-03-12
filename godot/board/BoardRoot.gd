@@ -10,11 +10,18 @@ func _ready():
 func paths_from(tile: Vector2i, max_cost: int):
 	return MapData.map.paths_from(tile, max_cost)
 func paths_for(unit: GamePiece):
-	var units: Array[GamePiece] = []
+	var other_units: Array[GamePiece] = []
 	for other_unit in %UnitLayer.get_children(true):
 		if unit.name != other_unit.name:
-			units.append(other_unit)
-	return MapData.map.paths_for(unit, units)
+			other_units.append(other_unit)
+	return MapData.map.paths_for(unit, other_units)
+
+func pathfinding_for(unit: GamePiece):
+	var other_units: Array[GamePiece] = []
+	for other_unit in %UnitLayer.get_children(true):
+		if unit.name != other_unit.name:
+			other_units.append(other_unit)
+	return BoardPathfinding.paths_for_unit(unit, other_units, %TileOverlay/TileMap)
 
 func get_units_on(tile: Vector2i):
 	return %UnitLayer.get_children().filter(func(unit): return unit.tile == tile)
