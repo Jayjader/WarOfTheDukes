@@ -1,7 +1,6 @@
-[gd_scene load_steps=10 format=3 uid="uid://bwst2xk4wn3l6"]
+[gd_scene load_steps=9 format=3 uid="uid://bwst2xk4wn3l6"]
 
 [ext_resource type="Script" path="res://board/BoardRoot.gd" id="1_7ngv4"]
-[ext_resource type="Script" path="res://board/tile_layer/TileOverlay.gd" id="2_g1bmc"]
 [ext_resource type="Script" path="res://board/unit_layer/unit_layer_root.gd" id="4_3bm0a"]
 [ext_resource type="Script" path="res://board/tile_layer/movement_range.gd" id="4_6mrs1"]
 [ext_resource type="Script" path="res://board/tile_layer/deployment_zone.gd" id="4_dn2ii"]
@@ -37,7 +36,6 @@ render_target_update_mode = 4
 
 [node name="TileOverlay" type="Node2D" parent="ViewportContainer/SubViewport"]
 unique_name_in_owner = true
-script = ExtResource("2_g1bmc")
 
 [node name="TileMap" parent="ViewportContainer/SubViewport/TileOverlay" instance=ExtResource("4_yw38a")]
 

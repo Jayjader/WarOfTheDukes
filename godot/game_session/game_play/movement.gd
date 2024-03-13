@@ -48,101 +48,43 @@ func __on_end_movement_pressed():
 
 ### Choose Mover
 var mover
-func __on_unit_selected_for_move(unit):
+func __on_unit_selected_for_move(unit: GamePiece):
 	mover = unit
 	mover.select("Moving")
 	schedule_event("mover chosen")
 
-func _get_ai_movement_choice():
-	var strategy = MovementStrategy.new()
-	var allies: Array[GamePiece] = []
-	var enemies: Array[GamePiece] = []
-	for unit in alive:
-		if unit.faction == current_player.faction:
-			allies.append(unit)
-		else:
-			enemies.append(unit)
-	var choice = strategy.choose_next_mover(moved, allies, enemies, MapData.map)
-	if choice is GamePiece:
-		__on_unit_selected_for_move(choice)
-	else:
-		__on_end_movement_pressed()
-
 func __on_choose_mover_state_entered():
 	%SubPhaseInstruction.text = "Choose a unit to move"
-	if current_player.is_computer:
-		schedule(_get_ai_movement_choice)
-	else:
-		%EndMovementPhase.show()
-		var can_choose : Array[GamePiece] = []
-		for unit in alive:
-			if unit.faction == current_player.faction and unit not in moved:
-				can_choose.append(unit)
-		cursor.unit_clicked.connect(__on_unit_selected_for_move)
-		cursor.choose_unit(can_choose, "Can move")
+	var player_controller = $ComputerController if current_player.is_computer else $PlayerController
+	player_controller.current_player = current_player
+	if not player_controller.movement_ended.is_connected(__on_end_movement_pressed):
+		player_controller.movement_ended.connect(__on_end_movement_pressed)
+	if not player_controller.mover_chosen.is_connected(__on_unit_selected_for_move):
+		player_controller.mover_chosen.connect(__on_unit_selected_for_move)
+	player_controller.query_for_mover(moved, alive)
 
 func __on_choose_unit_taken():
 	pass
 
 func __on_choose_mover_state_exited():
-	if not current_player.is_computer:
-		cursor.unit_clicked.disconnect(__on_unit_selected_for_move)
-		cursor.stop_choosing_unit()
-	%EndMovementPhase.hide()
-
+	var player_controller = $ComputerController if current_player.is_computer else $PlayerController
+	if player_controller.movement_ended.is_connected(__on_end_movement_pressed):
+		player_controller.movement_ended.disconnect(__on_end_movement_pressed)
+	if player_controller.mover_chosen.is_connected(__on_unit_selected_for_move):
+		player_controller.mover_chosen.disconnect(__on_unit_selected_for_move)
 
 ### Choose Destination
 var _destination : Vector2i
 
 func __on_choose_destination_state_entered():
 	%SubPhaseInstruction.text = "Choose the destination for the selected unit"
-	if current_player.is_computer:
-		schedule(_get_ai_movement_destination)
-	else:
-		%CancelMoverChoice.show()
-		var astar := Board.pathfinding_for(mover)
-		var paths = astar.get_destinations()
-		var destinations = {mover.tile: {from=null, can_stop_here=true, cost_to_reach=0}}
-		for destination in paths:
-			var allies_on_tile: Array[GamePiece] = []
-			for unit in alive:
-				if current_player == unit.player and unit.tile == destination:
-					allies_on_tile.append(unit)
-			var path = paths[destination]
-			var cost = 0
-			var previous = path[0]
-			for pos in path.slice(1):
-				if pos.distance_squared_to(floor(pos)) > 0:
-					# this is a border
-					var border_kind = MapData.map.borders.get(pos)
-					var tile_kind = MapData.map.tiles[Vector2i(previous)]
-					cost += Rules.MovementCost[border_kind if border_kind != null else tile_kind]
-				previous = pos
-			if cost <= Rules.MovementPoints[mover.kind]:
-				destinations[destination] = {
-					from=path[-3] if len(path) > 1 else destination,
-					can_stop_here=len(allies_on_tile) == 0  or (
-					len(allies_on_tile) == 1 and (mover.kind == Enums.Unit.Duke) != (allies_on_tile[0].kind == Enums.Unit.Duke)
-					),
-					cost_to_reach=cost
-				}
-		#print_debug(astar_destinations)
-		#var destinations = Board.paths_for(mover)
-		tile_layer.set_destinations(destinations)
-		var can_cross: Array[Vector2i] = []
-		var can_stop: Array[Vector2i] = [mover.tile]
-		for tile in destinations.keys():
-			can_cross.append(tile)
-			if destinations[tile].can_stop_here:
-				can_stop.append(tile)
-		can_stop.erase(mover.tile)
-		cursor.tile_clicked.connect(__on_tile_chosen_as_destination, CONNECT_ONE_SHOT)
-		cursor.choose_tile(can_stop)
-
-func __on_cancel_choice_of_mover_taken():
-	if not current_player.is_computer:
-		cursor.tile_clicked.disconnect(__on_tile_chosen_as_destination)
-
+	var player_controller = $ComputerController if current_player.is_computer else $PlayerController
+	if not current_player.is_computer and not player_controller.movement_cancelled.is_connected(__on_mover_choice_cancelled):
+		player_controller.movement_cancelled.connect(__on_mover_choice_cancelled)
+	if not player_controller.destination_chosen.is_connected(__on_mover_choice_cancelled):
+		player_controller.destination_chosen.connect(__on_tile_chosen_as_destination)
+	player_controller.query_for_destination(mover, alive)
+		
 func __on_choose_tile_taken():
 	if _destination != mover.tile:
 		unit_layer.move_unit(mover, mover.tile, _destination)
@@ -153,20 +95,15 @@ func __on_choose_tile_taken():
 func __on_choose_destination_state_exited():
 	mover.unselect()
 	mover = null
-	if current_player.is_computer:
-		pass
-	else:
-		%CancelMoverChoice.hide()
-		cursor.stop_choosing_tile()
-		tile_layer.clear_destinations()
+	var player_controller = $ComputerController if current_player.is_computer else $PlayerController
+	if not current_player.is_computer and player_controller.movement_cancelled.is_connected(__on_mover_choice_cancelled):
+		player_controller.movement_cancelled.disconnect(__on_mover_choice_cancelled)
+	if player_controller.destination_chosen.is_connected(__on_mover_choice_cancelled):
+		player_controller.destination_chosen.disconnect(__on_mover_choice_cancelled)
+	
 
 func __on_mover_choice_cancelled(_unit=null):
 	schedule_event("mover choice canceled")
-func __on_tile_chosen_as_destination(tile: Vector2i, _kind=null, _zones=null):
+func __on_tile_chosen_as_destination(tile: Vector2i):
 	_destination = tile
 	schedule_event("unit moved")
-
-
-func _get_ai_movement_destination():
-	var strategy = MovementStrategy.new()
-	__on_tile_chosen_as_destination(strategy.choose_destination(mover, MapData.map))

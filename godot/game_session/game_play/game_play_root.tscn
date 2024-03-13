@@ -1,7 +1,9 @@
-[gd_scene load_steps=14 format=3 uid="uid://dn24y8eq6bsf"]
+[gd_scene load_steps=16 format=3 uid="uid://dn24y8eq6bsf"]
 
 [ext_resource type="Script" path="res://game_session/game_play/game_play_root.gd" id="1_kicvc"]
 [ext_resource type="Script" path="res://game_session/game_play/combat.gd" id="3_3xcs7"]
+[ext_resource type="Script" path="res://game_session/game_play/player_controller.gd" id="3_qfohn"]
+[ext_resource type="Script" path="res://game_session/game_play/computer_controller.gd" id="4_8k7ub"]
 [ext_resource type="Script" path="res://game_session/game_play/movement.gd" id="8_w53gd"]
 [ext_resource type="StyleBox" uid="uid://bfoveihuvrux5" path="res://kenney_ui_rpg/stone_panel_stylebox.tres" id="10_y5nfl"]
 [ext_resource type="Texture2D" uid="uid://cssg6vlttu5fj" path="res://kenney_ui_rpg/uipack_rpg_vector.svg" id="11_kee8j"]
@@ -45,6 +47,12 @@ state_chart = NodePath("StateChart")
 
 [node name="Movement" type="Node" parent="."]
 script = ExtResource("8_w53gd")
+
+[node name="PlayerController" type="Node" parent="Movement"]
+script = ExtResource("3_qfohn")
+
+[node name="ComputerController" type="Node" parent="Movement"]
+script = ExtResource("4_8k7ub")
 
 [node name="Combat" type="Node" parent="."]
 script = ExtResource("3_3xcs7")
@@ -562,7 +570,7 @@ text = "Confirm Loss Allocation"
 [connection signal="pressed" from="BottomRightMargin/HBox/Cancel/ChangeAttackerForRetreat" to="Combat" method="__on_retreating_attacker_choice_cancelled"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Cancel/UnitChosenToMakeWay" to="Combat" method="__on_making_way_unit_choice_canceled"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Cancel/CancelPursuit" to="Combat" method="__on_pursuit_declined"]
-[connection signal="pressed" from="BottomRightMargin/HBox/Confirm/EndMovementPhase" to="Movement" method="__on_end_movement_pressed"]
+[connection signal="pressed" from="BottomRightMargin/HBox/Confirm/EndMovementPhase" to="Movement/PlayerController" method="__on_end_movement_pressed"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Confirm/EndCombatPhase" to="Combat" method="__on_end_combat_pressed"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Confirm/ConfirmAttackers" to="Combat" method="__on_confirm_attackers_pressed"]
 [connection signal="pressed" from="BottomRightMargin/HBox/Confirm/ConfirmDefender" to="Combat" method="__on_confirm_defender_pressed"]
