@@ -28,24 +28,25 @@ func _draw():
 		var cost_to_reach = "%s" % destinations[destination_tile].cost_to_reach
 		self.draw_string_outline(
 			self.get_window().get_theme_default_font(),
-			tile_map.map_to_local(destination_tile),
+			tile_map.map_to_local(destination_tile) + Vector2(-16, 16),
 			cost_to_reach,
-			HORIZONTAL_ALIGNMENT_CENTER, -1, 16, 2, Color.BLACK
+			HORIZONTAL_ALIGNMENT_CENTER, -1, 64, 2, Color.BLACK
 		)
 		self.draw_string(
 			self.get_window().get_theme_default_font(),
-			tile_map.map_to_local(destination_tile),
+			tile_map.map_to_local(destination_tile) + Vector2(-16, 16),
 			cost_to_reach,
-			HORIZONTAL_ALIGNMENT_CENTER, -1, 16, Color.WHITE
+			HORIZONTAL_ALIGNMENT_CENTER, -1, 64, Color.WHITE
 		)
 
-	var current_tile = hovered_tile
-	while current_tile in destinations:
-		var from_ = destinations[current_tile]
-		if from_.from == null:
-			break
-		self.draw_line(
-			tile_map.map_to_local(current_tile),
-			tile_map.map_to_local(from_.from),
-			Color.RED, 8, true)
-		current_tile = from_.from
+	if hovered_tile in destinations:
+		var current_tile = Vector2i(hovered_tile)
+		while true:
+			var from_ = destinations.get(current_tile)
+			if from_ == null or from_.from == null:
+				break
+			self.draw_line(
+				tile_map.map_to_local(current_tile),
+				tile_map.map_to_local(from_.from),
+				Color.RED, 8, true)
+			current_tile = from_.from
