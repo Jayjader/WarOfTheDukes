@@ -51,16 +51,16 @@ func query_for_destination(mover: GamePiece, alive: Array[GamePiece]):
 			#var border_kind = MapData.map.borders.get(path[path_index])
 			#var destination_tile_kind = MapData.map.tiles[Vector2i(path[path_index + 1])]
 			#cost += Rules.MovementCost.get(border_kind if border_kind != null else destination_tile_kind, +200)
-		if cost <= Rules.MovementPoints[mover.kind]:
-			destinations[destination] = {
-				path = path,
-				can_stop_here = len(allies_on_tile) == 0  or (
-				len(allies_on_tile) == 1 and (mover.kind == Enums.Unit.Duke) != (allies_on_tile[0].kind == Enums.Unit.Duke)
-				),
-				cost_to_reach = cost
-			}
+		#if cost <= Rules.MovementPoints[mover.kind]:
+		destinations[destination] = {
+			path = path,
+			can_stop_here = len(allies_on_tile) == 0  or (
+			len(allies_on_tile) == 1 and (mover.kind == Enums.Unit.Duke) != (allies_on_tile[0].kind == Enums.Unit.Duke)
+			),
+			cost_to_reach = cost
+		}
 	
-	movement_range.destinations = destinations
+	movement_range.destinations = destinations.duplicate()
 	if not Board.cursor.tile_changed.is_connected(movement_range.__on_tile_hovered):
 		Board.cursor.tile_changed.connect(movement_range.__on_tile_hovered)
 	movement_range.queue_redraw()
@@ -70,13 +70,13 @@ func query_for_destination(mover: GamePiece, alive: Array[GamePiece]):
 		can_cross.append(tile)
 		if destinations[tile].can_stop_here:
 			can_stop.append(tile)
-	Board.cursor.tile_clicked.connect(__on_tile_chosen_as_destination.bind(mover), CONNECT_ONE_SHOT)
+	Board.cursor.tile_clicked.connect(__on_tile_chosen_as_destination.bind(mover, destinations), CONNECT_ONE_SHOT)
 	Board.cursor.choose_tile(can_stop)
 
 
-func __on_tile_chosen_as_destination(tile: Vector2i, mover: GamePiece):
+func __on_tile_chosen_as_destination(tile: Vector2i, mover: GamePiece, destinations: Dictionary):
 	_cleanup_destination_choice()
-	if tile == mover.tile:
+	if tile == mover.tile or destinations[tile].cost_to_reach > Rules.MovementPoints[mover.kind]:
 		movement_cancelled.emit()
 	else:
 		destination_chosen.emit(tile)
