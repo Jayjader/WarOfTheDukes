@@ -1,6 +1,7 @@
 extends Node2D
 
 @export var destinations: Dictionary = {}
+@export var max_cost := 0
 
 @onready var tile_map: TileMap = $".."
 
@@ -36,11 +37,13 @@ func _draw():
 			self.get_window().get_theme_default_font(),
 			tile_map.map_to_local(destination_tile) + Vector2(-16, 16),
 			cost_to_reach,
-			HORIZONTAL_ALIGNMENT_CENTER, -1, 64, Color.WHITE
+			HORIZONTAL_ALIGNMENT_CENTER, -1, 64, Color.WHITE if destinations[destination_tile].cost_to_reach <= max_cost else Color.RED
 		)
 
 	if hovered_tile in destinations:
-		var path = destinations[hovered_tile].path
+		var dest = destinations[hovered_tile]
+		var path = dest.path
+		var path_color =  Color.WHITE if dest.cost_to_reach <= max_cost else Color.RED
 		if len(path) > 1:
 			var color_blend = 1.0
 			var local_path: PackedVector2Array = []
@@ -54,10 +57,10 @@ func _draw():
 				var middle = 0.5 * (start + end)
 				local_path.append(start)
 				local_path.append(middle)
-				colors.append(Color.RED * color_blend)
-				color_blend *= 0.9
+				colors.append(path_color * color_blend)
+				color_blend *= 0.95
 				local_path.append(middle)
 				local_path.append(end)
-				colors.append(Color.RED * color_blend)
-				color_blend *= 0.9
+				colors.append(path_color * color_blend)
+				color_blend *= 0.95
 			draw_multiline_colors(local_path, colors, 12)

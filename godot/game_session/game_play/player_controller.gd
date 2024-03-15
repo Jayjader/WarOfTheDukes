@@ -16,16 +16,15 @@ func query_for_mover(moved: Array[GamePiece], alive: Array[GamePiece]):
 		Board.cursor.choose_unit(can_choose, "Can move")
 
 func __on_end_movement_pressed():
-	_cleanup_mover_choice.call_deferred()
+	_cleanup_mover_choice()
+	Board.cursor.unit_clicked.disconnect(__on_unit_selected_for_move)
+	Board.cursor.stop_choosing_unit()
 	movement_ended.emit()
 func __on_unit_selected_for_move(unit: GamePiece):
-	_cleanup_mover_choice.call_deferred()
+	_cleanup_mover_choice()
 	mover_chosen.emit(unit)
 
 func _cleanup_mover_choice():
-	if Board.cursor.unit_clicked.is_connected(__on_unit_selected_for_move):
-		Board.cursor.unit_clicked.disconnect(__on_unit_selected_for_move)
-	Board.cursor.stop_choosing_unit()
 	%EndMovementPhase.hide()
 
 
@@ -46,12 +45,6 @@ func query_for_destination(mover: GamePiece, alive: Array[GamePiece]):
 				allies_on_tile.append(unit)
 		var path = paths[destination]
 		var cost = astar.cost_to(destination)
-		#for path_index in range(1, len(path), 2):
-		#	cost += astar.get_point_weight_scale(path_index)
-			#var border_kind = MapData.map.borders.get(path[path_index])
-			#var destination_tile_kind = MapData.map.tiles[Vector2i(path[path_index + 1])]
-			#cost += Rules.MovementCost.get(border_kind if border_kind != null else destination_tile_kind, +200)
-		#if cost <= Rules.MovementPoints[mover.kind]:
 		destinations[destination] = {
 			path = path,
 			can_stop_here = len(allies_on_tile) == 0  or (
@@ -61,6 +54,7 @@ func query_for_destination(mover: GamePiece, alive: Array[GamePiece]):
 		}
 	
 	movement_range.destinations = destinations.duplicate()
+	movement_range.max_cost = Rules.MovementPoints[mover.kind]
 	if not Board.cursor.tile_changed.is_connected(movement_range.__on_tile_hovered):
 		Board.cursor.tile_changed.connect(movement_range.__on_tile_hovered)
 	movement_range.queue_redraw()
@@ -71,7 +65,7 @@ func query_for_destination(mover: GamePiece, alive: Array[GamePiece]):
 		if destinations[tile].can_stop_here:
 			can_stop.append(tile)
 	Board.cursor.tile_clicked.connect(__on_tile_chosen_as_destination.bind(mover, destinations), CONNECT_ONE_SHOT)
-	Board.cursor.choose_tile(can_stop)
+	Board.cursor.choose_tile_for_unit(can_stop)
 
 
 func __on_tile_chosen_as_destination(tile: Vector2i, mover: GamePiece, destinations: Dictionary):

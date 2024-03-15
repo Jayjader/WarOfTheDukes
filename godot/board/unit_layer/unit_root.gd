@@ -14,20 +14,16 @@ const Textures = {
 @export var tile: Vector2i:
 	get:
 		return tile_map.local_to_map(position)
-		#return Util.nearest_hex_in_axial(self.position, Vector2i(0, 0), tile_map.tile_set.tile_size.y / sqrt(3))
 	set(value):
-		#self.position = Util.hex_coords_to_pixel(value, tile_map.tile_set.tile_size.y / sqrt(3))
 		position = tile_map.map_to_local(value)
 @export var kind: Enums.Unit:
 	set(value):
-		#$Label.set_text(Enums.Unit.find_key(value))
 		movement_points = Rules.MovementPoints[value]
 		kind = value
 @export var faction: Enums.Faction:
 	set(value):
 		$Label.add_theme_color_override("font_color", Drawing.faction_colors[value])
 		faction = value
-		# todo: set theme according to faction
 @export var movement_points: int
 
 @export var player: PlayerRs:

@@ -40,17 +40,17 @@ initial_state = NodePath("read only")
 [node name="read only" type="Node" parent="StateChart/cursor state"]
 script = ExtResource("5_wnm0a")
 
-[node name="to inspect" type="Node" parent="StateChart/cursor state/read only"]
+[node name="start inspecting" type="Node" parent="StateChart/cursor state/read only"]
 script = ExtResource("6_d07cb")
 to = NodePath("../../inspect")
 event = &"inspect"
 
-[node name="to choose tile" type="Node" parent="StateChart/cursor state/read only"]
+[node name="start choosing tile" type="Node" parent="StateChart/cursor state/read only"]
 script = ExtResource("6_d07cb")
 to = NodePath("../../choose tile")
 event = &"choose tile"
 
-[node name="to choose unit" type="Node" parent="StateChart/cursor state/read only"]
+[node name="start choosing unit" type="Node" parent="StateChart/cursor state/read only"]
 script = ExtResource("6_d07cb")
 to = NodePath("../../choose unit")
 event = &"choose unit"
@@ -58,7 +58,7 @@ event = &"choose unit"
 [node name="inspect" type="Node" parent="StateChart/cursor state"]
 script = ExtResource("5_wnm0a")
 
-[node name="to read only" type="Node" parent="StateChart/cursor state/inspect"]
+[node name="stop inspecting" type="Node" parent="StateChart/cursor state/inspect"]
 script = ExtResource("6_d07cb")
 to = NodePath("../../read only")
 event = &"stop inspecting"
@@ -66,7 +66,7 @@ event = &"stop inspecting"
 [node name="choose tile" type="Node" parent="StateChart/cursor state"]
 script = ExtResource("5_wnm0a")
 
-[node name="to read only" type="Node" parent="StateChart/cursor state/choose tile"]
+[node name="stop choosing tile" type="Node" parent="StateChart/cursor state/choose tile"]
 script = ExtResource("6_d07cb")
 to = NodePath("../../read only")
 event = &"stop choosing tile"
@@ -74,14 +74,19 @@ event = &"stop choosing tile"
 [node name="choose unit" type="Node" parent="StateChart/cursor state"]
 script = ExtResource("5_wnm0a")
 
-[node name="to read only" type="Node" parent="StateChart/cursor state/choose unit"]
+[node name="stop choosing unit" type="Node" parent="StateChart/cursor state/choose unit"]
 script = ExtResource("6_d07cb")
 to = NodePath("../../read only")
 event = &"stop choosing unit"
+
+[node name="choose tile for unit" type="Node" parent="StateChart/cursor state/choose unit"]
+script = ExtResource("6_d07cb")
+to = NodePath("../../choose tile")
+event = &"choose tile"
 
 [connection signal="state_entered" from="StateChart/cursor state/read only" to="." method="__on_read_only_state_entered"]
 [connection signal="state_entered" from="StateChart/cursor state/inspect" to="." method="__on_inspect_state_entered"]
 [connection signal="state_entered" from="StateChart/cursor state/choose tile" to="." method="__on_choose_tile_state_entered"]
 [connection signal="state_entered" from="StateChart/cursor state/choose unit" to="." method="__on_choose_unit_state_entered"]
-[connection signal="state_exited" from="StateChart/cursor state/choose unit" to="." method="__on_choose_unit_state_exited"]
-[connection signal="taken" from="StateChart/cursor state/choose unit/to read only" to="." method="__on_to_read_only_from_choose_unit_taken"]
+[connection signal="taken" from="StateChart/cursor state/choose unit/stop choosing unit" to="." method="__on_to_read_only_from_choose_unit_taken"]
+[connection signal="taken" from="StateChart/cursor state/choose unit/choose tile for unit" to="." method="__on_choose_tile_for_unit_taken"]

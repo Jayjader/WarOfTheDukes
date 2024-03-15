@@ -395,10 +395,10 @@ func __on_view_result_state_entered():
 	%ConfirmCombatResult.show()
 	%ConfirmCombatResult.grab_focus.call_deferred()
 func __on_confirm_combat_result_pressed():
-	schedule_event(emitted_event)
 	defending.unselect()
 	for unit in attacking:
 		unit.unselect()
+	state_chart.send_event(emitted_event)
 func __on_view_result_state_exited():
 	%ConfirmCombatResult.hide()
 
@@ -444,7 +444,8 @@ func __on_retreat_defender_state_entered():
 func __on_hex_clicked_for_defender_retreat(tile: Vector2i):
 	retreat_ui.destinations.clear()
 	retreat_ui.queue_redraw()
-	Board.cursor.stop_choosing_tile()
+	if not defending.player.is_computer:
+		Board.cursor.stop_choosing_tile()
 	defending.unselect()
 	pursue_to = defending.tile # save before moving defending/defender
 	for unit in Board.get_units_on(defending.tile):

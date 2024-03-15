@@ -57,16 +57,19 @@ func stop_inspecting():
 	state_chart.send_event("stop inspecting")
 
 func choose_tile(tiles: Array[Vector2i]):
+	assert(state is Readonly)
 	assert(len(tiles) > 0)
 	state = ChooseTile.new()
 	state.among.append_array(tiles)
 	state_chart.send_event("choose tile")
 
 func stop_choosing_tile():
+	assert(state is ChooseTile)
 	state = Readonly.new()
 	state_chart.send_event("stop choosing tile")
 
 func choose_unit(units: Array[GamePiece], for_:="Choosing unit"):
+	assert(state is Readonly)
 	assert(len(units) > 0)
 	state = ChooseUnit.new()
 	state.among.append_array(units)
@@ -74,7 +77,16 @@ func choose_unit(units: Array[GamePiece], for_:="Choosing unit"):
 	state_chart.send_event("choose unit")
 
 func stop_choosing_unit():
+	assert(state is ChooseUnit)
 	state_chart.send_event("stop choosing unit")
+
+var _tiles: Array[Vector2i] = []
+func choose_tile_for_unit(tiles: Array[Vector2i]):
+	assert(state is ChooseUnit)
+	assert(len(tiles) > 0)
+	_tiles.append_array(tiles)
+	state_chart.send_event("choose tile")
+	
 
 signal tile_clicked(tile: Vector2i)
 signal unit_clicked(unit: GamePiece)
@@ -156,17 +168,24 @@ func __on_choose_tile_state_entered():
 	if tile not in state.among:
 		tile = state.among[0]
 
+
 func __on_choose_unit_state_entered():
 	show()
-	if tile_contains_unit(tile, state.among):
+	if not tile_contains_unit(tile, state.among):
 		tile = state.among[0].tile
 	for unit in state.among:
 		unit.selectable(state.reason)
 
-func __on_choose_unit_state_exited():
-	state = Readonly.new()
 
 func __on_to_read_only_from_choose_unit_taken():
 	for unit in state.among:
 		unit.unselectable()
+	state = Readonly.new()
 
+func __on_choose_tile_for_unit_taken():
+	for unit in state.among:
+		if unit.tile != tile:
+			unit.unselectable()
+	state = ChooseTile.new()
+	state.among.append_array(_tiles)
+	_tiles.clear()

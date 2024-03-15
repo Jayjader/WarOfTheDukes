@@ -75,7 +75,7 @@ static func init_for_unit(unit: GamePiece, others: Array[GamePiece], _tile_map: 
 				#var neighbour = MapData.map.tiles.get(neighbour_tile)
 				if neighbour_data == null:
 					continue
-				var neighbour = _tile_map.tile_set.get_terrain_name(cell_data.terrain_set, cell_data.terrain)
+				var neighbour = _tile_map.tile_set.get_terrain_name(neighbour_data.terrain_set, neighbour_data.terrain)
 				var border_coords = 0.5 * (point + neighbour_tile)
 				var border = MapData.map.borders.get(border_coords)
 				if border == "River" or (neighbour == "Lake" and border == null):
@@ -83,19 +83,15 @@ static func init_for_unit(unit: GamePiece, others: Array[GamePiece], _tile_map: 
 				if is_in_enemy_zoc(point, enemy_tiles) and is_in_enemy_zoc(neighbour_tile, enemy_tiles):
 					continue
 				var neighbour_id = astar.get_closest_point(neighbour_tile)
+				var border_id = astar.get_available_point_id()
+				var movement_cost = Rules.MovementCost[neighbour if border == null else border]
+				astar.add_point(border_id, border_coords, movement_cost)
 				if border == null:
 					# border cost depends on tile being entered => mono-direction
-					var movement_cost = Rules.MovementCost[neighbour]
-					var border_id = astar.get_available_point_id()
-					astar.add_point(border_id, border_coords, movement_cost)
 					astar.connect_points(point_id, border_id, false)
 					astar.connect_points(border_id, neighbour_id, false)
-					
 				else:
 					# border cost is bidirectional
-					var movement_cost = Rules.MovementCost[border]
-					var border_id = astar.get_available_point_id()
-					astar.add_point(border_id, border_coords, movement_cost)
 					astar.connect_points(point_id, border_id)
 					astar.connect_points(border_id, neighbour_id)
 
