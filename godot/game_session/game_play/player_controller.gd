@@ -36,10 +36,8 @@ func query_for_destination(mover: GamePiece, alive: Array[GamePiece]):
 	%CancelMoverChoice.show()
 	var astar := Board.pathfinding_for(mover)
 	var paths = astar.get_destinations()
-	var destinations = {mover.tile: {from=null, can_stop_here=true, cost_to_reach=0}}
+	var destinations = {mover.tile: {path=paths[mover.tile], can_stop_here=true, cost_to_reach=0}}
 	for destination in paths:
-		if destination == Vector2i(6, 15):
-			pass
 		if destination in destinations:
 			continue
 		var allies_on_tile: Array[GamePiece] = []
@@ -47,21 +45,19 @@ func query_for_destination(mover: GamePiece, alive: Array[GamePiece]):
 			if current_player == unit.player and unit.tile == destination:
 				allies_on_tile.append(unit)
 		var path = paths[destination]
-		var cost = 0
-		for path_index in range(1, len(path)):
-			var pos = path[path_index]
-			if pos.distance_squared_to(floor(pos)) > 0:
-				# this is a border
-				var border_kind = MapData.map.borders.get(pos)
-				var destination_tile_kind = MapData.map.tiles[Vector2i(path[path_index + 1])]
-				cost += Rules.MovementCost[border_kind if border_kind != null else destination_tile_kind]
+		var cost = astar.cost_to(destination)
+		#for path_index in range(1, len(path), 2):
+		#	cost += astar.get_point_weight_scale(path_index)
+			#var border_kind = MapData.map.borders.get(path[path_index])
+			#var destination_tile_kind = MapData.map.tiles[Vector2i(path[path_index + 1])]
+			#cost += Rules.MovementCost.get(border_kind if border_kind != null else destination_tile_kind, +200)
 		if cost <= Rules.MovementPoints[mover.kind]:
 			destinations[destination] = {
-				from=Vector2i(path[-3]) if len(path) > 1 else destination,
-				can_stop_here=len(allies_on_tile) == 0  or (
+				path = path,
+				can_stop_here = len(allies_on_tile) == 0  or (
 				len(allies_on_tile) == 1 and (mover.kind == Enums.Unit.Duke) != (allies_on_tile[0].kind == Enums.Unit.Duke)
 				),
-				cost_to_reach=cost
+				cost_to_reach = cost
 			}
 	
 	movement_range.destinations = destinations

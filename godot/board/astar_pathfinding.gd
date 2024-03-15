@@ -1,8 +1,14 @@
-class_name BoardPathfinding
 extends AStar2D
+class_name BoardPathfinding
 
 var tile_ids := {}
-var border_ids := {}
+
+func _compute_cost(_from_id, _to_id):
+	return 1
+
+func _estimate_cost(_from_id, _to_id):
+	return 0
+
 var unit_tile: Vector2i
 
 
@@ -17,24 +23,25 @@ func get_destinations():
 	var destinations = {}
 	var unit_tile_id = tile_ids[unit_tile]
 	for destination in tile_ids:
-		if destination == unit_tile:
-			continue
 		var destination_id = tile_ids[destination]
 		var path = get_point_path(unit_tile_id, destination_id)
 		if len(path) > 0:
 			destinations[destination] = path
 	return destinations
 
+func cost_to(tile: Vector2i):
+	var destination_id = tile_ids[tile]
+	var path = get_id_path(tile_ids[unit_tile], destination_id)
+	var cost = 0
+	for id in path:
+		cost += get_point_weight_scale(id)
+	return cost
+
 static func init_for_unit(unit: GamePiece, others: Array[GamePiece], _tile_map: TileMap) -> BoardPathfinding:
-	var allies: Array[GamePiece] = []
 	var enemy_tiles: Array[Vector2i] = []
 	for other_unit in others:
-		match other_unit.faction:
-			unit.faction:
-				allies.append(other_unit)
-			_:
-				enemy_tiles.append(other_unit.tile)
-		
+		if other_unit.faction != unit.faction:
+			enemy_tiles.append(other_unit.tile)
 	var astar = BoardPathfinding.new()
 	astar.unit_tile = unit.tile
 	
@@ -55,9 +62,12 @@ static func init_for_unit(unit: GamePiece, others: Array[GamePiece], _tile_map: 
 		# c.f. https://www.redblobgames.com/grids/hexagons/#range for formula
 		for r in range(max(-max_range, -q-max_range), min(max_range, -q+max_range)):
 			var point := Vector2i(astar.unit_tile.x + q, astar.unit_tile.y + r)
+			var cell_data = _tile_map.get_cell_tile_data(0, point)
 			if MapData.map.tiles.get(point) == "Lake":
 				continue
-			var point_id = astar.get_closest_point(point)
+			var point_id = astar.tile_ids.get(point)
+			if point_id == null:
+				continue
 			for neighbour_tile in Util.neighbours_to_tile(point):
 				if neighbour_tile in enemy_tiles:
 					continue
@@ -78,29 +88,15 @@ static func init_for_unit(unit: GamePiece, others: Array[GamePiece], _tile_map: 
 					astar.add_point(border_id, border_coords, movement_cost)
 					astar.connect_points(point_id, border_id, false)
 					astar.connect_points(border_id, neighbour_id, false)
-					astar.border_ids[border_id] = [border_coords, false]
+					
 				else:
 					# border cost is bidirectional
 					var movement_cost = Rules.MovementCost[border]
-					# avoid duplicating bidi borders
-					var closest_id := astar.get_closest_point(border_coords)
-					var existing_border = astar.border_ids.get(closest_id)
-					if existing_border != null:
-						# => the closest astar point is already a border
-						if existing_border[0] == border_coords:
-							assert(astar.get_point_weight_scale(closest_id) == Rules.MovementCost[border])
-							assert(astar.are_points_connected(closest_id, point_id))
-							assert(astar.are_points_connected(closest_id, neighbour_id))
-							# check it is bi-directional
-							assert(existing_border[1])
-							# the bi-directional border has already been created
-							continue
-					# => the border needs to be created
 					var border_id = astar.get_available_point_id()
 					astar.add_point(border_id, border_coords, movement_cost)
 					astar.connect_points(point_id, border_id)
 					astar.connect_points(border_id, neighbour_id)
-	
+
 	return astar
 
 

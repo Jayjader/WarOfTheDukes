@@ -20,7 +20,7 @@ func _is_city_or_fort(tile):
 	return CITY_OR_FORTRESS.has(MapData.map.tiles[tile])
 
 func _ready():
-	setup = $SetupRoot
+	setup = _Setup.instantiate()
 	setup.empty_cities_and_forts[Enums.Faction.Orfburg] = MapData.map.zones.OrfburgTerritory.reduce(func(accu, next):
 		if _is_city_or_fort(next) and next not in accu:
 			accu.append(next)
@@ -32,6 +32,8 @@ func _ready():
 	setup.players.clear()
 	setup.players.append(player_1)
 	setup.players.append(player_2)
+	setup.setup_finished.connect(finish_setup)
+	add_child(setup)
 	#setup.start()
 
 

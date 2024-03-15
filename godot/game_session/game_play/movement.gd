@@ -81,7 +81,7 @@ func __on_choose_destination_state_entered():
 	var player_controller = $ComputerController if current_player.is_computer else $PlayerController
 	if not current_player.is_computer and not player_controller.movement_cancelled.is_connected(__on_mover_choice_cancelled):
 		player_controller.movement_cancelled.connect(__on_mover_choice_cancelled)
-	if not player_controller.destination_chosen.is_connected(__on_mover_choice_cancelled):
+	if not player_controller.destination_chosen.is_connected(__on_tile_chosen_as_destination):
 		player_controller.destination_chosen.connect(__on_tile_chosen_as_destination)
 	player_controller.query_for_destination(mover, alive)
 		
@@ -98,8 +98,8 @@ func __on_choose_destination_state_exited():
 	var player_controller = $ComputerController if current_player.is_computer else $PlayerController
 	if not current_player.is_computer and player_controller.movement_cancelled.is_connected(__on_mover_choice_cancelled):
 		player_controller.movement_cancelled.disconnect(__on_mover_choice_cancelled)
-	if player_controller.destination_chosen.is_connected(__on_mover_choice_cancelled):
-		player_controller.destination_chosen.disconnect(__on_mover_choice_cancelled)
+	if player_controller.destination_chosen.is_connected(__on_tile_chosen_as_destination):
+		player_controller.destination_chosen.disconnect(__on_tile_chosen_as_destination)
 	
 
 func __on_mover_choice_cancelled(_unit=null):

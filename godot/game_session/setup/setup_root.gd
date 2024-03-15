@@ -116,7 +116,7 @@ func _on_auto_setup_pressed():
 	auto_setup.disabled = true
 func query_current_player_for_deployment_tile():
 	var pieces_placed = _pieces_placed_summary()
-	print_debug("querying %s..." % Enums.Faction.find_key(current_player.faction))
+	#print_debug("querying %s..." % Enums.Faction.find_key(current_player.faction))
 	var choice
 	if current_player.is_computer or auto_place:
 		var strategy = SetupStrategy.new()
@@ -139,7 +139,7 @@ func query_current_player_for_deployment_tile():
 		var choices = strategy.choose_piece_to_place(pieces_placed, tiles)
 		placing = get_first_with_remaining(current_player.faction) # choices[0]
 		choice = choices[1]
-		print_debug("%s chosen." % Enums.Unit.find_key(placing))
+		#print_debug("%s chosen." % Enums.Unit.find_key(placing))
 		scene_tree_process_frame.connect(choose_tile.bind(current_player, placing, choice), CONNECT_ONE_SHOT)
 	else:
 		_sync_buttons(current_player)
@@ -157,7 +157,7 @@ func __on_player_tile_click_for_deployment(tile: Vector2i):
 		cursor.stop_choosing_tile()
 		deployment_ui.tiles.clear()
 		deployment_ui.queue_redraw()
-		print_debug("%s chosen." % Enums.Unit.find_key(placing))
+		#print_debug("%s chosen." % Enums.Unit.find_key(placing))
 		scene_tree_process_frame.connect(choose_tile.bind(current_player, placing, tile), CONNECT_ONE_SHOT)
 
 var placed: Dictionary

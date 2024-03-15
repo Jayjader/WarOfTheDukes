@@ -40,13 +40,24 @@ func _draw():
 		)
 
 	if hovered_tile in destinations:
-		var current_tile = Vector2i(hovered_tile)
-		while true:
-			var from_ = destinations.get(current_tile)
-			if from_ == null or from_.from == null:
-				break
-			self.draw_line(
-				tile_map.map_to_local(current_tile),
-				tile_map.map_to_local(from_.from),
-				Color.RED, 8, true)
-			current_tile = from_.from
+		var path = destinations[hovered_tile].path
+		if len(path) > 1:
+			var color_blend = 1.0
+			var local_path: PackedVector2Array = []
+			var colors: PackedColorArray = []
+			
+			# step over path 2-by-2, i.e. from tile to tile so that we can rederive
+			# border coords because map_to_local always returns a tile center 
+			for index in range(0, len(path) - 2, 2):
+				var start = tile_map.map_to_local(path[index])
+				var end = tile_map.map_to_local(path[index+2])
+				var middle = 0.5 * (start + end)
+				local_path.append(start)
+				local_path.append(middle)
+				colors.append(Color.RED * color_blend)
+				color_blend *= 0.9
+				local_path.append(middle)
+				local_path.append(end)
+				colors.append(Color.RED * color_blend)
+				color_blend *= 0.9
+			draw_multiline_colors(local_path, colors, 12)
