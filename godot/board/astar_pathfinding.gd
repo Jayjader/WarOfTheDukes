@@ -22,6 +22,22 @@ func get_destinations():
 			destinations[destination] = path
 	return destinations
 
+func get_path_to(tile: Vector2i) -> Array[PathNode]:
+	var destination_id = tile_ids[tile]
+	var unit_tile_id = tile_ids[unit_tile]
+	var id_path = get_id_path(unit_tile_id, destination_id)
+	var point_path = get_point_path(unit_tile_id, destination_id)
+	var node_path: Array[PathNode] = []
+	for i in range(len(id_path)):
+		var node = PathNode.new()
+		node.tile = point_path[i]
+		node.cost_to_enter = get_point_weight_scale(id_path[i])
+		node_path.append(node)
+	return node_path
+class PathNode:
+	var tile: Vector2
+	var cost_to_enter: int
+
 func cost_to(tile: Vector2i):
 	var destination_id = tile_ids[tile]
 	var path = get_id_path(tile_ids[unit_tile], destination_id)
@@ -48,7 +64,7 @@ static func init_for_unit(unit: GamePiece, others: Array[GamePiece], _tile_map: 
 		# c.f. https://www.redblobgames.com/grids/hexagons/#range for formula
 		for r in range(max(-max_range, -q-max_range), min(max_range, -q+max_range)):
 			var point = Vector2i(astar.unit_tile.x + q, astar.unit_tile.y + r + 1)
-			if MapData.map.tiles.get(point) != null:
+			if _tile_map.get_cell_tile_data(0, point) != null:
 				var point_id := astar.get_available_point_id()
 				astar.add_point(point_id, point, 0)
 				astar.tile_ids[point] = point_id
@@ -58,12 +74,9 @@ static func init_for_unit(unit: GamePiece, others: Array[GamePiece], _tile_map: 
 		for r in range(max(-max_range, -q-max_range), min(max_range, -q+max_range)):
 			var point := Vector2i(astar.unit_tile.x + q, astar.unit_tile.y + r + 1)
 			var cell_data = _tile_map.get_cell_tile_data(0, point)
-			#if MapData.map.tiles.get(point) == "Lake":
 			if cell_data == null:
-				#print_debug("skipping %s because its not a tile" % point)
 				continue
 			if  _tile_map.tile_set.get_terrain_name(cell_data.terrain_set, cell_data.terrain) == "Lake":
-				#print_debug("skipping %s because its a lake" % point)
 				continue
 			var point_id = astar.tile_ids.get(point)
 			if point_id == null:
@@ -72,7 +85,6 @@ static func init_for_unit(unit: GamePiece, others: Array[GamePiece], _tile_map: 
 				if neighbour_tile in enemy_tiles:
 					continue
 				var neighbour_data = _tile_map.get_cell_tile_data(0, neighbour_tile)
-				#var neighbour = MapData.map.tiles.get(neighbour_tile)
 				if neighbour_data == null:
 					continue
 				var neighbour = _tile_map.tile_set.get_terrain_name(neighbour_data.terrain_set, neighbour_data.terrain)
@@ -86,14 +98,10 @@ static func init_for_unit(unit: GamePiece, others: Array[GamePiece], _tile_map: 
 				var border_id = astar.get_available_point_id()
 				var movement_cost = Rules.MovementCost[neighbour if border == null else border]
 				astar.add_point(border_id, border_coords, movement_cost)
-				if border == null:
-					# border cost depends on tile being entered => mono-direction
-					astar.connect_points(point_id, border_id, false)
-					astar.connect_points(border_id, neighbour_id, false)
-				else:
-					# border cost is bidirectional
-					astar.connect_points(point_id, border_id)
-					astar.connect_points(border_id, neighbour_id)
+				# border cost depends on tile being entered => mono-direction
+				# else => border cost is bidirectional
+				astar.connect_points(point_id, border_id, border != null)
+				astar.connect_points(border_id, neighbour_id, border != null)
 
 	return astar
 
