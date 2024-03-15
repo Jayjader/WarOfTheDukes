@@ -12,5 +12,5 @@ func _draw():
 			MapData.map.borders[border_center],
 			border_center,
 			hex_size,
-			position + Vector2(hex_size, hex_size - 0.5 * hex_diff - 4)
+			position + Vector2(hex_size, hex_size - 0.5 * hex_diff - 6)
 			)
