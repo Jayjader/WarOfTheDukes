@@ -1,9 +1,10 @@
-[gd_scene load_steps=16 format=3 uid="uid://dn24y8eq6bsf"]
+[gd_scene load_steps=17 format=3 uid="uid://dn24y8eq6bsf"]
 
 [ext_resource type="Script" path="res://game_session/game_play/game_play_root.gd" id="1_kicvc"]
 [ext_resource type="Script" path="res://game_session/game_play/combat.gd" id="3_3xcs7"]
-[ext_resource type="Script" path="res://game_session/game_play/player_controller.gd" id="3_qfohn"]
-[ext_resource type="Script" path="res://game_session/game_play/computer_controller.gd" id="4_8k7ub"]
+[ext_resource type="Script" path="res://game_session/game_play/player_movement_controller.gd" id="3_h4pb7"]
+[ext_resource type="Script" path="res://game_session/game_play/computer_movement_controller.gd" id="4_17v3f"]
+[ext_resource type="Script" path="res://game_session/game_play/player_combat_controller.gd" id="6_fdoq6"]
 [ext_resource type="Script" path="res://game_session/game_play/movement.gd" id="8_w53gd"]
 [ext_resource type="StyleBox" uid="uid://bfoveihuvrux5" path="res://kenney_ui_rpg/stone_panel_stylebox.tres" id="10_y5nfl"]
 [ext_resource type="Texture2D" uid="uid://cssg6vlttu5fj" path="res://kenney_ui_rpg/uipack_rpg_vector.svg" id="11_kee8j"]
@@ -49,13 +50,16 @@ state_chart = NodePath("StateChart")
 script = ExtResource("8_w53gd")
 
 [node name="PlayerController" type="Node" parent="Movement"]
-script = ExtResource("3_qfohn")
+script = ExtResource("3_h4pb7")
 
 [node name="ComputerController" type="Node" parent="Movement"]
-script = ExtResource("4_8k7ub")
+script = ExtResource("4_17v3f")
 
 [node name="Combat" type="Node" parent="."]
 script = ExtResource("3_3xcs7")
+
+[node name="PlayerController" type="Node" parent="Combat"]
+script = ExtResource("6_fdoq6")
 
 [node name="StateChart" type="Node" parent="."]
 script = ExtResource("20_qywoi")

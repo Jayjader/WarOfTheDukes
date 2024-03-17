@@ -34,7 +34,6 @@ func _ready():
 	setup.players.append(player_2)
 	setup.setup_finished.connect(finish_setup)
 	add_child(setup)
-	#setup.start()
 
 
 func finish_setup():
@@ -50,7 +49,7 @@ signal new_lobby_started
 signal session_closed
 func end_game(result: Enums.GameResult, winner=null):
 	mode = Enums.SessionMode.GAME_OVER
-	$GamePlayRoot.queue_free()
+	game_play.queue_free()
 	game_over = _GameOver.instantiate()
 	game_over.result = result
 	game_over.winner = winner

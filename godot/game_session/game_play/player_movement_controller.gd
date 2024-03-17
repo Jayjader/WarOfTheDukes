@@ -6,14 +6,15 @@ signal movement_ended
 signal mover_chosen(unit: GamePiece)
 
 func query_for_mover(moved: Array[GamePiece], alive: Array[GamePiece]):
-		%EndMovementPhase.show()
-		var can_choose : Array[GamePiece] = []
-		for unit in alive:
-			if unit.faction == current_player.faction and unit not in moved:
-				can_choose.append(unit)
-		if not Board.cursor.unit_clicked.is_connected(__on_unit_selected_for_move):
-			Board.cursor.unit_clicked.connect(__on_unit_selected_for_move, CONNECT_ONE_SHOT)
-		Board.cursor.choose_unit(can_choose, "Can move")
+	%SubPhaseInstruction.text = "Choose a unit to move"
+	%EndMovementPhase.show()
+	var can_choose : Array[GamePiece] = []
+	for unit in alive:
+		if unit.faction == current_player.faction and unit not in moved:
+			can_choose.append(unit)
+	if not Board.cursor.unit_clicked.is_connected(__on_unit_selected_for_move):
+		Board.cursor.unit_clicked.connect(__on_unit_selected_for_move, CONNECT_ONE_SHOT)
+	Board.cursor.choose_unit(can_choose, "Can move")
 
 func __on_end_movement_pressed():
 	_cleanup_mover_choice()
@@ -32,6 +33,7 @@ signal movement_cancelled
 signal destination_chosen(tile: Vector2i)
 
 func query_for_destination(mover: GamePiece, alive: Array[GamePiece]):
+	%SubPhaseInstruction.text = "Choose the destination for the selected unit"
 	%CancelMoverChoice.show()
 	var astar := Board.pathfinding_for(mover)
 	var paths = astar.get_destinations()
@@ -64,11 +66,13 @@ func query_for_destination(mover: GamePiece, alive: Array[GamePiece]):
 		can_cross.append(tile)
 		if destinations[tile].can_stop_here:
 			can_stop.append(tile)
-	Board.cursor.tile_clicked.connect(__on_tile_chosen_as_destination.bind(mover, destinations), CONNECT_ONE_SHOT)
+	Board.cursor.tile_clicked.connect(__on_tile_chosen_as_destination.bind(mover, destinations, astar), CONNECT_ONE_SHOT)
 	Board.cursor.choose_tile_for_unit(can_stop)
 
 
-func __on_tile_chosen_as_destination(tile: Vector2i, mover: GamePiece, destinations: Dictionary):
+func __on_tile_chosen_as_destination(tile: Vector2i, mover: GamePiece, destinations: Dictionary, astar):
+	for node in astar.get_path_to(tile):
+		print_debug(node.tile, node.cost_to_enter, " ", astar.cost_to(node.tile))
 	_cleanup_destination_choice()
 	if tile == mover.tile or destinations[tile].cost_to_reach > Rules.MovementPoints[mover.kind]:
 		movement_cancelled.emit()
