@@ -1,6 +1,13 @@
 extends Object
 class_name Rules
 
+const MaxUnitCount = {
+	Enums.Unit.Duke: 1,
+	Enums.Unit.Infantry: 10,
+	Enums.Unit.Cavalry: 10,
+	Enums.Unit.Artillery: 10,
+}
+
 const MovementPoints = {
 	Enums.Unit.Duke: 6,
 	Enums.Unit.Infantry: 3,

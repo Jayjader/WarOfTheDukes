@@ -25,12 +25,6 @@ enum CombatSubPhase {
 }
 
 enum Unit { Duke, Infantry, Cavalry, Artillery }
-const MaxUnitCount = {
-	Unit.Duke: 1,
-	Unit.Infantry: 10,
-	Unit.Cavalry: 10,
-	Unit.Artillery: 10,
-}
 
 enum CombatResult {
 	AttackerEliminated,

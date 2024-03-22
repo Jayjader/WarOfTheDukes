@@ -34,9 +34,10 @@ func choose_destination(mover: GamePiece, map: HexMapData):
 	var astar := Board.pathfinding_for(mover)
 	for tile in astar.tile_ids:
 		var path_to = astar.get_path_to(tile)
-		var cost = 0
-		for node in path_to:
-			cost += node.cost_to_enter
+		var cost = astar.cost_to(tile)
+		#var cost = 0
+		#for node in path_to:
+		#	cost += node.cost_to_enter
 		if cost > Rules.MovementPoints[mover.kind]:
 			continue
 		var allies_on_tile = Board.get_units_on(tile).filter(func(unit): return unit.faction == mover.faction)

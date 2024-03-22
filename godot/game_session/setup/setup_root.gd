@@ -28,7 +28,6 @@ func set_phase(value):
 @onready var state_chart: StateChart = $StateChart
 
 @onready var unit_layer = Board.get_node("%UnitLayer")
-@onready var deployment_ui = Board.get_node("%DeploymentZone")
 @onready var cursor = Board.get_node("%PlayerCursor")
 
 var phase
@@ -87,28 +86,6 @@ func _pieces_placed_summary():
 		))
 	return pieces_placed
 
-func _sync_buttons(player: PlayerRs):
-		%Selection/Buttons/Infantry.disabled = pieces_remaining(player.faction, Enums.Unit.Infantry) == 0
-		%Selection/Buttons/Cavalry.disabled = pieces_remaining(player.faction, Enums.Unit.Cavalry) == 0
-		%Selection/Buttons/Artillery.disabled = pieces_remaining(player.faction, Enums.Unit.Artillery) == 0
-		%Selection/Buttons/Duke.disabled = pieces_remaining(player.faction, Enums.Unit.Duke) == 0
-		if pieces_remaining(player.faction, placing) == 0:
-			placing = get_first_with_remaining(player.faction)
-		
-		var selection_button
-		match placing:
-			Enums.Unit.Duke:
-				selection_button = %Selection/Buttons/Duke
-			Enums.Unit.Infantry:
-				selection_button = %Selection/Buttons/Infantry
-			Enums.Unit.Cavalry:
-				selection_button = %Selection/Buttons/Cavalry
-			Enums.Unit.Artillery:
-				selection_button = %Selection/Buttons/Artillery
-		if selection_button != null:
-			selection_button.grab_focus()
-			selection_button.set_pressed(true)
-
 @onready var auto_setup = %AutoSetup
 var auto_place = false
 func _on_auto_setup_pressed():
@@ -116,8 +93,6 @@ func _on_auto_setup_pressed():
 	auto_setup.disabled = true
 func query_current_player_for_deployment_tile():
 	var pieces_placed = _pieces_placed_summary()
-	#print_debug("querying %s..." % Enums.Faction.find_key(current_player.faction))
-	var choice
 	if current_player.is_computer or auto_place:
 		var strategy = SetupStrategy.new()
 		var tiles = {}
@@ -138,20 +113,10 @@ func query_current_player_for_deployment_tile():
 		
 		var choices = strategy.choose_piece_to_place(pieces_placed, tiles)
 		placing = get_first_with_remaining(current_player.faction) # choices[0]
-		choice = choices[1]
-		#print_debug("%s chosen." % Enums.Unit.find_key(placing))
+		var choice = choices[1]
 		scene_tree_process_frame.connect(choose_tile.bind(current_player, placing, choice), CONNECT_ONE_SHOT)
 	else:
-		_sync_buttons(current_player)
-		var occupied_tiles = pieces_placed.map(func(p): return p.tile)
-		var current_tiles: Array[Vector2i] = []
-		for tile in deployment_tiles_for_player(current_player, phase):
-			if tile not in occupied_tiles:
-				current_tiles.append(tile)
-		cursor.tile_clicked.connect(__on_player_tile_click_for_deployment, CONNECT_ONE_SHOT)
-		cursor.choose_tile(current_tiles)
-		deployment_ui.tiles = current_tiles
-		deployment_ui.queue_redraw()
+		pass
 
 func __on_player_tile_click_for_deployment(tile: Vector2i):
 		cursor.stop_choosing_tile()
@@ -295,7 +260,31 @@ func _ready():
 func _on_fill_cities_and_forts_state_entered():
 	cursor.grab_focus()
 	set_phase(Enums.SetupPhase.FILL_CITIES_FORTS)
+	var player_controller = $PlayerController
+	player_controller.unit_placed.connect(__on_unit_deployed, CONNECT_DEFERRED)
+	player_controller.query_for_deployment(placed, deployment_tiles_for_player(current_player, Enums.SetupPhase.FILL_CITIES_FORTS))
 
+func __on_unit_deployed(kind: Enums.Unit, tile: Vector2i):
+	if kind == Enums.Unit.Duke:
+		placed[current_player.faction][kind] = tile
+	else:
+		placed[current_player.faction][kind].append(tile)
+	
+	if players.all(func(p): return get_first_with_remaining(p.faction) == null):
+		setup_finished.emit()
+	elif phase == Enums.SetupPhase.DEPLOY_REMAINING:
+		state_chart.send_event("next player")
+	else:
+		var pieces_placed_by_player = 0
+		for unit_kind in Enums.Unit.values():
+			pieces_placed_by_player += piece_count(placed[current_player.faction], unit_kind)
+		if pieces_placed_by_player <= len(empty_cities_and_forts[current_player]):
+			var player_controller = $PlayerController
+			player_controller.query_for_deployment(placed, deployment_tiles_for_player(current_player, Enums.SetupPhase.FILL_CITIES_FORTS))
+		elif current_player == players.back():
+			state_chart.send_event("next phase")
+		else:
+			state_chart.send_event("next player")
 
 func _on_player_1_state_entered():
 	current_player = players[0]
